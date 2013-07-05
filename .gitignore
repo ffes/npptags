@@ -1,0 +1,12 @@
+__*
+*.LNK
+*.lnk
+*.suo
+*.ncb
+*.user
+*.opensdf
+*.sdf
+[Rr]elease/
+[Dd]ebug/
+ipch/
+*.deps

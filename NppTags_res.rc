@@ -1,0 +1,134 @@
+/////////////////////////////////////////////////////////////////////////////
+//                                                                         //
+//  NppTags - CTags plugin for Notepad++                                   //
+//  Copyright (C) 2013 Frank Fesevur                                       //
+//                                                                         //
+//  This program is free software; you can redistribute it and/or modify   //
+//  it under the terms of the GNU General Public License as published by   //
+//  the Free Software Foundation; either version 2 of the License, or      //
+//  (at your option) any later version.                                    //
+//                                                                         //
+//  This program is distributed in the hope that it will be useful,        //
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of         //
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           //
+//  GNU General Public License for more details.                           //
+//                                                                         //
+//  You should have received a copy of the GNU General Public License      //
+//  along with this program; if not, write to the Free Software            //
+//  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              //
+//                                                                         //
+/////////////////////////////////////////////////////////////////////////////
+
+#include <windows.h>
+#include <commctrl.h>
+#include "Resource.h"
+#include "Version.h"
+
+/////////////////////////////////////////////////////////////////////////////
+// Version Information
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION	VERSION_NUMBER
+PRODUCTVERSION	VERSION_NUMBER
+FILEFLAGSMASK	0x3fL
+FILEFLAGS 0
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+	BLOCK	"VarFileInfo"
+	BEGIN
+		VALUE	"Translation",	0x409,	1200
+	END
+	BLOCK	"StringFileInfo"
+	BEGIN
+		BLOCK "040904b0"
+		BEGIN
+			VALUE	"CompanyName",			"Frank Fesevur"
+			VALUE	"FileDescription",		"CTags plug-in for Notepad++"
+			VALUE	"FileVersion",			VERSION_NUMBER_STR
+			VALUE	"InternalName",			"NppTags.dll"
+			VALUE	"LegalCopyright",		COPYRIGHT_STR
+			VALUE	"OriginalFilename",		"NppTags.dll"
+			VALUE	"ProductName",			"NppTags"
+			VALUE	"ProductVersion",		VERSION_NUMBER_STR
+		END
+	END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+// Dialogs
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 224, 187
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_BORDER | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+	GROUPBOX		"CTags plug-in",IDC_STATIC,10,9,201,154,BS_CENTER
+	LTEXT			"Author:",IDC_STATIC,30,23,35,8
+	LTEXT			"Frank Fesevur",IDC_STATIC,75,23,74,8
+	LTEXT			"Version:",IDC_STATIC,30,38,31,8
+	LTEXT			VERSION_NUMBER_STR,IDC_STATIC,75,38,19,8
+	//LTEXT			"Using SQLite:",IDC_STATIC,30,52,43,8
+	//LTEXT			SQLITE_VERSION,IDC_STATIC,75,52,43,8
+	LTEXT			"Licence:",IDC_STATIC,30,67,43,8
+	LTEXT			"GPL-2",IDC_STATIC,75,67,43,8
+	LTEXT			"Site:",IDC_STATIC,30,84,27,8
+	CONTROL			"<a href=""http://www.fesevur.com/nppsnippets"">http://www.fesevur.com/nppsnippets</a>",IDC_SYSLINK,"SysLink",NOT WS_TABSTOP,75,84,130,8
+	EDITTEXT		IDC_CHANGELOG,29,97,175,61,ES_MULTILINE | ES_AUTOVSCROLL | NOT ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN | WS_VSCROLL | NOT WS_TABSTOP
+	PUSHBUTTON		"Close",IDCANCEL,86,167,50,14
+END
+
+IDD_TAGS_TREE DIALOGEX 0, 0, 190, 90
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Tags"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+	CONTROL			"Tree1",IDC_TREE,"SysTreeView32", TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_INFOTIP | WS_BORDER | WS_TABSTOP, 0, 7, 186, 90
+END
+
+IDD_SELECT_TAG DIALOGEX 0, 0, 365, 143
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Select Tag"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+	CONTROL			"List1", IDC_TAG_LIST, "SysListView32", LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOLABELWRAP | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP, 7, 7, 351, 109
+	DEFPUSHBUTTON	"&Goto",IDOK,93,122,50,14
+	PUSHBUTTON		"&Cancel",IDCANCEL,153,122,50,14
+END
+
+/////////////////////////////////////////////////////////////////////////////
+// Context Menus
+
+IDCM_SNIPPET MENU PRELOAD DISCARDABLE
+BEGIN
+	POPUP "_POPUP_"
+	BEGIN
+		MENUITEM "&Insert",						IDC_SNIPPET_INSERT
+		MENUITEM SEPARATOR
+		MENUITEM "&Add...",						IDC_SNIPPET_ADD
+		MENUITEM "&Edit...",					IDC_SNIPPET_EDIT
+		MENUITEM "&Delete...",					IDC_SNIPPET_DELETE
+		MENUITEM "Dup&licate...",				IDC_SNIPPET_DUPLICATE
+		MENUITEM SEPARATOR
+		MENUITEM "Add from &selection...",		IDC_SNIPPET_ADD_SELECTION
+		MENUITEM "Add from &clipboard...",		IDC_SNIPPET_ADD_CLIPBOARD
+		//MENUITEM SEPARATOR
+		//MENUITEM "Copy to another library...",	IDC_SNIPPET_COPY_TO_LIB
+		//MENUITEM "Paste from another library...",	IDC_SNIPPET_PASTE_FROM_LIB
+		MENUITEM SEPARATOR
+		MENUITEM "Move &up...",					IDC_SNIPPET_MOVE_UP
+		MENUITEM "Move d&own...",				IDC_SNIPPET_MOVE_DOWN
+	END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+// Bitmaps
+
+IDB_SHOW_TAGS	  	BITMAP	DISCARDABLE		"Res/MainToolbar_ShowTags.bmp"
+IDB_REFRESH_TAGS  	BITMAP	DISCARDABLE		"Res/MainToolbar_RefreshTags.bmp"
+IDB_JUMP_TO_TAG  	BITMAP	DISCARDABLE		"Res/MainToolbar_JumpToTag.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+// Icons
+
+IDI_TAGS			ICON	DISCARDABLE		"Res/NppTags.ico"
