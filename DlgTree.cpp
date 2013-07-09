@@ -74,14 +74,14 @@ void UpdateTagsTree()
 	// Is there a tags file set?
 	if (strlen(g_szCurTagsFile) == 0)
 	{
-		item.hInsertAfter = TVI_ROOT;                             
+		item.hInsertAfter = TVI_ROOT;
 		item.item.mask = TVIF_TEXT;
 		item.item.pszText = L"No tags file found";
 		TreeView_InsertItem(s_hTree, &item);
 		return;
 	}
 
-	item.hInsertAfter = TVI_ROOT;                             
+	item.hInsertAfter = TVI_ROOT;
 	item.item.mask = TVIF_TEXT;
 	item.item.pszText = L"Functions";
 	HTREEITEM hParent = TreeView_InsertItem(s_hTree, &item);
@@ -115,7 +115,7 @@ void UpdateTagsTree()
 		}
 	}
 	tagsClose(file);
-	
+
 	// Expand this item
 	TreeView_Expand(s_hTree, hParent, TVE_EXPAND);
 }
@@ -130,7 +130,7 @@ static void ShowContextMenu(HWND hwnd, UINT uResID, int xPos, int yPos)
 	if (hMenu == NULL)
 		return;
 
-	// TrackPopupMenu cannot display the menu bar so get a handle to the first shortcut menu. 
+	// TrackPopupMenu cannot display the menu bar so get a handle to the first shortcut menu.
 	HMENU hPopup = GetSubMenu(hMenu, 0);
 
 	// Disable various items of the snippet menu
@@ -179,7 +179,7 @@ static void SetFocusOnEditor()
 {
 	int currentEdit;
 	::SendMessage(g_nppData._nppHandle, NPPM_GETCURRENTSCINTILLA, 0, (LPARAM) &currentEdit);
-	SetFocus(getCurrentHScintilla(currentEdit));	
+	SetFocus(getCurrentHScintilla(currentEdit));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -275,7 +275,7 @@ static void OnCommand(HWND hWnd, int ResID, int msg)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static BOOL CALLBACK DlgProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message)
 	{
@@ -310,15 +310,14 @@ static BOOL CALLBACK DlgProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 			{
 				case IDC_TREE:
 				{
-					if (((LPNMHDR)lParam)->code == NM_DBLCLK)
+					switch (((LPNMHDR)lParam)->code)
 					{
-						MsgBox("Double Click");
-						return TRUE;
-					}
-					else if (((LPNMHDR)lParam)->code == TVN_SELCHANGED)
-					{
-						//MsgBox("SelChanged");
-						return TRUE;
+						case NM_DBLCLK:
+							MsgBox("Double Click");
+							return TRUE;
+						case TVN_SELCHANGED:
+							//MsgBox("SelChanged");
+							return TRUE;
 					}
 				}
 			}
@@ -389,5 +388,5 @@ void TagsTree()
 void CreateTreeDlg()
 {
 	// Create the window
-	s_hDlg = CreateDialog(g_hInst, MAKEINTRESOURCE(IDD_TAGS_TREE), g_nppData._nppHandle, DlgProcedure);
+	s_hDlg = CreateDialog(g_hInst, MAKEINTRESOURCE(IDD_TAGS_TREE), g_nppData._nppHandle, DlgProc);
 }
