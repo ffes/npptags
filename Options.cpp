@@ -61,7 +61,23 @@ Options::~Options()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Read a boolean from the ini file
+
+bool Options::GetPrivateProfileBool(WCHAR* szAppName, WCHAR* szKeyName, bool def)
+{
+	return(GetPrivateProfileInt(szAppName, szKeyName, def ? 1 : 0, _szIniPath) > 0);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Write a boolean to the ini file
+
+void Options::WritePrivateProfileBool(WCHAR* szAppName, WCHAR* szKeyName, bool val)
+{
+	WritePrivateProfileString(s_szOptions, s_szShow, val ? L"1" : L"0", _szIniPath);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Write an integer to the ini file
 
 void Options::WritePrivateProfileInt(WCHAR* szAppName, WCHAR* szKeyName, int val)
 {
@@ -70,13 +86,12 @@ void Options::WritePrivateProfileInt(WCHAR* szAppName, WCHAR* szKeyName, int val
 	WritePrivateProfileString(szAppName, szKeyName, temp, _szIniPath);
 }
 
-
 /////////////////////////////////////////////////////////////////////////////
 // Write the options to the ini-file
 
 void Options::Write()
 {
-	WritePrivateProfileInt(s_szOptions, s_szShow, (showTreeDlg ? 1 : 0));
+	WritePrivateProfileBool(s_szOptions, s_szShow, showTreeDlg);
 	WritePrivateProfileInt(s_szOptions, s_szDepth, maxDepth);
 	WritePrivateProfileString(s_szOptions, s_szVersion, VERSION_NUMBER_WSTR, _szIniPath);
 	WritePrivateProfileString(s_szOptions, s_szOptions, _szExtraOptions, _szIniPath);
@@ -87,7 +102,7 @@ void Options::Write()
 
 void Options::Read()
 {
-	showTreeDlg = (GetPrivateProfileInt(s_szOptions, s_szShow, 1, _szIniPath) > 0);
+	showTreeDlg = GetPrivateProfileBool(s_szOptions, s_szShow, true);
 	maxDepth = GetPrivateProfileInt(s_szOptions, s_szDepth, 3, _szIniPath);
 	GetPrivateProfileString(s_szOptions, s_szVersion, L"", _szPrevVersion, MAX_PATH,  _szIniPath);
 	GetPrivateProfileString(s_szOptions, s_szOptions, L"", _szExtraOptions, MAX_PATH,  _szIniPath);

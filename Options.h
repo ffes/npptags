@@ -42,6 +42,8 @@ public:
 
 private:
 	void WritePrivateProfileInt(WCHAR* appname, WCHAR* keyname, int val);
+	void WritePrivateProfileBool(WCHAR* szAppName, WCHAR* szKeyName, bool val);
+	bool GetPrivateProfileBool(WCHAR* szAppName, WCHAR* szKeyName, bool def);
 
 	WCHAR _szIniPath[MAX_PATH];
 	WCHAR _szPrevVersion[MAX_PATH];
