@@ -297,12 +297,45 @@ static bool FindTagFromFile(LPCSTR szFile, LPCSTR szTag)
 /////////////////////////////////////////////////////////////////////////////
 //
 
+static bool FindTagInDB(LPCWSTR szTag)
+{
+	if (!g_DB->Open())
+		return false;
+
+	SqliteStatement stmt(g_DB);
+	if (!stmt.Prepare("SELECT * FROM Tags WHERE Tag = @tag"))
+	{
+		g_DB->Close();
+		return false;
+	}
+
+	if (!stmt.BindTextParameter("@tag", szTag))
+	{
+		g_DB->Close();
+		return false;
+	}
+
+	Tag tag;
+	while (stmt.GetNextRecord())
+	{
+		tag.SetFromDB(&stmt);
+		s_foundTags.push_back(tag);
+	}
+	stmt.Finalize();
+	g_DB->Close();
+
+	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
 void JumpToTag()
 {
 	// Does the file exist?
-	if (strlen(g_szCurTagsFile) == 0)
+	if (wcslen(g_DB->GetFilename()) == 0)
 	{
-		MsgBox("No 'tags' file found");
+		MsgBox("No database file set");
 		return;
 	}
 
@@ -317,13 +350,20 @@ void JumpToTag()
 		MsgBox("No current word selected!");
 		return;
 	}
-	CHAR curW[MAX_PATH];
-	Unicode2Ansi(curW, curWord, MAX_PATH);
 
 	// Find the tags for this word
-	if (!FindTagFromFile(g_szCurTagsFile, curW))
+	if (!FindTagInDB(curWord))
 	{
-		MsgBoxf("%s not found", curW);
+		MsgBoxf("Error searching tag in database\n%s", g_DB->GetErrorMsg());
+		return;
+	}
+
+	// Find the tags for this word
+	if (s_foundTags.size() == 0)
+	{
+		wstring str = curWord;
+		str += L" not found";
+		MsgBox(str.c_str());
 		return;
 	}
 
@@ -332,9 +372,9 @@ void JumpToTag()
 	{
 		JumpToTag(&(s_foundTags[0]));
 	}
+	// Let the user select the right tag
 	else
 	{
-		// Let the user select the right tag
 		ShowSelectTagDlg();
 	}
 

@@ -10,3 +10,4 @@ __*
 [Dd]ebug/
 ipch/
 *.deps
+tags.sqlite

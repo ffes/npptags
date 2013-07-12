@@ -24,6 +24,7 @@
 
 extern HWND getCurrentHScintilla(int which);
 extern LRESULT SendMsg(UINT Msg, WPARAM wParam = 0, LPARAM lParam = 0, int count = 1);
+
 extern void Ansi2Unicode(LPWSTR wszStr, LPCSTR szStr, int iSize);
 extern void Unicode2Ansi(LPSTR szStr, LPCWSTR wszStr, int iSize);
 extern void MsgBox(const WCHAR* msg);
@@ -36,13 +37,15 @@ extern WCHAR* GetDlgText(HWND hDlg, UINT uID);
 extern HINSTANCE g_hInst;
 extern NppData g_nppData;
 extern FuncItem g_funcItem[];
-extern CHAR g_szCurTagsFile[MAX_PATH];
 
 class Tag;
 extern void JumpToTag(Tag* pTag);
 
 class Options;
 extern Options *g_Options;
+
+class TagsDatabase;
+extern TagsDatabase* g_DB;
 
 #ifdef _MSC_VER
 #define snprintf _snprintf

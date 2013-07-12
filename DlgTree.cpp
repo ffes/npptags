@@ -58,6 +58,86 @@ static void ClearTree()
 /////////////////////////////////////////////////////////////////////////////
 //
 
+static void AddMembers(HTREEITEM hParent, Tag* pTag)
+{
+/*
+	TVINSERTSTRUCT item;
+	ZeroMemory(&item, sizeof(item));
+	item.hParent = hParent;
+	//item.hInsertAfter = TVI_ROOT;
+	item.item.mask = TVIF_TEXT;
+
+	SqliteStatement stmt(g_DB);
+	if (!stmt.Prepare("SELECT * FROM Tags WHERE MemberOf = @memberof ORDER BY Tag, Signature"))
+		return;
+
+	stmt.BindTextParameter("@memberof", pTag->getTag().c_str());
+
+	Tag tag;
+	while (stmt.GetNextRecord())
+	{
+		tag.SetFromDB(&stmt);
+
+		// Now we can add the tag
+		string str = tag.getFullTag();
+		wstring wstr(str.begin(), str.end());
+		item.item.pszText = (LPWSTR) wstr.c_str();
+		TreeView_InsertItem(s_hTree, &item);
+	}
+	stmt.Finalize();
+*/
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+static void InsertItems(LPCWSTR group, LPCSTR where, bool members)
+{
+	TVINSERTSTRUCT item;
+	ZeroMemory(&item, sizeof(item));
+
+	SqliteStatement stmt(g_DB);
+	string sql = "SELECT * FROM Tags WHERE ";
+	sql += where;
+	if (!members)
+		sql += " AND MemberOf IS NULL";
+	sql += " ORDER BY Tag, Signature";
+	if (!stmt.Prepare(sql.c_str()))
+		return;
+
+	Tag tag;
+	HTREEITEM hParent = NULL, hItem = NULL;
+	while (stmt.GetNextRecord())
+	{
+		// Get the information from the database
+		tag.SetFromDB(&stmt);
+
+		// Do we need to add the parent item
+		if (hParent == NULL)
+		{
+			item.hInsertAfter = TVI_ROOT;
+			item.item.mask = TVIF_TEXT;
+			item.item.pszText = (LPWSTR) group;
+			hParent = TreeView_InsertItem(s_hTree, &item);
+			item.hParent = hParent;
+		}
+
+		// Now we can add the tag
+		string str = tag.getFullTag();
+		wstring wstr(str.begin(), str.end());
+		item.item.pszText = (LPWSTR) wstr.c_str();
+		hItem = TreeView_InsertItem(s_hTree, &item);
+
+		// Try to add members of this tag
+		if (members && hItem != NULL)
+			AddMembers(hItem, &tag);
+	}
+	stmt.Finalize();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
 void UpdateTagsTree()
 {
 	if (!s_bTreeVisible)
@@ -68,56 +148,38 @@ void UpdateTagsTree()
 	// First make sure we start with a clean tree
 	ClearTree();
 
-	TVINSERTSTRUCT item;
-	ZeroMemory(&item, sizeof(item));
-
 	// Is there a tags file set?
-	if (strlen(g_szCurTagsFile) == 0)
+	if (wcslen(g_DB->GetFilename()) == 0)
 	{
+		TVINSERTSTRUCT item;
+		ZeroMemory(&item, sizeof(item));
+
 		item.hInsertAfter = TVI_ROOT;
 		item.item.mask = TVIF_TEXT;
-		item.item.pszText = L"No tags file found";
+		item.item.pszText = L"Tags database not found";
 		TreeView_InsertItem(s_hTree, &item);
 		return;
 	}
 
-	item.hInsertAfter = TVI_ROOT;
-	item.item.mask = TVIF_TEXT;
-	item.item.pszText = L"Functions";
-	HTREEITEM hParent = TreeView_InsertItem(s_hTree, &item);
-	item.hParent = hParent;
-
-	// Open the tags file
-	tagFileInfo info;
-	tagEntry entry;
-	tagFile *const file = tagsOpen(g_szCurTagsFile, &info);
-	if (file == NULL)
-	{
-		MsgBox("Unable to open 'tags' file");
-		return;
-	}
-
-	// Go through the tag entries
-    Tag tag;
-	while (tagsNext(file, &entry) == TagSuccess)
-	{
-		tag = entry;
-		if (tag.isType("function"))
-		{
-			if (tag.getMemberOf().empty())
-			{
-				// Now we can add the tag
-				string str = tag.getFullTag();
-				wstring wstr(str.begin(), str.end());
-				item.item.pszText = (LPWSTR) wstr.c_str();
-				TreeView_InsertItem(s_hTree, &item);
-			}
-		}
-	}
-	tagsClose(file);
-
-	// Expand this item
-	TreeView_Expand(s_hTree, hParent, TVE_EXPAND);
+	// Add the tags to the tree (as many as possible)
+	g_DB->Open();
+	InsertItems(L"Classes", "Type = 'class' OR Type = 'interface'", true);
+	InsertItems(L"Structures", "Type = 'struct'", true);
+	InsertItems(L"Unions", "Type = 'union'", true);
+	InsertItems(L"Enumerations", "Type = 'enum'", true);
+	InsertItems(L"Sub routines", "(Type = 'sub' OR Type = 'subroutine')", false);
+	InsertItems(L"Procedures", "Type = 'procedure'", false);
+	InsertItems(L"Procedures", "Type = 'procedure'", false);
+	InsertItems(L"Functions", "Type = 'function'", false);
+	InsertItems(L"Members", "Type = 'member'", false);
+	InsertItems(L"Method", "Type = 'method'", false);
+	InsertItems(L"Variables", "Type = 'variable'", false);
+	InsertItems(L"Macros", "Type = 'variable'", false);
+	InsertItems(L"Type definitions", "Type = 'typedef'", false);
+	InsertItems(L"Label", "Type = 'label'", false);
+	InsertItems(L"Define", "Type = 'define'", false);
+	InsertItems(L"Anchor", "Type = 'Anchor'", false);
+	g_DB->Close();
 }
 
 /////////////////////////////////////////////////////////////////////////////

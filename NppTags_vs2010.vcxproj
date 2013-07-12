@@ -102,10 +102,14 @@
     <ClCompile Include="DlgAbout.cpp" />
     <ClCompile Include="DlgSelectTag.cpp" />
     <ClCompile Include="DlgTree.cpp" />
+    <ClCompile Include="GenerateTagsDB.cpp" />
     <ClCompile Include="NppTags.cpp" />
     <ClCompile Include="Options.cpp" />
     <ClCompile Include="readtags.c" />
+    <ClCompile Include="sqlite3.c" />
+    <ClCompile Include="SqliteDatabase.cpp" />
     <ClCompile Include="Tag.cpp" />
+    <ClCompile Include="TagsDatabase.cpp" />
     <ClCompile Include="Version.cpp" />
     <ClCompile Include="WaitCursor.cpp" />
   </ItemGroup>
@@ -113,11 +117,15 @@
     <ClInclude Include="DlgAbout.h" />
     <ClInclude Include="DlgSelectTag.h" />
     <ClInclude Include="DlgTree.h" />
+    <ClInclude Include="GenerateTagsDB.h" />
     <ClInclude Include="NppTags.h" />
     <ClInclude Include="Options.h" />
     <ClInclude Include="readtags.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="sqlite3.h" />
+    <ClInclude Include="SqliteDatabase.h" />
     <ClInclude Include="Tag.h" />
+    <ClInclude Include="TagsDatabase.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="WaitCursor.h" />
   </ItemGroup>

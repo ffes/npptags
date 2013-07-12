@@ -25,6 +25,7 @@
 #include <string>
 
 #include "readtags.h"
+#include "TagsDatabase.h"
 
 class Tag
 {
@@ -32,6 +33,9 @@ public:
 	Tag();
 
 	Tag& operator=(const tagEntry);
+
+	void SetFromDB(SqliteStatement* stmt);
+	bool SaveToDB(SqliteStatement* stmt);
 
 	void empty();
 
@@ -65,6 +69,8 @@ protected:
 	std::string _implementation;		// Limited implementation (like virtual for C++)?
 	bool _thisFileOnly;					// Is this tag relevant only in this file?
 	std::string _unrecognized;			// Not recognized tags
+
+	void TrimPattern();
 };
 
 #endif // __TAG_H__

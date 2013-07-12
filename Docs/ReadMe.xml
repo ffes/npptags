@@ -16,7 +16,7 @@
 	<sect1 id="introduction">
 		<title>Introduction</title>
 		<para>NppTags is a <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> plug-in for <ulink url="http://www.notepad-plus-plus.org/">Notepad++</ulink>.</para>
-		<para>When you use Notepad++ to program in a popular programming language (like C/C++, Java, JavaScript, PHP), ctags can be very useful for you. It creates a so called tags file that can be used to navigate through your sources. This small tool can help you to jump to a selected function / variable / class / etc in you code by pressing just one key!</para>
+		<para>When you use Notepad++ to program in a popular programming language (like C/C++, Java, JavaScript, PHP), ctags can be very useful for you. It creates a so called tags file that can be used to navigate through your sources. This small tool can help you to jump to a selected function / variable / class / etc in your code by pressing just one key!</para>
 	</sect1>
 
 	<sect1 id="install">
@@ -35,11 +35,12 @@
 
 	<sect1 id="tree">
 		<title>Tree</title>
-		<para>Since ctags supports so many programming languages, it is impossible for me to add support for all these languages to the tree in the ShowTags dialog instantly.</para>
+		<para>Since ctags supports so many programming languages, it is impossible for me to add support for all these languages to the tree instantly.</para>
 		<para>Based upon a combination of the documentation of ctags and personal testing, these languages should work quite well:</para>
 		<itemizedlist>
-			<listitem><para>ASP</para></listitem>
+			<listitem><para>Classic ASP</para></listitem>
 			<listitem><para>C / C++</para></listitem>
+			<listitem><para>C#</para></listitem>
 			<listitem><para>Java</para></listitem>
 			<listitem><para>JavaScript</para></listitem>
 			<listitem><para>PHP</para></listitem>
@@ -49,20 +50,15 @@
 		<para>Note that this it only affects the tree, FindTag should not have any problem.</para>
 	</sect1>
 
-	<sect1 id="history">
-		<title>History</title>
-		<para>In 2003 Ben Bluemel released the first version of the IndentByFold plug-in. He released three version, up till 0.7. But since then he switched away from Notepad++ and stopped developing his plug-ins. In April 2013 Frank Fesevur took over the maintenance of the plug-in.</para>
-	</sect1>
-
 	<sect1 id="contact">
 		<title>Contact</title>
-		<para>The plug-in's web page can be found at <ulink url="https://code.google.com/p/indentbyfold/">https://code.google.com/p/indentbyfold/</ulink>. The downloads and issue tracker can be found there as well. The git repository is at <ulink url="https://github.com/ffes/indentbyfold">https://github.com/ffes/indentbyfold</ulink>.</para>
-		<para>If you have problems with, questions about or suggestions for IndentByFold and you want to contact me directly, you can send me an email at <ulink url="mailto:fesevur@gmail.com">fesevur@gmail.com</ulink>.</para>
+		<para>The plug-in's web page can be found at <ulink url="https://code.google.com/p/npptags/">https://code.google.com/p/npptags/</ulink>. The downloads and issue tracker can be found there as well. The git repository is at <ulink url="https://github.com/ffes/npptags">https://github.com/ffes/npptags</ulink>.</para>
+		<para>If you have problems with, questions about or suggestions for NppTags and you want to contact me directly, you can send me an email at <ulink url="mailto:fesevur@gmail.com">fesevur@gmail.com</ulink>.</para>
 	</sect1>
 
 	<sect1 id="license">
 		<title>License</title>
-		<para>This plug-in is published under the GPL-2 license. See <xref linkend="gpl"/> for the full license agreement. You can find the sources of the latest version at the <ulink url="https://code.google.com/p/indentbyfold/">Google code project page</ulink> or find the lastest developments at <ulink url="https://github.com/ffes/indentbyfold">GitHub</ulink>.</para>
+		<para>This plug-in is published under the GPL-2 license. See <xref linkend="gpl"/> for the full license agreement. You can find the sources of the latest version at the <ulink url="https://code.google.com/p/npptags/">Google code project page</ulink> or find the lastest developments at <ulink url="https://github.com/ffes/npptags">GitHub</ulink>.</para>
 		<para>This plug-in relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> to recognise the tags. Exuberant CTags is released under GPL-2 as well and the source code of Exuberant CTags can be found at its <ulink url="http://ctags.sourceforge.net/">website</ulink>.</para>
 	</sect1>
 
@@ -74,7 +70,7 @@
 					Does NppTags recognize tags in language 'XYZ'?
 				</para></question>
 				<answer><para>
-					NppTags relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> for the recognition of tags. So please check the documentation of Exuberant CTags to see if your language is supported by Exuberant CTags. If not, you have to contact the author of Exuberant CTags to see if he wants to add support for your programming language. If Exuberant CTags supports your language the FindTag mode of this add-in should have no problems, but the tree could not show all tags.
+					NppTags relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> for the recognition of tags. So please check the documentation of Exuberant CTags to see if your language is supported by Exuberant CTags. If not, you have to contact the Exuberant CTags team to see if he wants to add support for your programming language. If Exuberant CTags supports your language the FindTag mode of this add-in should have no problems, but the tree could not show all tags.
 				</para></answer>
 			</qandaentry>
 			<qandaentry>
@@ -116,7 +112,14 @@ When you switch the case sensitive search you should regenerate all tags file, o
 		<title>Revision History</title>
 
 		<sect2 id="v0_2_0">
-			<title>Version 0.2.0, 5 July 2013</title>
+			<title>Version 0.2.0, XX July 2013</title>
+			<itemizedlist>
+				<listitem><para>After generating the tags file, it is now converted to a SQLite database. This makes is much easier and faster to build a proper tree.</para></listitem>
+			</itemizedlist>
+		</sect2>
+
+		<sect2 id="v0_1_1">
+			<title>Version 0.1.1, 5 July 2013</title>
 			<itemizedlist>
 				<listitem><para>Tree now filled with functions.</para></listitem>
 				<listitem><para>Added three toolbar buttons.</para></listitem>

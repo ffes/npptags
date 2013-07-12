@@ -34,8 +34,8 @@ using namespace std;
 #include "DlgAbout.h"
 #include "DlgTree.h"
 #include "DlgSelectTag.h"
+#include "GenerateTagsDB.h"
 #include "Options.h"
-#include "readtags.h"
 #include "Tag.h"
 #include "WaitCursor.h"
 
@@ -52,54 +52,7 @@ HINSTANCE g_hInst;
 NppData g_nppData;
 FuncItem g_funcItem[nbFunc];
 Options *g_Options = NULL;
-CHAR g_szCurTagsFile[MAX_PATH];
-
-/////////////////////////////////////////////////////////////////////////////
-// Check is a file exists
-
-static bool FileExists(LPCTSTR path)
-{
-	DWORD dwAttrib = GetFileAttributes(path);
-	return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// Get the filename of the tags file
-
-static string GetTagsFilename(bool mustExist)
-{
-	WCHAR curPath[MAX_PATH];
-	SendMessage(g_nppData._nppHandle, NPPM_GETCURRENTDIRECTORY, MAX_PATH, (LPARAM) &curPath);
-
-	CHAR curP[MAX_PATH];
-	Unicode2Ansi(curP, curPath, MAX_PATH);
-
-	string tagsFile = curP;
-	tagsFile += "\\tags";
-
-	// Need to check if the file must exist. This is used when reading
-	// a tags file. If not found, return empty string
-	if (mustExist)
-	{
-		wstring wstr(tagsFile.begin(), tagsFile.end());
-		return (FileExists(wstr.c_str()) ? tagsFile : "");
-	}
-
-	return tagsFile;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// If needed, update the global tags filename and the tree
-
-static void UpdateTagsFilename()
-{
-	string newfile = GetTagsFilename(true);
-	if (newfile != g_szCurTagsFile)
-	{
-		strncpy(g_szCurTagsFile, newfile.c_str(), MAX_PATH);
-		UpdateTagsTree();
-	}
-}
+TagsDatabase* g_DB = NULL;
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -338,17 +291,10 @@ void JumpToTag(Tag* pTag)
 	}
 	else
 	{
-		// Remove the slashes and regex symbols at the start and end of the pattern
-		string pattern = pTag->getPattern();
-		if (pattern.substr(0, 2) == "/^")
-		{
-			pattern = pattern.substr(2);
-			pattern = pattern.substr(0, pattern.length() - 2);
-		}
-
-		// Now search for this pattern
+		// Now search for the pattern of the tag
 		int length = SendMsg(SCI_GETLENGTH);
-		char* searchPattern = (char*) pattern.c_str();
+		string str = pTag->getPattern();
+		char* searchPattern = (char*) str.c_str();
 		Sci_TextToFind search;
 		search.lpstrText = searchPattern;
 		search.chrg.cpMin = 0;
@@ -358,78 +304,6 @@ void JumpToTag(Tag* pTag)
 		if (pos >= 0)
 			SendMsg(SCI_GOTOPOS, pos);
 	}
-}
-
-////////////////////////////////////////////////////////////////////////////
-//
-
-static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
-{
-	TCHAR szCmd[_MAX_PATH];
-	lstrcpy(szCmd, szCmdLine);
-
-	STARTUPINFO si;
-	ZeroMemory(&si, sizeof(STARTUPINFO));
-	si.dwFlags = STARTF_USESHOWWINDOW;
-	si.wShowWindow = SW_HIDE;
-	si.cb = sizeof(STARTUPINFO);
-
-	PROCESS_INFORMATION pi;
-	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
-
-	WaitCursor wait;
-
-	DWORD dwReturn = NOERROR;
-	if (CreateProcess(NULL, szCmd, NULL, NULL, FALSE, CREATE_DEFAULT_ERROR_MODE, NULL, szDir, &si, &pi))
-	{
-		if (waitFinish)
-			WaitForSingleObject(pi.hProcess, INFINITE);
-	}
-	else
-		dwReturn = GetLastError();
-
-	return dwReturn;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// Generate a tags file in the current directory
-
-static void GenerateTagsFile()
-{
-	WCHAR szExePath[_MAX_PATH];
-	SendMessage(g_nppData._nppHandle, NPPM_GETNPPDIRECTORY, MAX_PATH, (LPARAM) &szExePath);
-	wcsncat(szExePath, L"\\plugins\\NppTags\\ctags", _MAX_PATH);
-
-	WCHAR curDir[MAX_PATH];
-	SendMessage(g_nppData._nppHandle, NPPM_GETCURRENTDIRECTORY, MAX_PATH, (LPARAM) &curDir);
-
-	wstring cmd;
-	cmd += char(34);
-	cmd += szExePath;
-	cmd += char(34);
-	if (g_Options->maxDepth > 0)
-		cmd += L" -R";
-	cmd += L" --fields=+i+K+S+l+m+a";
-
-	wstring options = g_Options->GetExtraOptions();
-	if (options.length() > 0)
-	{
-		cmd += L" ";
-		cmd += options;
-	}
-
-	cmd += L" ";
-	cmd += char(34);
-	cmd += curDir;
-	cmd += L"\\*.*";
-	cmd += char(34);
-
-	//MsgBox(cmd.c_str());
-	Run(cmd.c_str(), curDir, true);
-
-	// Now update the global tags filename and the tree
-	strncpy(g_szCurTagsFile, "INVALID", MAX_PATH);
-	UpdateTagsFilename();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -444,7 +318,6 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 		case DLL_PROCESS_ATTACH:
 		{
 			g_hInst = (HINSTANCE) hModule;
-			g_szCurTagsFile[0] = 0;
 
 			// The menu entries
 			int index = 0;
@@ -475,7 +348,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 			index++;
 
 			// The basic jump-to-tag handling
-			g_funcItem[index]._pFunc = GenerateTagsFile;
+			g_funcItem[index]._pFunc = GenerateTagsDB;
 			wcscpy(g_funcItem[index]._itemName, L"Generate tags file");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
@@ -502,6 +375,9 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 			s_hbmpRefreshTags = CreateMappedBitmap(g_hInst, IDB_REFRESH_TAGS, 0, 0, 0);
 			s_hbmpJumpToTag = CreateMappedBitmap(g_hInst, IDB_JUMP_TO_TAG, 0, 0, 0);
 
+			// Allocate the database class
+			g_DB = new TagsDatabase();
+
 			// Create the tree dialog
 			CreateTreeDlg();
 		}
@@ -525,6 +401,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 
 			// Clean up the options
 			delete g_Options;
+			delete g_DB;
 		}
 		break;
 

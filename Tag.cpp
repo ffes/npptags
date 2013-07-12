@@ -21,15 +21,13 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include <string>
 
 #include "Tag.h"
+using namespace std;
 
-// From NppTags.h
-extern void MsgBox(const char* msg);
-extern void MsgBoxf(const char* szFmt, ...);
+const string whiteSpaces(" \f\n\r\t\v");
 
-#define NO_MEMBER_OF			0
+#define NOT_MEMBER_OF			0
 #define MEMBER_OF_CLASS			1
 #define MEMBER_OF_STRUCT		2
 #define MEMBER_OF_UNION			3
@@ -64,7 +62,7 @@ void Tag::empty()
 	_unrecognized.clear();
 
 	_memberOf.clear();
-	_memberOfType = NO_MEMBER_OF;
+	_memberOfType = NOT_MEMBER_OF;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -79,7 +77,11 @@ Tag& Tag::operator=(const tagEntry tag)
 	_tag = tag.name;
 	_file = tag.file;
 	_line = tag.address.lineNumber;
-	_pattern = tag.address.pattern;
+	if (_line == 0)
+	{
+		_pattern = tag.address.pattern;
+		TrimPattern();
+	}
 	_type = tag.kind;
 	_thisFileOnly = (bool) (tag.fileScope != 0);
 
@@ -159,13 +161,13 @@ Tag& Tag::operator=(const tagEntry tag)
 		}
 
 		// Does it have an implementation field?
-		if (strcmp(tag.fields.list[i].key, "implementation:") == 0)
+		if (strcmp(tag.fields.list[i].key, "implementation") == 0)
 		{
 			_implementation = tag.fields.list[i].value;
 			continue;
 		}
 
-		// Any unrecognized (probably new) type
+		// Any unrecognized type
 		if (!_unrecognized.empty())
 			_unrecognized += ' ';
 		_unrecognized += tag.fields.list[i].key;
@@ -186,7 +188,7 @@ bool Tag::isMemberOf(LPCSTR szMemberOf)
 
 bool Tag::isType(LPCSTR szType)
 {
-	return(_type == szType);		// COMPARE NO CASE!!!!
+	return(stricmp(_type.c_str(), szType) == 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -293,4 +295,76 @@ std::string Tag::getDetails()
 	}
 
 	return ret;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+bool Tag::SaveToDB(SqliteStatement* stmt)
+{
+	// Bind the values to the parameters
+	stmt->BindTextParameter("@tag", _tag.c_str());
+	stmt->BindTextParameter("@file", _file.c_str());
+	stmt->BindIntParameter("@line", _line, _line == 0);
+	stmt->BindTextParameter("@pattern", _pattern.c_str());
+	stmt->BindTextParameter("@type", _type.c_str());
+	stmt->BindTextParameter("@language", _language.c_str());
+	stmt->BindTextParameter("@memberof", _memberOf.c_str());
+	stmt->BindIntParameter("@memberoftype", _memberOfType, _memberOfType == NOT_MEMBER_OF);
+	stmt->BindTextParameter("@inherits", _inherits.c_str());
+	stmt->BindTextParameter("@signature", _signature.c_str());
+	stmt->BindTextParameter("@access", _access.c_str());
+	stmt->BindTextParameter("@implementation", _implementation.c_str());
+	stmt->BindBoolParameter("@thisfileonly", _thisFileOnly);
+	stmt->BindTextParameter("@unrecognized", _unrecognized.c_str());
+	stmt->SaveRecord();
+
+	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+void Tag::SetFromDB(SqliteStatement* stmt)
+{
+	// Make sure we start empty
+	empty();
+
+	// Fill the members from the active Sqlite statement
+	_tag = stmt->GetTextColumn("Tag");
+	_file = stmt->GetTextColumn("File");
+	_line = stmt->GetIntColumn("Line");
+	_pattern = stmt->GetTextColumn("Pattern");
+	_type = stmt->GetTextColumn("Type");
+	_language = stmt->GetTextColumn("Language");
+	_memberOf = stmt->GetTextColumn("MemberOf");
+	_memberOfType = stmt->GetIntColumn("MemberOfType");
+	_inherits = stmt->GetTextColumn("Inherits");
+	_signature = stmt->GetTextColumn("Signature");
+	_access = stmt->GetTextColumn("Access");
+	_implementation = stmt->GetTextColumn("Implementation");
+	_thisFileOnly = stmt->GetBoolColumn("ThisFileOnly");
+	_unrecognized = stmt->GetTextColumn("Unrecognized");
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+void Tag::TrimPattern()
+{
+	// Do we need to do anything?
+	if (_pattern.length() == 0)
+		return;
+
+	// Remove the regex helper from begin and end
+	_pattern.erase(0, 2);									// First two chars are /^
+	_pattern.erase(_pattern.end() - 2, _pattern.end());		// Last two chars are $/
+
+	// Trim right side of pattern
+	std::string::size_type pos = _pattern.find_last_not_of(whiteSpaces);
+	_pattern.erase(pos + 1);
+
+	// Trim from the left
+	pos = _pattern.find_first_not_of(whiteSpaces);
+	_pattern.erase(0, pos);
 }
