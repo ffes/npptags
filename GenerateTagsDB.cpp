@@ -40,6 +40,12 @@ static bool FileExists(LPCWSTR path)
 	return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
+static bool FileExists(LPCSTR path)
+{
+	DWORD dwAttrib = GetFileAttributesA(path);
+	return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Get the filename of the tags file
 
@@ -120,6 +126,13 @@ static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 
 static bool GenerateTagsFile()
 {
+	// Overwrite an already existing tags file?
+	if (!g_Options->overwriteExistingTagsFile)
+	{
+		if (FileExists(s_tagsFile.c_str()))
+			return true;
+	}
+
 	WaitCursor wait;
 
 	WCHAR szExePath[_MAX_PATH];
@@ -229,6 +242,10 @@ void GenerateTagsDB()
 		MsgBoxf("Something went wrong convert tags file to database!\n%s", g_DB->GetErrorMsg().c_str());
 		return;
 	}
+
+	// Delete the temp tags file
+	if (g_Options->deleteTagsFile)
+		DeleteFileA(s_tagsFile.c_str());
 
 	// After that update the global tags filename and the tree
 	g_DB->SetFilename(L"");

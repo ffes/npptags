@@ -31,8 +31,13 @@ public:
 	Options();
 	~Options();
 
+	// General options
 	bool showTreeDlg;
 	int maxDepth;
+
+	// Debug options
+	bool deleteTagsFile;
+	bool overwriteExistingTagsFile;
 
 	WCHAR* GetPrevVersion() { return _szPrevVersion; };
 	WCHAR* GetExtraOptions() { return _szExtraOptions; };

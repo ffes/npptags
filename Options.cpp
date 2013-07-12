@@ -33,6 +33,9 @@ static WCHAR s_szOptions[]			= L"Options";
 static WCHAR s_szShow[]				= L"Show";
 static WCHAR s_szVersion[]			= L"Version";
 static WCHAR s_szDepth[]			= L"Depth";
+static WCHAR s_szDebug[]			= L"Debug";
+static WCHAR s_szDelTags[]			= L"DelTags";
+static WCHAR s_szOverwriteTags[]	= L"OverwriteTags";
 
 /////////////////////////////////////////////////////////////////////////////
 // Constructor: read the settings
@@ -106,4 +109,8 @@ void Options::Read()
 	maxDepth = GetPrivateProfileInt(s_szOptions, s_szDepth, 3, _szIniPath);
 	GetPrivateProfileString(s_szOptions, s_szVersion, L"", _szPrevVersion, MAX_PATH,  _szIniPath);
 	GetPrivateProfileString(s_szOptions, s_szOptions, L"", _szExtraOptions, MAX_PATH,  _szIniPath);
+
+	// Read Only Debug options
+	deleteTagsFile = GetPrivateProfileBool(s_szDebug, s_szDelTags, true);
+	overwriteExistingTagsFile = GetPrivateProfileBool(s_szDebug, s_szOverwriteTags, true);
 }
