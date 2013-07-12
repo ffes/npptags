@@ -194,7 +194,7 @@ static bool ConvertTagsToDB()
 
 	// Prepare the statement
 	SqliteStatement stmt(g_DB);
-	if (!stmt.Prepare("INSERT INTO Tags(Idx, Tag, File, Line, Pattern, Type, Language, MemberOf, MemberOfType, Inherits, Signature, Access, Implementation, ThisFileOnly, Unrecognized) VALUES (@idx, @tag, @file, @line, @pattern, @type, @language, @memberof, @memberoftype, @inherits, @signature, @access, @implementation, @thisfileonly, @unrecognized)"))
+	if (!stmt.Prepare("INSERT INTO Tags(Tag, File, Line, Pattern, Type, Language, MemberOf, MemberOfType, Inherits, Signature, Access, Implementation, ThisFileOnly, Unrecognized) VALUES (@tag, @file, @line, @pattern, @type, @language, @memberof, @memberoftype, @inherits, @signature, @access, @implementation, @thisfileonly, @unrecognized)"))
 	{
 		tagsClose(file);
 		g_DB->Close();
@@ -209,6 +209,12 @@ static bool ConvertTagsToDB()
 	{
 		// Put it in the array		
 		tag = entry;
+
+		// Very long search pattern in JavaScript, minimized?
+		if (tag.getLanguage() == "JavaScript")
+			if (tag.getPattern().length() >= MAX_PATH)
+				continue;
+
 		tag.SaveToDB(&stmt);
 	}
 	stmt.Finalize();
