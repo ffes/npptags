@@ -266,37 +266,6 @@ static bool ShowSelectTagDlg()
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static bool FindTagFromFile(LPCSTR szFile, LPCSTR szTag)
-{
-	tagFileInfo info;
-	tagEntry entry;
-	tagFile *const file = tagsOpen(szFile, &info);
-	if (file == NULL)
-	{
-		MsgBox("Unable to open 'tags' file");
-		return false;
-	}
-
-	bool m_bCaseSensitive = false;
-	int options = (m_bCaseSensitive ? TAG_OBSERVECASE : TAG_IGNORECASE);
-	if (tagsFind(file, &entry, szTag, options) == TagSuccess)
-	{
-		do
-		{
-			Tag tag;
-			tag = entry;
-			s_foundTags.push_back(tag);
-		}
-		while (tagsFindNext(file, &entry) == TagSuccess);
-	}
-
-	tagsClose(file);
-	return(s_foundTags.size() > 0);
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
 static bool FindTagInDB(LPCWSTR szTag)
 {
 	if (!g_DB->Open())
