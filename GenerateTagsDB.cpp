@@ -165,16 +165,28 @@ static bool ConvertTagsToDB()
 	if (file == NULL)
 		return false;
 
+	// First delete the old database (if any)
 	if (!g_DB->Delete())
+	{
+		tagsClose(file);
 		return false;
+	}
 
+	// Create the new database
 	if (!g_DB->Open())
+	{
+		tagsClose(file);
 		return false;
+	}
 
 	// Prepare the statement
 	SqliteStatement stmt(g_DB);
 	if (!stmt.Prepare("INSERT INTO Tags(Idx, Tag, File, Line, Pattern, Type, Language, MemberOf, MemberOfType, Inherits, Signature, Access, Implementation, ThisFileOnly, Unrecognized) VALUES (@idx, @tag, @file, @line, @pattern, @type, @language, @memberof, @memberoftype, @inherits, @signature, @access, @implementation, @thisfileonly, @unrecognized)"))
+	{
+		tagsClose(file);
+		g_DB->Close();
 		return false;
+	}
 
 	// Go through the records and save them in the database
 	Tag tag;
@@ -189,6 +201,9 @@ static bool ConvertTagsToDB()
 	stmt.Finalize();
 	g_DB->CommitTransaction();
 	g_DB->Close();
+
+	// Close the tags file
+	tagsClose(file);
 
 	return true;
 }
