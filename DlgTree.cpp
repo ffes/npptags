@@ -58,7 +58,7 @@ static void ClearTree()
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static void AddTextItem(LPWSTR txt)
+static HTREEITEM InsertTextItem(LPWSTR txt)
 {
 	TVINSERTSTRUCT item;
 	ZeroMemory(&item, sizeof(item));
@@ -66,7 +66,24 @@ static void AddTextItem(LPWSTR txt)
 	item.hInsertAfter = TVI_ROOT;
 	item.item.mask = TVIF_TEXT;
 	item.item.pszText = txt;
-	TreeView_InsertItem(s_hTree, &item);
+	return TreeView_InsertItem(s_hTree, &item);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+static HTREEITEM InsertTagItem(HTREEITEM hParent, Tag* pTag)
+{
+	TVINSERTSTRUCT item;
+	ZeroMemory(&item, sizeof(item));
+
+	item.hParent = hParent;
+	string str = pTag->getFullTag();
+	wstring wstr(str.begin(), str.end());
+	item.item.mask = TVIF_TEXT | TVIF_PARAM;
+	item.item.pszText = (LPWSTR) wstr.c_str();
+	item.item.lParam = pTag->getIdx();
+	return TreeView_InsertItem(s_hTree, &item);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -75,12 +92,6 @@ static void AddTextItem(LPWSTR txt)
 static void AddMembers(HTREEITEM hParent, Tag* pTag)
 {
 /*
-	TVINSERTSTRUCT item;
-	ZeroMemory(&item, sizeof(item));
-	item.hParent = hParent;
-	//item.hInsertAfter = TVI_ROOT;
-	item.item.mask = TVIF_TEXT;
-
 	SqliteStatement stmt(g_DB);
 	if (!stmt.Prepare("SELECT * FROM Tags WHERE MemberOf = @memberof ORDER BY Tag, Signature"))
 		return;
@@ -90,13 +101,9 @@ static void AddMembers(HTREEITEM hParent, Tag* pTag)
 	Tag tag;
 	while (stmt.GetNextRecord())
 	{
+		// Get the tag from the database and add
 		tag.SetFromDB(&stmt);
-
-		// Now we can add the tag
-		string str = tag.getFullTag();
-		wstring wstr(str.begin(), str.end());
-		item.item.pszText = (LPWSTR) wstr.c_str();
-		TreeView_InsertItem(s_hTree, &item);
+		InsertTagItem(hParent, &tag);
 	}
 	stmt.Finalize();
 */
@@ -107,9 +114,6 @@ static void AddMembers(HTREEITEM hParent, Tag* pTag)
 
 static void InsertItems(LPCWSTR group, LPCSTR where, bool members)
 {
-	TVINSERTSTRUCT item;
-	ZeroMemory(&item, sizeof(item));
-
 	SqliteStatement stmt(g_DB);
 	string sql = "SELECT * FROM Tags WHERE ";
 	sql += where;
@@ -128,19 +132,10 @@ static void InsertItems(LPCWSTR group, LPCSTR where, bool members)
 
 		// Do we need to add the parent item
 		if (hParent == NULL)
-		{
-			item.hInsertAfter = TVI_ROOT;
-			item.item.mask = TVIF_TEXT;
-			item.item.pszText = (LPWSTR) group;
-			hParent = TreeView_InsertItem(s_hTree, &item);
-			item.hParent = hParent;
-		}
+			hParent = InsertTextItem((LPWSTR) group);
 
 		// Now we can add the tag
-		string str = tag.getFullTag();
-		wstring wstr(str.begin(), str.end());
-		item.item.pszText = (LPWSTR) wstr.c_str();
-		hItem = TreeView_InsertItem(s_hTree, &item);
+		hItem = InsertTagItem(hParent, &tag);
 
 		// Try to add members of this tag
 		if (members && hItem != NULL)
@@ -165,7 +160,7 @@ void UpdateTagsTree()
 	// Is there a tags file set?
 	if (wcslen(g_DB->GetFilename()) == 0)
 	{
-		AddTextItem(L"Tags database not found");
+		InsertTextItem(L"Tags database not found");
 		return;
 	}
 
@@ -189,7 +184,38 @@ void UpdateTagsTree()
 	g_DB->Close();
 
 	if (TreeView_GetCount(s_hTree) == 0)
-		AddTextItem(L"No tags found in database");
+		InsertTextItem(L"No tags found in database");
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+static bool FindTagInDB(int idx, Tag* pTag)
+{
+	if (!g_DB->Open())
+		return false;
+
+	SqliteStatement stmt(g_DB);
+	if (!stmt.Prepare("SELECT * FROM Tags WHERE Idx = @idx"))
+	{
+		g_DB->Close();
+		return false;
+	}
+
+	if (!stmt.BindIntParameter("@idx", idx))
+	{
+		g_DB->Close();
+		return false;
+	}
+
+	if (stmt.GetNextRecord())
+	{
+		pTag->SetFromDB(&stmt);
+	}
+	stmt.Finalize();
+	g_DB->Close();
+
+	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -319,9 +345,30 @@ static void OnClose(HWND hWnd)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static void OnDblClk_List(HWND hWnd)
+static BOOL OnDblClk_Tree()
 {
-	//OnTagsInsert(hWnd);
+	TVHITTESTINFO hti;
+	POINT p1;
+	GetCursorPos(&p1);
+	hti.flags = TVHT_ONITEM;
+	memcpy(&hti.pt, &p1, sizeof(POINT));
+	ScreenToClient(s_hTree, &hti.pt);
+
+	TVITEM tv;
+	ZeroMemory(&tv, sizeof(TVITEM));
+
+	tv.hItem = (HTREEITEM) TreeView_HitTest(s_hTree, &hti);
+	tv.mask = TVIF_PARAM;
+	int err = TreeView_GetItem(s_hTree, &tv);
+
+	if (tv.lParam != 0)
+	{
+		Tag tag;
+		FindTagInDB(tv.lParam, &tag);
+		JumpToTag(&tag);
+		SetFocusOnEditor();
+	}
+	return TRUE;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -336,7 +383,7 @@ static void OnCommand(HWND hWnd, int ResID, int msg)
 			switch (msg)
 			{
 				case LBN_DBLCLK:
-					OnDblClk_List(hWnd);
+					//OnDblClk_List(hWnd);
 					break;
 			}
 			break;
@@ -385,11 +432,14 @@ static BOOL CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 					switch (((LPNMHDR)lParam)->code)
 					{
 						case NM_DBLCLK:
-							MsgBox("Double Click");
-							return TRUE;
+						{
+							return OnDblClk_Tree();
+						}
 						case TVN_SELCHANGED:
+						{
 							//MsgBox("SelChanged");
 							return TRUE;
+						}
 					}
 				}
 			}

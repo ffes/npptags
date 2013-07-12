@@ -39,6 +39,7 @@ public:
 
 	void empty();
 
+	int getIdx()					{ return _idx; };
 	std::string getTag()			{ return _tag; };
 	std::string getFullTag()		{ return _tag + _signature; };
 	std::string getFile()			{ return _file; };
@@ -55,6 +56,7 @@ public:
 	bool thisFileOnly()				{ return _thisFileOnly; };
 
 protected:
+	int _idx;							// Index field in database
 	std::string _tag;					// Name of the tag
 	std::string _file;					// What file is the tag in?
 	int _line;							// On which line it is?

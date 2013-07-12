@@ -47,6 +47,7 @@ Tag::Tag()
 
 void Tag::empty()
 {
+	_idx = 0;
 	_line = 0;
 	_thisFileOnly = false;
 
@@ -331,6 +332,7 @@ void Tag::SetFromDB(SqliteStatement* stmt)
 	empty();
 
 	// Fill the members from the active Sqlite statement
+	_idx = stmt->GetIntColumn("Idx");
 	_tag = stmt->GetTextColumn("Tag");
 	_file = stmt->GetTextColumn("File");
 	_line = stmt->GetIntColumn("Line");
