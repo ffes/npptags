@@ -76,7 +76,7 @@ bool Options::GetPrivateProfileBool(WCHAR* szAppName, WCHAR* szKeyName, bool def
 
 void Options::WritePrivateProfileBool(WCHAR* szAppName, WCHAR* szKeyName, bool val)
 {
-	WritePrivateProfileString(s_szOptions, s_szShow, val ? L"1" : L"0", _szIniPath);
+	WritePrivateProfileString(szAppName, szKeyName, val ? L"1" : L"0", _szIniPath);
 }
 
 /////////////////////////////////////////////////////////////////////////////
