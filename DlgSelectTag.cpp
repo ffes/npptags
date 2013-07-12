@@ -323,7 +323,7 @@ void JumpToTag()
 	// Find the tags for this word
 	if (!FindTagInDB(curWord))
 	{
-		MsgBoxf("Error searching tag in database\n%s", g_DB->GetErrorMsg());
+		MsgBoxf("Error searching tag in database\n%s", g_DB->GetErrorMsg().c_str());
 		return;
 	}
 

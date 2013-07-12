@@ -42,14 +42,18 @@ PROGRAM_SRCS_CPP = \
 	DlgAbout.cpp \
 	DlgSelectTag.cpp \
 	DlgTree.cpp \
+	GenerateTagsDB.cpp \
 	NppTags.cpp \
+	SqliteDatabase.cpp \
 	Tag.cpp \
+	TagsDatabase.cpp \
 	Options.cpp \
 	Version.cpp \
 	WaitCursor.cpp
 
 PROGRAM_SRCS_C = \
-	readtags.c
+	readtags.c \
+	sqlite3.c
 
 PROGRAM_OBJS_CPP=$(PROGRAM_SRCS_CPP:.cpp=.o)
 PROGRAM_OBJS_C=$(PROGRAM_SRCS_C:.c=.o)
@@ -64,7 +68,7 @@ depend: $(PROGRAM_SRCS_CPP)
 	$(CXX) -MM $^ > Makefile.deps
 
 clean:
-	rm -f $(PROGRAM_OBJS_CPP) $(PROGRAM_OBJS_C) $(PROGRAM_OBJS_RC) $(PROGRAM).dll $(PROGRAM).dll.map $(PROGRAM).a tags Makefile.deps
+	rm -f $(PROGRAM_OBJS_CPP) $(PROGRAM_OBJS_C) $(PROGRAM_OBJS_RC) $(PROGRAM).dll $(PROGRAM).dll.map $(PROGRAM).a tags tags.sqlite Makefile.deps
 	touch Makefile.deps
 
 ### code dependencies ###
