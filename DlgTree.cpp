@@ -72,7 +72,7 @@ static HTREEITEM InsertTextItem(LPWSTR txt)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static HTREEITEM InsertTagItem(HTREEITEM hParent, Tag* pTag)
+static HTREEITEM InsertTagItem(HTREEITEM hParent, Tag* pTag, bool members)
 {
 	TVINSERTSTRUCT item;
 	ZeroMemory(&item, sizeof(item));
@@ -83,6 +83,14 @@ static HTREEITEM InsertTagItem(HTREEITEM hParent, Tag* pTag)
 	item.item.mask = TVIF_TEXT | TVIF_PARAM;
 	item.item.pszText = (LPWSTR) wstr.c_str();
 	item.item.lParam = pTag->getIdx();
+
+	// Add a (+) before this item, handled in OnItemExpanding()
+	if (members)
+	{
+		item.item.mask |= TVIF_CHILDREN;
+		item.item.cChildren = 1;
+	}
+
 	return TreeView_InsertItem(s_hTree, &item);
 }
 
@@ -91,22 +99,25 @@ static HTREEITEM InsertTagItem(HTREEITEM hParent, Tag* pTag)
 
 static void AddMembers(HTREEITEM hParent, Tag* pTag)
 {
-/*
+	g_DB->Open();
 	SqliteStatement stmt(g_DB);
 	if (!stmt.Prepare("SELECT * FROM Tags WHERE MemberOf = @memberof ORDER BY Tag, Signature"))
+	{
+		g_DB->Close();
 		return;
+	}
 
 	stmt.BindTextParameter("@memberof", pTag->getTag().c_str());
 
 	Tag tag;
 	while (stmt.GetNextRecord())
 	{
-		// Get the tag from the database and add
+		// Get the tag from the database and add to tree
 		tag.SetFromDB(&stmt);
-		InsertTagItem(hParent, &tag);
+		InsertTagItem(hParent, &tag, false);
 	}
 	stmt.Finalize();
-*/
+	g_DB->Close();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -124,7 +135,7 @@ static void InsertItems(LPCWSTR group, LPCSTR where, bool members)
 		return;
 
 	Tag tag;
-	HTREEITEM hParent = NULL, hItem = NULL;
+	HTREEITEM hParent = NULL;
 	while (stmt.GetNextRecord())
 	{
 		// Get the information from the database
@@ -135,11 +146,7 @@ static void InsertItems(LPCWSTR group, LPCSTR where, bool members)
 			hParent = InsertTextItem((LPWSTR) group);
 
 		// Now we can add the tag
-		hItem = InsertTagItem(hParent, &tag);
-
-		// Try to add members of this tag
-		if (members && hItem != NULL)
-			AddMembers(hItem, &tag);
+		InsertTagItem(hParent, &tag, members);
 	}
 	stmt.Finalize();
 }
@@ -347,27 +354,54 @@ static void OnClose(HWND hWnd)
 
 static BOOL OnDblClk_Tree()
 {
-	TVHITTESTINFO hti;
-	POINT p1;
-	GetCursorPos(&p1);
-	hti.flags = TVHT_ONITEM;
-	memcpy(&hti.pt, &p1, sizeof(POINT));
-	ScreenToClient(s_hTree, &hti.pt);
+	TVITEM tvi;
+	ZeroMemory(&tvi, sizeof(TVITEM));
 
-	TVITEM tv;
-	ZeroMemory(&tv, sizeof(TVITEM));
+	tvi.hItem = (HTREEITEM) TreeView_GetSelection(s_hTree);
+	tvi.mask = TVIF_PARAM;
+	int err = TreeView_GetItem(s_hTree, &tvi);
 
-	tv.hItem = (HTREEITEM) TreeView_HitTest(s_hTree, &hti);
-	tv.mask = TVIF_PARAM;
-	int err = TreeView_GetItem(s_hTree, &tv);
-
-	if (tv.lParam != 0)
+	if (tvi.lParam != 0)
 	{
 		Tag tag;
-		FindTagInDB(tv.lParam, &tag);
+		FindTagInDB(tvi.lParam, &tag);
 		JumpToTag(&tag);
 		SetFocusOnEditor();
 	}
+
+	return TRUE;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+static BOOL OnItemExpanding(NMTREEVIEW* pNMTreeView)
+{
+	// Only do something when expanding
+	if (pNMTreeView->action != TVE_EXPAND)
+		return FALSE;
+
+	// Don't duplicate children
+	TVITEM tvi = pNMTreeView->itemNew;
+	if (tvi.state & TVIS_EXPANDEDONCE)
+		return FALSE;
+
+	// Is this a tag
+	if (tvi.lParam != 0)
+	{
+		Tag tag;
+		FindTagInDB(tvi.lParam, &tag);
+		AddMembers(tvi.hItem, &tag);
+	}
+
+	return FALSE;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+static BOOL OnSelChanged(NMTREEVIEW* pNMTreeView)
+{
 	return TRUE;
 }
 
@@ -435,10 +469,13 @@ static BOOL CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 						{
 							return OnDblClk_Tree();
 						}
+						case TVN_ITEMEXPANDING:
+						{
+							return OnItemExpanding((NMTREEVIEW*) lParam);
+						}
 						case TVN_SELCHANGED:
 						{
-							//MsgBox("SelChanged");
-							return TRUE;
+							return OnSelChanged((NMTREEVIEW*) lParam);
 						}
 					}
 				}
