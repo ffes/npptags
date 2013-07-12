@@ -58,6 +58,20 @@ static void ClearTree()
 /////////////////////////////////////////////////////////////////////////////
 //
 
+static void AddTextItem(LPWSTR txt)
+{
+	TVINSERTSTRUCT item;
+	ZeroMemory(&item, sizeof(item));
+
+	item.hInsertAfter = TVI_ROOT;
+	item.item.mask = TVIF_TEXT;
+	item.item.pszText = txt;
+	TreeView_InsertItem(s_hTree, &item);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
 static void AddMembers(HTREEITEM hParent, Tag* pTag)
 {
 /*
@@ -151,13 +165,7 @@ void UpdateTagsTree()
 	// Is there a tags file set?
 	if (wcslen(g_DB->GetFilename()) == 0)
 	{
-		TVINSERTSTRUCT item;
-		ZeroMemory(&item, sizeof(item));
-
-		item.hInsertAfter = TVI_ROOT;
-		item.item.mask = TVIF_TEXT;
-		item.item.pszText = L"Tags database not found";
-		TreeView_InsertItem(s_hTree, &item);
+		AddTextItem(L"Tags database not found");
 		return;
 	}
 
@@ -169,7 +177,6 @@ void UpdateTagsTree()
 	InsertItems(L"Enumerations", "Type = 'enum'", true);
 	InsertItems(L"Sub routines", "(Type = 'sub' OR Type = 'subroutine')", false);
 	InsertItems(L"Procedures", "Type = 'procedure'", false);
-	InsertItems(L"Procedures", "Type = 'procedure'", false);
 	InsertItems(L"Functions", "Type = 'function'", false);
 	InsertItems(L"Members", "Type = 'member'", false);
 	InsertItems(L"Method", "Type = 'method'", false);
@@ -178,8 +185,11 @@ void UpdateTagsTree()
 	InsertItems(L"Type definitions", "Type = 'typedef'", false);
 	InsertItems(L"Label", "Type = 'label'", false);
 	InsertItems(L"Define", "Type = 'define'", false);
-	InsertItems(L"Anchor", "Type = 'Anchor'", false);
+	InsertItems(L"Anchor", "Type = 'anchor'", false);
 	g_DB->Close();
+
+	if (TreeView_GetCount(s_hTree) == 0)
+		AddTextItem(L"No tags found in database");
 }
 
 /////////////////////////////////////////////////////////////////////////////
