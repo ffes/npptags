@@ -31,6 +31,7 @@ using namespace std;
 #include "Resource.h"
 
 static vector<Tag> s_foundTags;
+static char s_szFile[MAX_PATH];
 
 // The names of the columns
 #define COL_TAG     0
@@ -67,7 +68,7 @@ static void FillList(HWND hList)
 {
 	LV_ITEM item;
 	string str;
-	int iSelItem = 0;
+	int selItem = 0;
 	for (int i = 0; i < (int) s_foundTags.size(); i++)
 	{
 		ZeroMemory(&item, sizeof(item));
@@ -94,20 +95,10 @@ static void FillList(HWND hList)
 			{
 				case COL_FILE:      // Filename
 					str = s_foundTags[i].getFile();
-/*
+
 					// Is it the current file, preselect the tag
-					if (str.Left(1) == ".")
-					{
-						CString strTmp = str.Mid(1);
-						if (strTmp.CompareNoCase(m_strFile.Right(strTmp.GetLength())) == 0)
-							iSelItem = i;
-					}
-					else
-					{
-						if (m_strFile.CompareNoCase(str) == 0)
-							iSelItem = i;
-					}
-*/
+					if (stricmp(s_szFile, str.c_str()) == 0 && selItem == 0)
+						selItem = i;
 					break;
 
 					case COL_TYPE:
@@ -139,9 +130,9 @@ static void FillList(HWND hList)
 		ListView_SetColumnWidth(hList, col, LVSCW_AUTOSIZE_USEHEADER);
 
 	// Select the line and make sure it is visible
-	ListView_EnsureVisible(hList, iSelItem, FALSE);
-	ListView_SetItemState(hList, iSelItem, LVIS_SELECTED, LVIS_SELECTED);
-	ListView_SetItemState(hList, iSelItem, LVIS_FOCUSED, LVIS_FOCUSED);
+	ListView_EnsureVisible(hList, selItem, FALSE);
+	ListView_SetItemState(hList, selItem, LVIS_SELECTED, LVIS_SELECTED);
+	ListView_SetItemState(hList, selItem, LVIS_FOCUSED, LVIS_FOCUSED);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -201,6 +192,11 @@ static BOOL OnCancel(HWND hDlg)
 static BOOL OnInitDialog(HWND hDlg)
 {
 	CenterWindow(hDlg);
+
+	// Store the current filename
+	WCHAR curPath[MAX_PATH];
+	SendMessage(g_nppData._nppHandle, NPPM_GETFULLCURRENTPATH, MAX_PATH, (LPARAM) &curPath);
+	Unicode2Ansi(s_szFile, curPath, MAX_PATH);
 
 	// Create the columns and fill the listview with the tags in s_foundTags
 	HWND hList = GetDlgItem(hDlg, IDC_TAG_LIST);
