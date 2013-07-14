@@ -337,7 +337,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 
 			// The basic jump-to-tag handling
 			g_funcItem[index]._pFunc = JumpToTag;
-			wcscpy(g_funcItem[index]._itemName, L"Jump to tag");
+			wcscpy(g_funcItem[index]._itemName, L"Jump to Tag");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = new ShortcutKey;
 			g_funcItem[index]._pShKey->_isAlt = true;
@@ -349,7 +349,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 
 			// The basic jump-to-tag handling
 			g_funcItem[index]._pFunc = GenerateTagsDB;
-			wcscpy(g_funcItem[index]._itemName, L"Generate tags file");
+			wcscpy(g_funcItem[index]._itemName, L"Generate tags database");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
 			s_iRefreshTagsIndex = index;
