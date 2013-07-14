@@ -28,10 +28,20 @@ using namespace std;
 
 TagsDatabase::TagsDatabase() : SqliteDatabase()
 {
+	SetValues();
 }
 
 TagsDatabase::TagsDatabase(LPCWSTR file) : SqliteDatabase(file)
 {
+	SetValues();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+void TagsDatabase::SetValues()
+{
+	_dbVersion = 1;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -42,27 +52,27 @@ bool TagsDatabase::Open()
 	if (!SqliteDatabase::Open())
 		return false;
 
-	switch (GetUserVersion())
+	// If it is the same version as we generate, we're done
+	int dbVersion = GetUserVersion();
+	if (dbVersion == _dbVersion)
+		return true;
+
+	// Newly created database
+	if (dbVersion == 0)
 	{
-		case 0:
-			if (!Init())
-			{
-				_errorMsg = "Something went wrong initialising the SqliteDatabase!";
-				Close();
-				return false;
-			}
-			break;
+		// Initialise the database
+		if (Init())
+			return true;
 
-		case 1:
-			break;
-
-		default:
-			_errorMsg = "Wrong SqliteDatabase version, please regenerate!";
-			Close();
-			return false;
+		_errorMsg = "Something went wrong initialising the SqliteDatabase!";
+		Close();
+		return false;
 	}
 
-	return true;
+	// Database is not the right version!
+	_errorMsg = "Wrong SqliteDatabase version, please regenerate!";
+	Close();
+	return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -81,7 +91,7 @@ bool TagsDatabase::Init()
 	CommitTransaction();
 
 	// Set the schema version
-	return SetUserVersion(1);
+	return SetUserVersion(_dbVersion);
 }
 
 /////////////////////////////////////////////////////////////////////////////

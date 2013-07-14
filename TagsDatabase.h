@@ -35,6 +35,9 @@ public:
 
 protected:
 	bool Init();
+	void SetValues();
+
+	int _dbVersion;
 };
 
 #endif // __TAGSDATABASE_H__
