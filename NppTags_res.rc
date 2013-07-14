@@ -23,6 +23,7 @@
 #include <commctrl.h>
 #include "Resource.h"
 #include "Version.h"
+#include "sqlite3.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Version Information
@@ -63,13 +64,13 @@ IDD_ABOUTBOX DIALOGEX 0, 0, 224, 187
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_BORDER | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-	GROUPBOX		"CTags plug-in",IDC_STATIC,10,9,201,154,BS_CENTER
+	GROUPBOX		"Exuberant CTags plug-in",IDC_STATIC,10,9,201,154,BS_CENTER
 	LTEXT			"Author:",IDC_STATIC,30,23,35,8
 	LTEXT			"Frank Fesevur",IDC_STATIC,75,23,74,8
 	LTEXT			"Version:",IDC_STATIC,30,38,31,8
 	LTEXT			VERSION_NUMBER_STR,IDC_STATIC,75,38,19,8
-	//LTEXT			"Using SQLite:",IDC_STATIC,30,52,43,8
-	//LTEXT			SQLITE_VERSION,IDC_STATIC,75,52,43,8
+	LTEXT			"Using SQLite:",IDC_STATIC,30,52,43,8
+	LTEXT			SQLITE_VERSION,IDC_STATIC,75,52,43,8
 	LTEXT			"Licence:",IDC_STATIC,30,67,43,8
 	LTEXT			"GPL-2",IDC_STATIC,75,67,43,8
 	LTEXT			"Site:",IDC_STATIC,30,84,27,8

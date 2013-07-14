@@ -41,11 +41,12 @@ struct VersionInfo
 	WCHAR*	text;
 };
 
-#define MAX_VERSION_INFO 2
+#define MAX_VERSION_INFO 3
 
 static VersionInfo s_info[MAX_VERSION_INFO] =
 {
-	{	{0,2,0,0},	{2013, 7, 5},	L"- Tree now filled with functions.\n- Added three toolbar buttons." },
+	{	{0,2,0,0},	{2013, 7,14},	L"- After generating the tags file, it is now converted to a SQLite database. This makes it much easier and faster to build a proper tree.\n- Tree filled with common types of tags for various languages." },
+	{	{0,1,1,0},	{2013, 7, 5},	L"- Tree now filled with functions.\n- Added three toolbar buttons." },
 	{	{0,1,0,0},	{2013, 6,30},	L"- Internal proof of concept." }
 };
 
