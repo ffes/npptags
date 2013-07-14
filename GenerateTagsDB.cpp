@@ -146,8 +146,9 @@ static bool GenerateTagsFile()
 	cmd += char(34);
 	cmd += szExePath;
 	cmd += char(34);
-	if (g_Options->maxDepth > 0)
-		cmd += L" -R";
+	// Temporary disable this, because the search for the right database file is not done yet!!!
+	//if (g_Options->maxDepth > 0)
+	//	cmd += L" -R";
 	cmd += L" --fields=+i+K+S+l+m+a";
 
 	wstring options = g_Options->GetExtraOptions();
