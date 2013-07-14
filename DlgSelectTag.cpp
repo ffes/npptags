@@ -31,7 +31,6 @@ using namespace std;
 #include "Resource.h"
 
 static vector<Tag> s_foundTags;
-static char s_szFile[MAX_PATH];
 
 // The names of the columns
 #define COL_TAG     0
@@ -66,6 +65,14 @@ static void CreateColumns(HWND hList)
 
 static void FillList(HWND hList)
 {
+	// Get the filename of the current document
+	WCHAR tmp[MAX_PATH];
+	SendMessage(g_nppData._nppHandle, NPPM_GETFULLCURRENTPATH, MAX_PATH, (LPARAM) &tmp);
+
+	char curPath[MAX_PATH];
+	Unicode2Ansi(curPath, tmp, MAX_PATH);
+
+	// To through the found items
 	LV_ITEM item;
 	string str;
 	int selItem = 0;
@@ -97,26 +104,26 @@ static void FillList(HWND hList)
 					str = s_foundTags[i].getFile();
 
 					// Is it the current file, preselect the tag
-					if (stricmp(s_szFile, str.c_str()) == 0 && selItem == 0)
+					if (stricmp(curPath, str.c_str()) == 0 && selItem == 0)
 						selItem = i;
 					break;
 
-					case COL_TYPE:
-						str = s_foundTags[i].getType();
-						break;
+				case COL_TYPE:
+					str = s_foundTags[i].getType();
+					break;
 
-					case COL_DETAILS:
-						str = s_foundTags[i].getDetails();
-						break;
+				case COL_DETAILS:
+					str = s_foundTags[i].getDetails();
+					break;
 
-					case COL_LANG:
-						str = s_foundTags[i].getLanguage();
-						break;
+				case COL_LANG:
+					str = s_foundTags[i].getLanguage();
+					break;
 
-					default:
-						MsgBoxf("col = %d", col);
-						assert(false);
-						return;
+				default:
+					MsgBoxf("col = %d", col);
+					assert(false);
+					return;
 			}
 
 			wstring wstr2(str.begin(), str.end());
@@ -192,11 +199,6 @@ static BOOL OnCancel(HWND hDlg)
 static BOOL OnInitDialog(HWND hDlg)
 {
 	CenterWindow(hDlg);
-
-	// Store the current filename
-	WCHAR curPath[MAX_PATH];
-	SendMessage(g_nppData._nppHandle, NPPM_GETFULLCURRENTPATH, MAX_PATH, (LPARAM) &curPath);
-	Unicode2Ansi(s_szFile, curPath, MAX_PATH);
 
 	// Create the columns and fill the listview with the tags in s_foundTags
 	HWND hList = GetDlgItem(hDlg, IDC_TAG_LIST);
