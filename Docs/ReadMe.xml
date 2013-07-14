@@ -7,8 +7,8 @@
 <article lang="en">
 
 	<articleinfo>
-		<title>CTags plug-in for Notepad++</title>
-		<titleabbrev>NppTags</titleabbrev>
+		<title>NppTags</title>
+		<subtitle>Exuberant CTags plug-in for Notepad++</subtitle>
 		<author><firstname>Frank</firstname><surname>Fesevur</surname></author>
 		<pubdate>2013-07-14</pubdate>
 	</articleinfo>
@@ -24,19 +24,24 @@
 		<para>For the plug-in to work properly it is important that ctags.exe is somewhere in the path, preferably in the XXXXx.</para>
 	</sect1>
 
+	<sect1 id="history">
+		<title>History</title>
+		<para>There are several ctags based plug-ins for Notepad++, but none of them really fits my needs. There are to limited (only jump, just one file, based upon line numbers, etc) or to slow at startup. Back in 2002 and 2003 I wrote an add-on for TextPad named <ulink url="http://findtag.sourceforge.net/">FindTag</ulink>. I used this code base to create my own ctags based plug-in for Notepad++.</para>
+	</sect1>
+
 	<sect1 id="howtouse">
 		<title>How to use this plug-in</title>
 		<para>This plug-in has two different ways to use:</para>
 		<itemizedlist>
-			<listitem><para>FindTag tries to find the tag (function, variable, etc) under the cursor. If you want to jump to this tag simply press the assigned button. If there is only one reference found, you will be taken to it. Otherwise a dialog is shown where you can select the right one. If the tags is not found in the primary file, it will search the secondary file (as set in the options). Please be aware that the first time this file must be created, and from the root of my compiler's include directory it took more than 30 seconds.</para></listitem>
-			<listitem><para>ShowTags shows all (recognized) tags in a tree. You can select a tag from the tree and you will be taken to it.</para></listitem>
+			<listitem><para>"Jump to Tag" tries to find the tag (function, variable, etc) under the cursor. If you want to jump to this tag simply press the assigned button (default Alt+Q). If there is only one reference found, you will be taken to it. Otherwise a dialog is shown where you can select the right one.</para></listitem>
+			<listitem><para>The tree shows all (recognized) tags in a tree. You can select a tag from the tree and you will be taken to it.</para></listitem>
 		</itemizedlist>
 	</sect1>
 
 	<sect1 id="tree">
 		<title>Tree</title>
 		<para>Since ctags supports so many programming languages, it is impossible for me to add support for all these languages to the tree instantly.</para>
-		<para>Based upon a combination of the documentation of ctags and personal testing, these languages should work quite well:</para>
+		<para>Based upon a combination of the documentation of ctags and personal testing, these languages should work reasonably well:</para>
 		<itemizedlist>
 			<listitem><para>Classic ASP</para></listitem>
 			<listitem><para>C / C++</para></listitem>
@@ -47,7 +52,7 @@
 			<listitem><para>Python</para></listitem>
 		</itemizedlist>
 		<para>If your programming language isn't in the list and/or your type of tags don't show (properly) in the tree, contact me because it is not so difficult to add support for other languages/types.</para>
-		<para>Note that this it only affects the tree, FindTag should not have any problem.</para>
+		<para>Note that this it only affects the tree, "Jump to Tag" shouldn't have any problem.</para>
 	</sect1>
 
 	<sect1 id="contact">
@@ -70,10 +75,10 @@
 					Does NppTags recognize tags in language 'XYZ'?
 				</para></question>
 				<answer><para>
-					NppTags relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> for the recognition of tags. So please check the documentation of Exuberant CTags to see if your language is supported by Exuberant CTags. If not, you have to contact the Exuberant CTags team to see if he wants to add support for your programming language. If Exuberant CTags supports your language the FindTag mode of this add-in should have no problems, but the tree could not show all tags.
+					NppTags relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> for the recognition of tags. So please check the documentation of Exuberant CTags to see if your language is supported by Exuberant CTags. If not, you have to contact the Exuberant CTags team to see if they want to add support for your programming language. If Exuberant CTags supports your language "Jump to Tag" should have no problems, but the tree could not show all tags.
 				</para></answer>
 			</qandaentry>
-			<qandaentry>
+			<!--qandaentry>
 				<question id="faq_general_2"><para>
 					How can I use NppTags when the sources are in a directory tree?
 				</para></question>
@@ -82,20 +87,42 @@
 					When you work with only one directory tree, you can set the Initial Folder to a full path.<br/>
 					When you don't want this you could use a Workspace (located in the root of this directory tree) and set the Initial Folder to $WspDir. When you have a workspace loaded, this will put the tags in the same directory where the workspace is located. But if no workspace is loaded, it will work just like $FileDir.
 				</para></answer>
-			</qandaentry>
+			</qandaentry-->
 			<qandaentry>
 				<question id="faq_general_3"><para>
 					I want to add extra command line options the ctags generates the tags file. Can this be done?
 				</para></question>
 				<answer><para>
-					If you want to add extra command line options to ctags, use a <ulink url="http://ctags.sourceforge.net/ctags.html#FILES">ctags.cnf</ulink> file. See the Files section in the documentation of ctags.
+					There are several ways:
+					<itemizedlist>
+						<listitem><para>
+							Options
+						</para></listitem>
+						<listitem><para>
+							If you want to add extra command line options to ctags, use a <ulink url="http://ctags.sourceforge.net/ctags.html#FILES">ctags.cnf</ulink> file. See the Files section in the documentation of ctags.
+						</para></listitem>
+					</itemizedlist>
+				</para></answer>
+			</qandaentry>
+			<qandaentry>
+				<question id="faq_general_4"><para>
+					Why are the languages C and C++ are displayed as 'C/C++'?
+				</para></question>
+				<answer><para>
+					This is done because .h files are standard marked as C++ by ctags. And for tags there is not too much difference to not combine them.
+				</para></answer>
+			</qandaentry>
+			<qandaentry>
+				<question id="faq_general_5"><para>
+					When I jump to a tag it misses it by a few lines or it can not find it at all.
+				</para></question>
+				<answer><para>
+					You probably need to regenerate the tags database by pressing generate button.
 				</para></answer>
 			</qandaentry>
 
 <!--
-If the tags begin to get misplaced, you probably need to regenerate the tags file. The most easy way is open the ShowTags tree and press the Refresh button. The problem is that line numbers are the only way for me to jump to a tag. It would be great if TextPad would get native ctags support, so it can use the regex field to jump to a tag and not rely on line numbers. Or if they implement a DDE command Find (based upon regular expressions).
 Do not try to use this tool in the root directory (c:\) of a harddisk. Because of the ctags -R flag it will search your entire disk for source files.
-When you switch the case sensitive search you should regenerate all tags file, otherwise the fast binary search of readtags can not be used.
 -->
 
 		</qandaset>
@@ -104,7 +131,16 @@ When you switch the case sensitive search you should regenerate all tags file, o
 	<sect1 id="wishlist">
 		<title>Wish list</title>
 		<itemizedlist>
-			<listitem><para>Too many to mention.</para></listitem>
+			<listitem><para>Internally use the filenames always as WCHARs</para></listitem>
+			<listitem><para>Add an Options dialog</para></listitem>
+			<listitem><para>Better support for sources stored in various subdirectories.</para></listitem>
+			<listitem><para>Add an option to set a path to a secondary tags database. If the tag is not found in the default tags database, the secondary one should be searched. Such a tags database can be created from the root of your programming environment to search the standard libraries. Where to find this secondary database could be based upon the language of current document.</para></listitem>
+			<listitem><para>Nest enums and structs in C++ classes in the tree.</para></listitem>
+			<listitem><para>Autocompletion based upon the tags database.</para></listitem>
+			<listitem><para>"Jump Back" to bring you back to the position where when you jumped to a tag.</para></listitem>
+			<listitem><para>Show the tags in the tree grouped per file (regardless of their extension).</para></listitem>
+			<listitem><para>Show a seperate root item per language, if more then one language is found.</para></listitem>
+			<listitem><para>Show some details about the selected tag in the tree.</para></listitem>
 		</itemizedlist>
 	</sect1>
 
@@ -114,7 +150,9 @@ When you switch the case sensitive search you should regenerate all tags file, o
 		<sect2 id="v0_2_0">
 			<title>Version 0.2.0, XX July 2013</title>
 			<itemizedlist>
-				<listitem><para>After generating the tags file, it is now converted to a SQLite database. This makes is much easier and faster to build a proper tree.</para></listitem>
+				<listitem><para>After generating the tags file, it is now converted to a SQLite database. This makes it much easier and faster to build a proper tree.</para></listitem>
+				<listitem><para>Tree filled with common types of tags for various languages.</para></listitem>
+				<listitem><para>In the Select Tag dialog, preselect the first tag in the current file.</para></listitem>
 			</itemizedlist>
 		</sect2>
 
