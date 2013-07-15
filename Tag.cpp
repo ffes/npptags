@@ -33,6 +33,7 @@ const string whiteSpaces(" \f\n\r\t\v");
 #define MEMBER_OF_UNION			3
 #define MEMBER_OF_ENUM			4
 #define MEMBER_OF_INTERFACE		5
+#define MEMBER_OF_NAMESPACE		6
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -137,6 +138,14 @@ Tag& Tag::operator=(const tagEntry tag)
 		{
 			_memberOf = tag.fields.list[i].value;
 			_memberOfType = MEMBER_OF_INTERFACE;
+			continue;
+		}
+
+		// Is it member of a namespace?
+		if (strcmp(tag.fields.list[i].key, "namespace") == 0)
+		{
+			_memberOf = tag.fields.list[i].value;
+			_memberOfType = MEMBER_OF_NAMESPACE;
 			continue;
 		}
 
