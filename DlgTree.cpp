@@ -97,27 +97,32 @@ static HTREEITEM InsertTagItem(HTREEITEM hParent, Tag* pTag, bool members)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static void AddMembers(HTREEITEM hParent, Tag* pTag)
+static bool AddMembers(HTREEITEM hParent, Tag* pTag)
 {
 	g_DB->Open();
 	SqliteStatement stmt(g_DB);
-	if (!stmt.Prepare("SELECT * FROM Tags WHERE MemberOf = @memberof ORDER BY Tag, Signature"))
+	if (!stmt.Prepare("SELECT * FROM Tags WHERE MemberOf = @memberof AND Language = @lang ORDER BY Tag, Signature"))
 	{
 		g_DB->Close();
-		return;
+		return false;
 	}
 
 	stmt.BindTextParameter("@memberof", pTag->getTag().c_str());
+	stmt.BindTextParameter("@lang", pTag->getLanguage().c_str());
 
 	Tag tag;
+	bool added = false;
 	while (stmt.GetNextRecord())
 	{
 		// Get the tag from the database and add to tree
 		tag.SetFromDB(&stmt);
 		InsertTagItem(hParent, &tag, false);
+		added = true;
 	}
 	stmt.Finalize();
 	g_DB->Close();
+
+	return added;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -183,7 +188,7 @@ void UpdateTagsTree()
 	InsertItems(L"Members", "Type = 'member'", false);
 	InsertItems(L"Method", "Type = 'method'", false);
 	InsertItems(L"Variables", "Type = 'variable'", false);
-	InsertItems(L"Macros", "Type = 'variable'", false);
+	InsertItems(L"Macros", "Type = 'macro'", false);
 	InsertItems(L"Type definitions", "Type = 'typedef'", false);
 	InsertItems(L"Label", "Type = 'label'", false);
 	InsertItems(L"Define", "Type = 'define'", false);
@@ -387,11 +392,20 @@ static BOOL OnItemExpanding(NMTREEVIEW* pNMTreeView)
 		return FALSE;
 
 	// Is this a tag
+	bool added = true;
 	if (tvi.lParam != 0)
 	{
 		Tag tag;
 		FindTagInDB(tvi.lParam, &tag);
-		AddMembers(tvi.hItem, &tag);
+		added = AddMembers(tvi.hItem, &tag);
+	}
+
+	// If we didn't add anything, remove the (+) from the tree
+	if (!added)
+	{
+		tvi.mask = TVIF_CHILDREN;
+		tvi.cChildren = 0;
+		TreeView_SetItem(s_hTree, &tvi);
 	}
 
 	return FALSE;
