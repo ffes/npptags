@@ -75,7 +75,7 @@ static void FillList(HWND hList)
 	// To through the found items
 	LV_ITEM item;
 	string str;
-	int selItem = 0;
+	int selItem = -1;
 	for (int i = 0; i < (int) s_foundTags.size(); i++)
 	{
 		ZeroMemory(&item, sizeof(item));
@@ -104,7 +104,7 @@ static void FillList(HWND hList)
 					str = s_foundTags[i].getFile();
 
 					// Is it the current file, preselect the tag
-					if (stricmp(curPath, str.c_str()) == 0 && selItem == 0)
+					if (stricmp(curPath, str.c_str()) == 0 && selItem < 0)
 						selItem = i;
 					break;
 
@@ -137,6 +137,9 @@ static void FillList(HWND hList)
 		ListView_SetColumnWidth(hList, col, LVSCW_AUTOSIZE_USEHEADER);
 
 	// Select the line and make sure it is visible
+	if (selItem < 0)
+		selItem = 0;
+
 	ListView_EnsureVisible(hList, selItem, FALSE);
 	ListView_SetItemState(hList, selItem, LVIS_SELECTED, LVIS_SELECTED);
 	ListView_SetItemState(hList, selItem, LVIS_FOCUSED, LVIS_FOCUSED);
