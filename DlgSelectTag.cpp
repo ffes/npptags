@@ -265,7 +265,8 @@ static bool ShowSelectTagDlg()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Search the tag in the database. Returns false on error, s_foundTags is
+// empty when the tag is not found.
 
 static bool FindTagInDB(LPCWSTR szTag)
 {
@@ -298,14 +299,14 @@ static bool FindTagInDB(LPCWSTR szTag)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Entry point. Get current word from editor, and search for it in the db.
 
 void JumpToTag()
 {
-	// Does the file exist?
+	// Does the database exist?
 	if (wcslen(g_DB->GetFilename()) == 0)
 	{
-		MsgBox("No database file set");
+		MsgBox("Tags database not found!");
 		return;
 	}
 
@@ -331,8 +332,9 @@ void JumpToTag()
 	// Find the tags for this word
 	if (s_foundTags.size() == 0)
 	{
-		wstring str = curWord;
-		str += L" not found";
+		wstring str = L"Tag '";
+		str += curWord;
+		str += L"' not found!";
 		MsgBox(str.c_str());
 		return;
 	}
