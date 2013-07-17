@@ -23,9 +23,6 @@
 #include <stdio.h>
 
 #include "Tag.h"
-using namespace std;
-
-const string whiteSpaces(" \f\n\r\t\v");
 
 #define NOT_MEMBER_OF			0
 #define MEMBER_OF_CLASS			1
@@ -373,7 +370,7 @@ void Tag::TrimPattern()
 
 	// Fix all escaped slashes
 	std::string::size_type pos = 0;
-	string from = "\\/", to = "/";
+	std::string from = "\\/", to = "/";
 	while ((pos = _pattern.find(from, pos)) != std::string::npos)
 	{
 		_pattern.replace(pos, from.length(), to);
@@ -381,6 +378,7 @@ void Tag::TrimPattern()
 	}
 
 	// Trim right side of pattern
+	std::string whiteSpaces(" \f\n\r\t\v");
 	pos = _pattern.find_last_not_of(whiteSpaces);
 	_pattern.erase(pos + 1);
 
