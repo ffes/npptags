@@ -55,6 +55,18 @@
 		<para>Note that this it only affects the tree, "Jump to Tag" shouldn't have any problem.</para>
 	</sect1>
 
+	<sect1 id="inidebug">
+		<title>Debug section in NppTags.ini</title>
+		<para>You can manually add an extra section with read-only options to the <computeroutput>NppTags.ini</computeroutput> to control what happens to the automatically generated tags file. These are the default settings:</para>
+		<screen>
+			[Debug]
+			OverwriteTags=1
+			DelTags=1
+		</screen>
+		<para>When <computeroutput>OverwriteTags</computeroutput> is set to <computeroutput>0</computeroutput> and a tags file is found the plug-in will not overwrite and regenerate this existing tags file before generating the database.</para>
+		<para>When <computeroutput>DelTags</computeroutput> is set to <computeroutput>0</computeroutput> the plug-in will not delete the generated tags file after generating the database.</para>
+	</sect1>
+
 	<sect1 id="contact">
 		<title>Contact</title>
 		<para>The plug-in's web page can be found at <ulink url="https://code.google.com/p/npptags/">https://code.google.com/p/npptags/</ulink>. The downloads and issue tracker can be found there as well. The git repository is at <ulink url="https://github.com/ffes/npptags">https://github.com/ffes/npptags</ulink>.</para>
@@ -140,7 +152,8 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 			<listitem><para>"Jump Back" to bring you back to the position where when you jumped to a tag.</para></listitem>
 			<listitem><para>Show the tags in the tree grouped per file (regardless of their extension).</para></listitem>
 			<listitem><para>Show a seperate root item per language, if more then one language is found.</para></listitem>
-			<listitem><para>Show some details about the selected tag in the tree.</para></listitem>
+			<listitem><para>Show details about the selected tag in the tree.</para></listitem>
+			<listitem><para>Options per tags database. Preserve those settings when the database is regenerated.</para></listitem>
 		</itemizedlist>
 	</sect1>
 
