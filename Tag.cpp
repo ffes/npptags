@@ -307,26 +307,24 @@ std::string Tag::getDetails()
 /////////////////////////////////////////////////////////////////////////////
 //
 
-bool Tag::SaveToDB(SqliteStatement* stmt)
+void Tag::SaveToDB(SqliteStatement* stmt)
 {
 	// Bind the values to the parameters
-	stmt->BindTextParameter("@tag", _tag.c_str());
-	stmt->BindTextParameter("@file", _file.c_str());
-	stmt->BindIntParameter("@line", _line, _line == 0);
-	stmt->BindTextParameter("@pattern", _pattern.c_str());
-	stmt->BindTextParameter("@type", _type.c_str());
-	stmt->BindTextParameter("@language", _language.c_str());
-	stmt->BindTextParameter("@memberof", _memberOf.c_str());
-	stmt->BindIntParameter("@memberoftype", _memberOfType, _memberOfType == NOT_MEMBER_OF);
-	stmt->BindTextParameter("@inherits", _inherits.c_str());
-	stmt->BindTextParameter("@signature", _signature.c_str());
-	stmt->BindTextParameter("@access", _access.c_str());
-	stmt->BindTextParameter("@implementation", _implementation.c_str());
-	stmt->BindBoolParameter("@thisfileonly", _thisFileOnly);
-	stmt->BindTextParameter("@unrecognized", _unrecognized.c_str());
+	stmt->Bind("@tag", _tag.c_str());
+	stmt->Bind("@file", _file.c_str());
+	stmt->Bind("@line", _line, _line == 0);
+	stmt->Bind("@pattern", _pattern.c_str());
+	stmt->Bind("@type", _type.c_str());
+	stmt->Bind("@language", _language.c_str());
+	stmt->Bind("@memberof", _memberOf.c_str());
+	stmt->Bind("@memberoftype", _memberOfType, _memberOfType == NOT_MEMBER_OF);
+	stmt->Bind("@inherits", _inherits.c_str());
+	stmt->Bind("@signature", _signature.c_str());
+	stmt->Bind("@access", _access.c_str());
+	stmt->Bind("@implementation", _implementation.c_str());
+	stmt->Bind("@thisfileonly", _thisFileOnly);
+	stmt->Bind("@unrecognized", _unrecognized.c_str());
 	stmt->SaveRecord();
-
-	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////

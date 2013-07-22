@@ -19,8 +19,7 @@
 //                                                                         //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __TAGSDATABASE_H__
-#define __TAGSDATABASE_H__
+#pragma once
 
 #include "SqliteDatabase.h"
 
@@ -30,14 +29,12 @@ public:
 	TagsDatabase();
 	TagsDatabase(LPCWSTR file);
 
-	virtual bool Open();
-	bool InsertPragmas();
+	virtual void Open();
+	void InsertPragmas();
 
 protected:
-	bool Init();
+	void Init();
 	void SetValues();
 
 	int _dbVersion;
 };
-
-#endif // __TAGSDATABASE_H__

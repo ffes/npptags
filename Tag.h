@@ -19,8 +19,7 @@
 //                                                                         //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __TAG_H__
-#define __TAG_H__
+#pragma once
 
 #include <string>
 
@@ -35,7 +34,7 @@ public:
 	Tag& operator=(const tagEntry);
 
 	void SetFromDB(SqliteStatement* stmt);
-	bool SaveToDB(SqliteStatement* stmt);
+	void SaveToDB(SqliteStatement* stmt);
 
 	void empty();
 
@@ -64,7 +63,7 @@ protected:
 	std::string _type;					// What is its type?
 	std::string _language;				// What is the programming language?
 	std::string _memberOf;				// Is it a member?
-	int _memberOfType;						// Member of what type?
+	int _memberOfType;					// Member of what type?
 	std::string _inherits;				// List of classes from which this class is derived
 	std::string _signature;				// What is its signature? (from ctags 5.4)
 	std::string _access;				// What is the access (or export) of class members?
@@ -74,5 +73,3 @@ protected:
 
 	void TrimPattern();
 };
-
-#endif // __TAG_H__

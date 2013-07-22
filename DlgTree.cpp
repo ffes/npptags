@@ -101,14 +101,9 @@ static bool AddMembers(HTREEITEM hParent, Tag* pTag)
 {
 	g_DB->Open();
 	SqliteStatement stmt(g_DB);
-	if (!stmt.Prepare("SELECT * FROM Tags WHERE MemberOf = @memberof AND Language = @lang ORDER BY Tag, Signature"))
-	{
-		g_DB->Close();
-		return false;
-	}
-
-	stmt.BindTextParameter("@memberof", pTag->getTag().c_str());
-	stmt.BindTextParameter("@lang", pTag->getLanguage().c_str());
+	stmt.Prepare("SELECT * FROM Tags WHERE MemberOf = @memberof AND Language = @lang ORDER BY Tag, Signature");
+	stmt.Bind("@memberof", pTag->getTag().c_str());
+	stmt.Bind("@lang", pTag->getLanguage().c_str());
 
 	Tag tag;
 	bool added = false;
@@ -136,8 +131,7 @@ static void InsertItems(LPCWSTR group, LPCSTR where, bool members)
 	if (!members)
 		sql += " AND MemberOf IS NULL";
 	sql += " ORDER BY Tag, Signature";
-	if (!stmt.Prepare(sql.c_str()))
-		return;
+	stmt.Prepare(sql.c_str());
 
 	Tag tag;
 	HTREEITEM hParent = NULL;
@@ -177,6 +171,8 @@ void UpdateTagsTree()
 	}
 
 	// Add the tags to the tree (as many as possible)
+	try
+	{
 	g_DB->Open();
 	InsertItems(L"Classes", "Type = 'class' OR Type = 'interface'", true);
 	InsertItems(L"Structures", "Type = 'struct'", true);
@@ -194,6 +190,12 @@ void UpdateTagsTree()
 	InsertItems(L"Define", "Type = 'define'", false);
 	InsertItems(L"Anchor", "Type = 'anchor'", false);
 	g_DB->Close();
+	}
+	catch(SqliteException e)
+	{
+		InsertTextItem(L"Error building tree");
+		return;
+	}
 
 	if (TreeView_GetCount(s_hTree) == 0)
 		InsertTextItem(L"No tags found in database");
@@ -202,23 +204,12 @@ void UpdateTagsTree()
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static bool FindTagInDB(int idx, Tag* pTag)
+static void FindTagInDB(int idx, Tag* pTag)
 {
-	if (!g_DB->Open())
-		return false;
-
+	g_DB->Open();
 	SqliteStatement stmt(g_DB);
-	if (!stmt.Prepare("SELECT * FROM Tags WHERE Idx = @idx"))
-	{
-		g_DB->Close();
-		return false;
-	}
-
-	if (!stmt.BindIntParameter("@idx", idx))
-	{
-		g_DB->Close();
-		return false;
-	}
+	stmt.Prepare("SELECT * FROM Tags WHERE Idx = @idx");
+	stmt.Bind("@idx", idx);
 
 	if (stmt.GetNextRecord())
 	{
@@ -226,8 +217,6 @@ static bool FindTagInDB(int idx, Tag* pTag)
 	}
 	stmt.Finalize();
 	g_DB->Close();
-
-	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////

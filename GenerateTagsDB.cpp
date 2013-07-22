@@ -177,54 +177,52 @@ static bool ConvertTagsToDB()
 	tagFileInfo info;
 	tagFile *const file = tagsOpen(s_tagsFile.c_str(), &info);
 	if (file == NULL)
-		return false;
-
-	// First delete the old database (if any)
-	if (!g_DB->Delete())
 	{
-		tagsClose(file);
+		MsgBox("Something went wrong opening generated tags file");
 		return false;
 	}
 
-	// Create the new database
-	if (!g_DB->Open())
+	try
 	{
-		tagsClose(file);
-		return false;
-	}
+		// First delete the old database (if any)
+		g_DB->Delete();
 
-	// Prepare the statement
-	SqliteStatement stmt(g_DB);
-	if (!stmt.Prepare("INSERT INTO Tags(Tag, File, Line, Pattern, Type, Language, MemberOf, MemberOfType, Inherits, Signature, Access, Implementation, ThisFileOnly, Unrecognized) VALUES (@tag, @file, @line, @pattern, @type, @language, @memberof, @memberoftype, @inherits, @signature, @access, @implementation, @thisfileonly, @unrecognized)"))
-	{
-		tagsClose(file);
+		// Create the new database
+		g_DB->Open();
+
+		// Prepare the statement
+		SqliteStatement stmt(g_DB);
+		stmt.Prepare("INSERT INTO Tags(Tag, File, Line, Pattern, Type, Language, MemberOf, MemberOfType, Inherits, Signature, Access, Implementation, ThisFileOnly, Unrecognized) VALUES (@tag, @file, @line, @pattern, @type, @language, @memberof, @memberoftype, @inherits, @signature, @access, @implementation, @thisfileonly, @unrecognized)");
+
+		// Go through the records and save them in the database
+		Tag tag;
+		tagEntry entry;
+		g_DB->BeginTransaction();
+		while (tagsNext(file, &entry) == TagSuccess)
+		{
+			// Put it in the array		
+			tag = entry;
+
+			// Very long search pattern in JavaScript, minimized?
+			if (tag.getLanguage() == "JavaScript")
+				if (tag.getPattern().length() >= MAX_PATH)
+					continue;
+
+			tag.SaveToDB(&stmt);
+		}
+		stmt.Finalize();
+		g_DB->CommitTransaction();
 		g_DB->Close();
+	}
+	catch(SqliteException e)
+	{
+		tagsClose(file);
+		MsgBoxf("Something went wrong convert tags file to database!\n%s", e.what());
 		return false;
 	}
-
-	// Go through the records and save them in the database
-	Tag tag;
-	tagEntry entry;
-	g_DB->BeginTransaction();
-	while (tagsNext(file, &entry) == TagSuccess)
-	{
-		// Put it in the array		
-		tag = entry;
-
-		// Very long search pattern in JavaScript, minimized?
-		if (tag.getLanguage() == "JavaScript")
-			if (tag.getPattern().length() >= MAX_PATH)
-				continue;
-
-		tag.SaveToDB(&stmt);
-	}
-	stmt.Finalize();
-	g_DB->CommitTransaction();
-	g_DB->Close();
 
 	// Close the tags file
 	tagsClose(file);
-
 	return true;
 }
 
@@ -245,10 +243,7 @@ void GenerateTagsDB()
 
 	// Now we can convert the tags file to a SQLite database
 	if (!ConvertTagsToDB())
-	{
-		MsgBoxf("Something went wrong convert tags file to database!\n%s", g_DB->GetErrorMsg().c_str());
 		return;
-	}
 
 	// Delete the temp tags file
 	if (g_Options->deleteTagsFile)

@@ -265,26 +265,14 @@ static bool ShowSelectTagDlg()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Search the tag in the database. Returns false on error, s_foundTags is
-// empty when the tag is not found.
+// Search the tag in the database.
 
-static bool FindTagInDB(LPCWSTR szTag)
+static void FindTagInDB(LPCWSTR szTag)
 {
-	if (!g_DB->Open())
-		return false;
-
+	g_DB->Open();
 	SqliteStatement stmt(g_DB);
-	if (!stmt.Prepare("SELECT * FROM Tags WHERE Tag = @tag"))
-	{
-		g_DB->Close();
-		return false;
-	}
-
-	if (!stmt.BindTextParameter("@tag", szTag))
-	{
-		g_DB->Close();
-		return false;
-	}
+	stmt.Prepare("SELECT * FROM Tags WHERE Tag = @tag");
+	stmt.Bind("@tag", szTag);
 
 	Tag tag;
 	while (stmt.GetNextRecord())
@@ -294,8 +282,6 @@ static bool FindTagInDB(LPCWSTR szTag)
 	}
 	stmt.Finalize();
 	g_DB->Close();
-
-	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -323,9 +309,13 @@ void JumpToTag()
 	}
 
 	// Find the tags for this word
-	if (!FindTagInDB(curWord))
+	try
 	{
-		MsgBoxf("Error searching tag in database\n%s", g_DB->GetErrorMsg().c_str());
+		FindTagInDB(curWord);
+	}
+	catch(SqliteException e)
+	{
+		MsgBoxf("Error searching tag in database\n%s", e.what());
 		return;
 	}
 

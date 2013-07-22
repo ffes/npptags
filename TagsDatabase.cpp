@@ -47,60 +47,50 @@ void TagsDatabase::SetValues()
 /////////////////////////////////////////////////////////////////////////////
 //
 
-bool TagsDatabase::Open()
+void TagsDatabase::Open()
 {
-	if (!SqliteDatabase::Open())
-		return false;
+	SqliteDatabase::Open();
 
 	// If it is the same version as we generate, we're done
 	int dbVersion = GetUserVersion();
 	if (dbVersion == _dbVersion)
-		return true;
+		return;
 
-	// Newly created database
+	// New created database?
 	if (dbVersion == 0)
 	{
 		// Initialise the database
-		if (Init())
-			return true;
-
-		_errorMsg = "Something went wrong initialising the SqliteDatabase!";
-		Close();
-		return false;
+		Init();
+		return;
 	}
 
 	// Database is not the right version!
-	_errorMsg = "Wrong SqliteDatabase version, please regenerate!";
-	Close();
-	return false;
+	throw SqliteException("Database has wrong version, please regenerate!");
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Need to improve error handling!
+// Create a new database
 
-bool TagsDatabase::Init()
+void TagsDatabase::Init()
 {
-	if (!BeginTransaction())
-		return false;
-
-	RunSQL("CREATE TABLE Tags(Idx INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Tag TEXT NOT NULL, File TEXT NOT NULL, Line INTEGER, Pattern TEXT, Type TEXT, Language TEXT, MemberOf TEXT, MemberOfType INTEGER, Inherits TEXT, Signature TEXT, Access TEXT, Implementation TEXT, ThisFileOnly INTEGER, Unrecognized TEXT);");
-	RunSQL("CREATE INDEX TagsName ON Tags(Tag);");
-	RunSQL("CREATE INDEX TagsLangType ON Tags(Language, Type);");
-	RunSQL("CREATE INDEX TagsType ON Tags(Type);");
-	RunSQL("CREATE INDEX TagsLangMember ON Tags(Language, MemberOf);");
+	BeginTransaction();
+	Execute("CREATE TABLE Tags(Idx INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Tag TEXT NOT NULL, File TEXT NOT NULL, Line INTEGER, Pattern TEXT, Type TEXT, Language TEXT, MemberOf TEXT, MemberOfType INTEGER, Inherits TEXT, Signature TEXT, Access TEXT, Implementation TEXT, ThisFileOnly INTEGER, Unrecognized TEXT);");
+	Execute("CREATE INDEX TagsName ON Tags(Tag);");
+	Execute("CREATE INDEX TagsLangType ON Tags(Language, Type);");
+	Execute("CREATE INDEX TagsType ON Tags(Type);");
+	Execute("CREATE INDEX TagsLangMember ON Tags(Language, MemberOf);");
+	Execute("CREATE TABLE Settings(Key TEXT PRIMARY KEY, Value TEXT);");
 	CommitTransaction();
-
-	// Set the schema version
-	return SetUserVersion(_dbVersion);
+	SetUserVersion(_dbVersion);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // To speed up the inserting
 
-bool TagsDatabase::InsertPragmas()
+void TagsDatabase::InsertPragmas()
 {
-	RunSQL("PRAGMA synchronous = OFF");
-	RunSQL("PRAGMA count_changes = OFF");
-	RunSQL("PRAGMA journal_mode = MEMORY");
-	return RunSQL("PRAGMA temp_store = MEMORY");
+	Execute("PRAGMA synchronous = OFF");
+	Execute("PRAGMA count_changes = OFF");
+	Execute("PRAGMA journal_mode = MEMORY");
+	Execute("PRAGMA temp_store = MEMORY");
 }
