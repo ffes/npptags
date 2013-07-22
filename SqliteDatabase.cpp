@@ -35,14 +35,15 @@ SqliteDatabase::SqliteDatabase()
 
 SqliteDatabase::SqliteDatabase(LPCWSTR file)
 {
-	wcsncpy(_dbFile, file, MAX_PATH);
 	_db = NULL;
+	SetFilename(file);
+	Open();
 }
 
 SqliteDatabase::~SqliteDatabase()
 {
 	if (_db != NULL)
-		Close();
+		sqlite3_close(_db);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -56,132 +57,108 @@ void SqliteDatabase::SetFilename(LPCWSTR file)
 /////////////////////////////////////////////////////////////////////////////
 // Close the database
 
-bool SqliteDatabase::Close()
+void SqliteDatabase::Close()
 {
-	bool ret = (sqlite3_close(_db) == SQLITE_OK);
+	if (sqlite3_close(_db) != SQLITE_OK)
+		throw SqliteException(sqlite3_errmsg(_db));
+
 	_db = NULL;
-	return ret;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Open the database
 
-bool SqliteDatabase::Open()
+void SqliteDatabase::Open()
 {
 	if (_db != NULL)
-	{
-		_errorMsg = "Database already opened!";
-		return false;
-	}
+		throw SqliteException("Database already opened!");
 
 	// Is the filename filled?
 	if (wcslen(_dbFile) == 0)
-	{
-		_errorMsg = "Filename not set!";
-		return false;
-	}
+		throw SqliteException("Filename not set!");
 
 	// Open the database
-	bool ret = (sqlite3_open16(_dbFile, &_db) == SQLITE_OK);
-
-	if (!ret)
-		_errorMsg = sqlite3_errmsg(_db);
-
-	return ret;
+	if (sqlite3_open16(_dbFile, &_db) != SQLITE_OK)
+		throw SqliteException(sqlite3_errmsg(_db));
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Open the database
 
-bool SqliteDatabase::Open(LPCWSTR file)
+void SqliteDatabase::Open(LPCWSTR file)
 {
 	SetFilename(file);
-	return Open();
+	Open();
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Delete the database file
 
-bool SqliteDatabase::Delete()
+void SqliteDatabase::Delete()
 {
 	if (!DeleteFile(_dbFile))
 	{
 		DWORD err = GetLastError();
 		if (err != ERROR_FILE_NOT_FOUND)
-		{
-			_errorMsg = "Unable to delete SqliteDatabase";
-			return false;
-		}
+			throw SqliteException("Unable to delete SqliteDatabase");
 	}
-	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Compress the database
 
-bool SqliteDatabase::Vacuum()
+void SqliteDatabase::Vacuum()
 {
-	return RunSQL("VACUUM;");
+	Execute("VACUUM;");
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Check if a table exists
+
+bool SqliteDatabase::TableExists(const char* table)
+{
+	SqliteStatement stmt(this, "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = @name;");
+	stmt.Bind("@name", table);
+	stmt.GetNextRecord();
+	int count = stmt.GetIntColumn(0);
+	return (count == 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 
-bool SqliteDatabase::BeginTransaction()
+void SqliteDatabase::BeginTransaction()
 {
-	return RunSQL("BEGIN TRANSACTION;");
+	Execute("BEGIN TRANSACTION;");
 }
 
-bool SqliteDatabase::CommitTransaction()
+void SqliteDatabase::CommitTransaction()
 {
-	return RunSQL("COMMIT TRANSACTION;");
+	Execute("COMMIT TRANSACTION;");
 }
 
-bool SqliteDatabase::RollbackTransaction()
+void SqliteDatabase::RollbackTransaction()
 {
-	return RunSQL("ROLLBACK TRANSACTION;");
+	Execute("ROLLBACK TRANSACTION;");
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Execute an SQL statement without results (UPDATE, INSERT, DELETE, etc)
+
+void SqliteDatabase::Execute(LPCSTR szSQL)
+{
+	if (sqlite3_exec(_db, szSQL, NULL, NULL, NULL) != SQLITE_OK)
+		throw sqlite3_errmsg(_db);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 
-bool SqliteDatabase::RunSQL(LPCSTR szSQL)
-{
-	bool ret = (sqlite3_exec(_db, szSQL, NULL, NULL, NULL) == SQLITE_OK);
-
-	if (!ret)
-		_errorMsg = sqlite3_errmsg(_db);
-
-	return ret;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-bool SqliteDatabase::GetLongResult(LPCSTR szStmt, long& result)
-{
-	bool ret = false;
-
-	sqlite3_stmt *stmt;
-	sqlite3_prepare(_db, szStmt, -1, &stmt, NULL);
-	if (sqlite3_step(stmt) == SQLITE_ROW)
-	{
-		result = sqlite3_column_int(stmt, 0);
-		ret = true;
-	}
-
-	sqlite3_finalize(stmt);
-	return ret;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-bool SqliteDatabase::SetUserVersion(long version)
+void SqliteDatabase::SetUserVersion(long version)
 {
 	char sql[MAX_PATH];
-	_snprintf(sql, MAX_PATH, "PRAGMA user_version = %ld", version);
-	return RunSQL(sql);
+	_snprintf(sql, MAX_PATH, "PRAGMA user_version = %ld;", version);
+	Execute(sql);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -189,22 +166,20 @@ bool SqliteDatabase::SetUserVersion(long version)
 
 long SqliteDatabase::GetUserVersion()
 {
-	long user_version = 0;
-	if (!GetLongResult("PRAGMA user_version;", user_version))
-		return 0;
-
-	return user_version;
+	SqliteStatement stmt(this, "PRAGMA user_version;");
+	stmt.GetNextRecord();
+	return stmt.GetIntColumn(0);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 
-bool SqliteDatabase::EnableForeignKeys(bool on)
+void SqliteDatabase::EnableForeignKeys(bool on)
 {
 	char sql[MAX_PATH];
 	strncpy(sql, "PRAGMA foreign_keys = ", MAX_PATH);
 	strncat(sql, on ? "ON" : "OFF", MAX_PATH);
-	return RunSQL(sql);
+	Execute(sql);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -216,39 +191,39 @@ SqliteStatement::SqliteStatement(SqliteDatabase* db)
 	_stmt = NULL;
 }
 
+SqliteStatement::SqliteStatement(SqliteDatabase* db, const char* sql)
+{
+	_db = db->GetDB();
+	_stmt = NULL;
+	Prepare(sql);
+}
+
 SqliteStatement::~SqliteStatement()
 {
 	if (_stmt != NULL)
-		Finalize();
+		sqlite3_finalize(_stmt);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 
-bool SqliteStatement::Prepare(const char* sql)
+void SqliteStatement::Prepare(const char* sql)
 {
-	bool ret = (sqlite3_prepare_v2(_db, sql, -1, &_stmt, NULL) == SQLITE_OK);
-
-	if (!ret)
-		_errorMsg = sqlite3_errmsg(_db);
-
-	return ret;
+	if (sqlite3_prepare_v2(_db, sql, -1, &_stmt, NULL) != SQLITE_OK)
+		throw SqliteException(sqlite3_errmsg(_db));
+	_colNames.clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 
-bool SqliteStatement::SaveRecord()
+void SqliteStatement::SaveRecord()
 {
-	bool ret = (sqlite3_step(_stmt) == SQLITE_DONE);
+	if (sqlite3_step(_stmt) != SQLITE_DONE)
+		throw SqliteException(sqlite3_errmsg(_db));
 
-	if (ret)
-		ret = (sqlite3_reset(_stmt) == SQLITE_DONE);
-
-	if (!ret)
-		_errorMsg = sqlite3_errmsg(_db);
-
-	return ret;
+	if (sqlite3_reset(_stmt) != SQLITE_OK)
+		throw SqliteException(sqlite3_errmsg(_db));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -266,7 +241,7 @@ bool SqliteStatement::GetNextRecord()
 	}
 
 	if (rc != SQLITE_DONE)
-		_errorMsg = sqlite3_errmsg(_db);
+		throw SqliteException(sqlite3_errmsg(_db));
 
 	return false;
 }
@@ -274,25 +249,20 @@ bool SqliteStatement::GetNextRecord()
 /////////////////////////////////////////////////////////////////////////////
 //
 
-bool SqliteStatement::Finalize()
+void SqliteStatement::Finalize()
 {
-	bool ret = (sqlite3_finalize(_stmt) == SQLITE_OK);
+	if (sqlite3_finalize(_stmt) != SQLITE_OK)
+		throw SqliteException(sqlite3_errmsg(_db));
 
-	if (ret)
-	{
-		_stmt = NULL;
-		_colNames.clear();
-	}
-	else
-		_errorMsg = sqlite3_errmsg(_db);
-
-	return ret;
+	_stmt = NULL;
+	_colNames.clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Binds a wchar string to the given parameter. Empty strings are bound
+// as null
 
-bool SqliteStatement::BindTextParameter(const char* param, const WCHAR* val)
+void SqliteStatement::Bind(const char* param, const WCHAR* val)
 {
 	int col = sqlite3_bind_parameter_index(_stmt, param);
 	
@@ -311,15 +281,14 @@ bool SqliteStatement::BindTextParameter(const char* param, const WCHAR* val)
 	}
 
 	if (res != SQLITE_OK)
-		_errorMsg = sqlite3_errmsg(_db);
-
-	return (res == SQLITE_OK);
+		throw SqliteException(sqlite3_errmsg(_db));
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Binds a char string to the given parameter. Empty strings are bound
+// as null
 
-bool SqliteStatement::BindTextParameter(const char* param, const char *val)
+void SqliteStatement::Bind(const char* param, const char *val)
 {
 	int col = sqlite3_bind_parameter_index(_stmt, param);
 
@@ -339,39 +308,44 @@ bool SqliteStatement::BindTextParameter(const char* param, const char *val)
 	}
 
 	if (res != SQLITE_OK)
-		_errorMsg = sqlite3_errmsg(_db);
-
-	return (res == SQLITE_OK);
+		throw SqliteException(sqlite3_errmsg(_db));
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Bind an integer to the given parameter. If optional "bool null" is true,
+// null is bound. Use like this: stmt.Bind("col", var, var == 0);
 
-bool SqliteStatement::BindIntParameter(const char* param, const int val, bool null)
+void SqliteStatement::Bind(const char* param, const int val, bool null)
 {
 	int col = sqlite3_bind_parameter_index(_stmt, param);
-
 	int res = (null ? sqlite3_bind_null(_stmt, col) : sqlite3_bind_int(_stmt, col, val));
 
 	if (res != SQLITE_OK)
-		_errorMsg = sqlite3_errmsg(_db);
-
-	return(res == SQLITE_OK);
+		throw SqliteException(sqlite3_errmsg(_db));
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Binds 1 for true and 0 for false to the given parameter
 
-bool SqliteStatement::BindBoolParameter(const char* param, const bool val)
+void SqliteStatement::Bind(const char* param, const bool val)
 {
 	int col = sqlite3_bind_parameter_index(_stmt, param);
-
 	int res = sqlite3_bind_int(_stmt, col, val ? 1 : 0);
 
 	if (res != SQLITE_OK)
-		_errorMsg = sqlite3_errmsg(_db);
+		throw SqliteException(sqlite3_errmsg(_db));
+}
 
-	return(res == SQLITE_OK);
+/////////////////////////////////////////////////////////////////////////////
+// Bind NULL to the given parameter
+
+void SqliteStatement::Bind(const char* param)
+{
+	int col = sqlite3_bind_parameter_index(_stmt, param);
+	int res = sqlite3_bind_null(_stmt, col);
+
+	if (res != SQLITE_OK)
+		throw SqliteException(sqlite3_errmsg(_db));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -386,20 +360,35 @@ void SqliteStatement::ResolveColumnNames()
 /////////////////////////////////////////////////////////////////////////////
 //
 
+std::string SqliteStatement::GetTextColumn(int col)
+{
+	LPCSTR val = (LPCSTR) sqlite3_column_text(_stmt, col);
+	return (val == NULL ? "" : val);
+}
+
 std::string SqliteStatement::GetTextColumn(std::string col)
 {
-	LPCSTR val = (LPCSTR) sqlite3_column_text(_stmt, _colNames[col]);
-	return (val == NULL ? "" : val);
+	return GetTextColumn(_colNames[col]);
+}
+
+std::wstring SqliteStatement::GetWTextColumn(int col)
+{
+	LPCWSTR val = (LPCWSTR) sqlite3_column_text16(_stmt, col);
+	return (val == NULL ? L"" : val);
 }
 
 std::wstring SqliteStatement::GetWTextColumn(std::string col)
 {
-	LPCWSTR val = (LPCWSTR) sqlite3_column_text16(_stmt, _colNames[col]);
-	return (val == NULL ? L"" : val);
+	return GetWTextColumn(_colNames[col]);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
+
+int SqliteStatement::GetIntColumn(int col)
+{
+	return sqlite3_column_int(_stmt, col);
+}
 
 int SqliteStatement::GetIntColumn(std::string col)
 {
@@ -408,6 +397,11 @@ int SqliteStatement::GetIntColumn(std::string col)
 
 /////////////////////////////////////////////////////////////////////////////
 //
+
+bool SqliteStatement::GetBoolColumn(int col)
+{
+	return (sqlite3_column_int(_stmt, col) > 0);
+}
 
 bool SqliteStatement::GetBoolColumn(std::string col)
 {

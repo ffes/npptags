@@ -19,78 +19,82 @@
 //                                                                         //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __SQLITEDATABASE_H__
-#define __SQLITEDATABASE_H__
+#pragma once
 
 #include <string>
 #include <map>
+#include <stdexcept>
 #include "sqlite3.h"
 
 typedef std::map<std::string, int> StrIntMap;
 
-class SqliteBase
+class SqliteException : public std::runtime_error
 {
 public:
-	std::string GetErrorMsg()		{ return _errorMsg; };
-
-protected:
-	std::string _errorMsg;
+	SqliteException(const std::string& errorMessage) : std::runtime_error(errorMessage)
+	{
+	}
 };
 
-class SqliteDatabase : public SqliteBase
+class SqliteDatabase
 {
 public:
 	SqliteDatabase();
 	SqliteDatabase(LPCWSTR file);
 	~SqliteDatabase();
 
-	virtual bool Open();
-	virtual bool Open(LPCWSTR file);
-	bool Close();
-	bool Delete();
-	bool Vacuum();
+	virtual void Open();
+	virtual void Open(LPCWSTR file);
+	void Close();
+	void Delete();
+	void Vacuum();
 
 	void SetFilename(LPCWSTR file);
-	bool SetUserVersion(long version);
+	void SetUserVersion(long version);
 
 	LPCWSTR GetFilename() { return _dbFile; };
 	long GetUserVersion();
+	bool TableExists(const char* table);
 	sqlite3* GetDB() { return _db; };
 
-	bool EnableForeignKeys(bool on = true);
+	void EnableForeignKeys(bool on = true);
 
-	bool RunSQL(LPCSTR szSQL);
-	bool BeginTransaction();
-	bool CommitTransaction();
-	bool RollbackTransaction();
+	void Execute(LPCSTR szSQL);
+	void BeginTransaction();
+	void CommitTransaction();
+	void RollbackTransaction();
 
 protected:
-	bool GetLongResult(LPCSTR szStmt, long& result);
-
 	WCHAR _dbFile[MAX_PATH];
 	sqlite3* _db;
 };
 
-class SqliteStatement : public SqliteBase
+class SqliteStatement
 {
 public:
 	SqliteStatement(SqliteDatabase* db);
+	SqliteStatement(SqliteDatabase* db, const char* sql);
 	~SqliteStatement();
 
-	bool Prepare(const char* sql);
-	bool SaveRecord();
+	void Prepare(const char* sql);
+	void SaveRecord();
 	bool GetNextRecord();
-	bool Finalize();
+	void Finalize();
 
+	std::string GetTextColumn(int col);
 	std::string GetTextColumn(std::string col);
+	std::wstring GetWTextColumn(int col);
 	std::wstring GetWTextColumn(std::string col);
+	int GetIntColumn(int col);
 	int GetIntColumn(std::string col);
+	bool GetBoolColumn(int col);
 	bool GetBoolColumn(std::string col);
 
-	bool BindTextParameter(const char* param, const WCHAR* val);
-	bool BindTextParameter(const char* param, const char *val);
-	bool BindIntParameter(const char* param, const int val, bool null = false);
-	bool BindBoolParameter(const char* param, const bool val);
+	void Bind(const char* param, const WCHAR* val);
+	void Bind(const char* param, const char *val);
+	void Bind(const char* param, const int val, bool null = false);
+	void Bind(const char* param, const bool val);
+	void Bind(const char* param);
 
 protected:
 	void ResolveColumnNames();
@@ -99,5 +103,3 @@ protected:
 	sqlite3_stmt* _stmt;
 	StrIntMap _colNames;
 };
-
-#endif // __SQLITEDATABASE_H__
