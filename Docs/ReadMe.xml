@@ -16,12 +16,12 @@
 	<sect1 id="introduction">
 		<title>Introduction</title>
 		<para>NppTags is a <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> plug-in for <ulink url="http://www.notepad-plus-plus.org/">Notepad++</ulink>.</para>
-		<para>When you use Notepad++ to program in a popular programming language (like C/C++, Java, JavaScript, PHP), ctags can be very useful for you. It creates a so called tags file that can be used to navigate through your sources. This small tool can help you to jump to a selected function / variable / class / etc in your code by pressing just one key!</para>
+		<para>When you use Notepad++ to program in a popular programming language (like C, C++, Java, JavaScript, PHP), ctags can be very useful for you. It creates a so called tags file that can be used to navigate through your sources. This plug-in can help you to jump to a selected function / variable / class / etc in your code by pressing just one key!</para>
 	</sect1>
 
 	<sect1 id="install">
 		<title>Installation Note</title>
-		<para>For the plug-in to work properly it is important that ctags.exe is somewhere in the path, preferably in the XXXXx.</para>
+		<para>To manually install the plug-in, copy <computeroutput>NppTags.dll</computeroutput> to the <computeroutput>plugins</computeroutput> directory. There you need to create a directory <computeroutput>NppTags</computeroutput> and copy <computeroutput>ctags.exe</computeroutput> to that directory. Then (re)start Notepad++.</para>
 	</sect1>
 
 	<sect1 id="history">
@@ -31,10 +31,11 @@
 
 	<sect1 id="howtouse">
 		<title>How to use this plug-in</title>
+		<para>To use this plug-in you first need to generate a tags database in the directory of the current source file by pressing the <computeroutput>Generate</computeroutput> button in the toolbar. This will first generate a tags file using the ctags program which is converted to a <ulink url="http://www.sqlite.org/">SQLite</ulink> database directly after that. This tags database is used by the plug-in.</para>
 		<para>This plug-in has two different ways to use:</para>
 		<itemizedlist>
-			<listitem><para>"Jump to Tag" tries to find the tag (function, variable, etc) under the cursor. If you want to jump to this tag simply press the assigned button (default Alt+Q). If there is only one reference found, you will be taken to it. Otherwise a dialog is shown where you can select the right one.</para></listitem>
-			<listitem><para>The tree shows all (recognized) tags in a tree. You can select a tag from the tree and you will be taken to it.</para></listitem>
+			<listitem><para>"Jump to Tag" tries to find the tag (function, variable, etc) under the cursor. If you want to jump to this tag simply press the assigned button (default <computeroutput>Alt+Q</computeroutput>) or the button in the toolbar. If there is only one reference found, you will be taken to it. Otherwise a dialog is shown where you can select the right one.</para></listitem>
+			<listitem><para>The tree shows all (recognized) tags in a tree. You can double-click on a tag in the tree and you will be taken to it.</para></listitem>
 		</itemizedlist>
 	</sect1>
 
@@ -45,26 +46,26 @@
 		<itemizedlist>
 			<listitem><para>Classic ASP</para></listitem>
 			<listitem><para>C / C++</para></listitem>
-			<listitem><para>C#</para></listitem>
-			<listitem><para>Java</para></listitem>
+			<listitem><para>C#, without namespaces</para></listitem>
+			<listitem><para>Java, without packages</para></listitem>
 			<listitem><para>JavaScript</para></listitem>
 			<listitem><para>PHP</para></listitem>
 			<listitem><para>Python</para></listitem>
 		</itemizedlist>
-		<para>If your programming language isn't in the list and/or your type of tags don't show (properly) in the tree, contact me because it is not so difficult to add support for other languages/types.</para>
+		<para>If your programming language isn't in the list and/or your type of tags don't show (properly) in the tree, <link linkend="contact">contact me</link> because it is probably not too difficult to add/improve support for other languages and/or types.</para>
 		<para>Note that this it only affects the tree, "Jump to Tag" shouldn't have any problem.</para>
 	</sect1>
 
 	<sect1 id="inidebug">
 		<title>Debug section in NppTags.ini</title>
-		<para>You can manually add an extra section with read-only options to the <computeroutput>NppTags.ini</computeroutput> to control what happens to the automatically generated tags file. These are the default settings:</para>
+		<para>For debugging it can be necessary to see the raw tags file. You can manually add an extra section with read-only options to the <computeroutput>NppTags.ini</computeroutput> to control what happens to the automatically generated tags file. These are the default settings:</para>
 		<screen>
 			[Debug]
 			OverwriteTags=1
 			DelTags=1
 		</screen>
 		<para>When <computeroutput>OverwriteTags</computeroutput> is set to <computeroutput>0</computeroutput> and a tags file is found the plug-in will not overwrite and regenerate this existing tags file before generating the database.</para>
-		<para>When <computeroutput>DelTags</computeroutput> is set to <computeroutput>0</computeroutput> the plug-in will not delete the generated tags file after generating the database.</para>
+		<para>When <computeroutput>DelTags</computeroutput> is set to <computeroutput>0</computeroutput> the plug-in will not delete the generated tags file after it is converted to the database.</para>
 	</sect1>
 
 	<sect1 id="contact">
@@ -75,8 +76,8 @@
 
 	<sect1 id="license">
 		<title>License</title>
-		<para>This plug-in is published under the GPL-2 license. See <xref linkend="gpl"/> for the full license agreement. You can find the sources of the latest version at the <ulink url="https://code.google.com/p/npptags/">Google code project page</ulink> or find the lastest developments at <ulink url="https://github.com/ffes/npptags">GitHub</ulink>.</para>
-		<para>This plug-in relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> to recognise the tags. Exuberant CTags is released under GPL-2 as well and the source code of Exuberant CTags can be found at its <ulink url="http://ctags.sourceforge.net/">website</ulink>.</para>
+		<para>This plug-in is published under the GPL-2 license. See <xref linkend="gpl"/> for the full license agreement. You can find the sources of the latest version at the <ulink url="https://code.google.com/p/npptags/">Google code project page</ulink> or find the latest developments at <ulink url="https://github.com/ffes/npptags">GitHub</ulink>.</para>
+		<para>This plug-in relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> to recognise the tags. Exuberant CTags is released under GPL-2 as well and the source code of Exuberant CTags can be found at their <ulink url="http://ctags.sourceforge.net/">website</ulink>.</para>
 	</sect1>
 
 	<sect1 id="faq">
@@ -104,24 +105,24 @@
 				<question id="faq_general_3"><para>
 					I want to add extra command line options the ctags generates the tags file. Can this be done?
 				</para></question>
-				<answer><para>
+				<answer><!--para>
 					There are several ways:
 					<itemizedlist>
 						<listitem><para>
 							Options
 						</para></listitem>
-						<listitem><para>
-							If you want to add extra command line options to ctags, use a <ulink url="http://ctags.sourceforge.net/ctags.html#FILES">ctags.cnf</ulink> file. See the Files section in the documentation of ctags.
-						</para></listitem>
+						<listitem--><para>
+							If you want to add extra command line options to ctags, use a ctags.cnf file. See the <ulink url="http://ctags.sourceforge.net/ctags.html#FILES">Files section</ulink> in the documentation of ctags for more details.
+						</para><!--/listitem>
 					</itemizedlist>
-				</para></answer>
+				</para--></answer>
 			</qandaentry>
 			<qandaentry>
 				<question id="faq_general_4"><para>
 					Why are the languages C and C++ are displayed as 'C/C++'?
 				</para></question>
 				<answer><para>
-					This is done because .h files are standard marked as C++ by ctags. And for tags there is not too much difference to not combine them.
+					This is done because .h files are standard marked as C++ by ctags. And for tags there is not too much difference between C and C++ to not combine them.
 				</para></answer>
 			</qandaentry>
 			<qandaentry>
@@ -143,17 +144,25 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 	<sect1 id="wishlist">
 		<title>Wish list</title>
 		<itemizedlist>
-			<listitem><para>Internally use the filenames always as WCHARs</para></listitem>
+			<listitem><para>Internally always use WCHARS for filenames</para></listitem>
 			<listitem><para>Add an Options dialog</para></listitem>
+			<listitem><para>Better support for C# namespaces and Java packages.</para></listitem>
 			<listitem><para>Better support for sources stored in various subdirectories.</para></listitem>
 			<listitem><para>Add an option to set a path to a secondary tags database. If the tag is not found in the default tags database, the secondary one should be searched. Such a tags database can be created from the root of your programming environment to search the standard libraries. Where to find this secondary database could be based upon the language of current document.</para></listitem>
 			<listitem><para>Nest enums and structs in C++ classes in the tree.</para></listitem>
-			<listitem><para>Autocompletion based upon the tags database.</para></listitem>
+			<listitem><para>Auto-completion based upon the tags database.</para></listitem>
 			<listitem><para>"Jump Back" to bring you back to the position where when you jumped to a tag.</para></listitem>
 			<listitem><para>Show the tags in the tree grouped per file (regardless of their extension).</para></listitem>
-			<listitem><para>Show a seperate root item per language, if more then one language is found.</para></listitem>
+			<listitem><para>Show a separate root item per language, if more then one language is found.</para></listitem>
 			<listitem><para>Show details about the selected tag in the tree.</para></listitem>
 			<listitem><para>Options per tags database. Preserve those settings when the database is regenerated.</para></listitem>
+		</itemizedlist>
+	</sect1>
+
+	<sect1 id="knownissues">
+		<title>Known Issues</title>
+		<itemizedlist>
+			<listitem><para>When you double-click in the tree the focus will not return to the edit window.</para></listitem>
 		</itemizedlist>
 	</sect1>
 
@@ -163,9 +172,11 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 		<sect2 id="v0_2_0">
 			<title>Version 0.2.0, XX July 2013</title>
 			<itemizedlist>
+				<listitem><para>First public release, external proof of concept</para></listitem>
 				<listitem><para>After generating the tags file, it is now converted to a SQLite database. This makes it much easier and faster to build a proper tree.</para></listitem>
-				<listitem><para>Tree filled with common types of tags for various languages.</para></listitem>
+				<listitem><para>Tree filled with common types of tags for various languages. Still far from perfect.</para></listitem>
 				<listitem><para>In the Select Tag dialog, preselect the first tag in the current file.</para></listitem>
+				<listitem><para>Using a SVN (rev 804) based build of ctags for better JavaScript support.</para></listitem>
 			</itemizedlist>
 		</sect2>
 
