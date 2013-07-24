@@ -41,11 +41,57 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////
 // Various static variables
 
-static HWND s_hDlg = NULL;						// The HWND to the dialog
-static HWND s_hTree = NULL;						// The HWND to the tree
-static HICON s_hTabIcon = NULL;					// The icon on the docking tab
-static bool s_bTreeInitialized = false;			// Is the tree initialized?
-static bool s_bTreeVisible = false;				// Is the tree visible?
+static HWND s_hDlg = NULL;					// The HWND to the dialog
+static HWND s_hTree = NULL;					// The HWND to the tree
+static HICON s_hTabIcon = NULL;				// The icon on the docking tab
+static bool s_bTreeInitialized = false;		// Is the tree initialized?
+static bool s_bTreeVisible = false;			// Is the tree visible?
+
+/////////////////////////////////////////////////////////////////////////////
+// Link the n++ language to the ctags language
+
+static bool TagLangEqualsNppLang(string lang)
+{
+	std::pair<int, std::string> langMap[] =
+	{
+		std::make_pair(L_PHP,		"PHP"),
+		std::make_pair(L_C,			"C/C++"),
+		std::make_pair(L_CPP,		"C/C++"),
+		std::make_pair(L_OBJC,		"C/C++"),
+		std::make_pair(L_CS,		"C#"),
+		std::make_pair(L_JAVA,		"Java"),
+		std::make_pair(L_HTML,		"HTML"),
+		std::make_pair(L_MAKEFILE,	"Make"),
+		std::make_pair(L_PASCAL,	"Pascal"),
+		std::make_pair(L_BATCH,		"DosBatch"),
+		std::make_pair(L_ASP,		"Asp"),
+		std::make_pair(L_SQL,		"SQL"),
+		std::make_pair(L_VB,		"Basic"),
+		std::make_pair(L_JS,		"JavaScript"),
+		std::make_pair(L_PERL,		"Perl"),
+		std::make_pair(L_PYTHON,	"Python"),
+		std::make_pair(L_LUA,		"Lua"),
+		std::make_pair(L_TEX,		"Tex"),
+		std::make_pair(L_FORTRAN,	"Fortran"),
+		std::make_pair(L_BASH,		"Sh"),
+		std::make_pair(L_TCL,		"Tcl"),
+		std::make_pair(L_LISP,		"Lisp"),
+		std::make_pair(L_SCHEME,	"Scheme"),
+		std::make_pair(L_ASM,		"Asm"),
+		std::make_pair(L_RUBY,		"Ruby"),
+		std::make_pair(L_VHDL,		"VHDL"),
+		std::make_pair(L_VERILOG,	"Verilog"),
+		std::make_pair(L_MATLAB,	"MatLab"),
+		std::make_pair(L_COBOL,		"Cobol")
+	};
+
+	std::map<int, std::string> langLang(langMap, langMap + sizeof langMap / sizeof langMap[0]);
+
+	LangType currentLang;
+	SendMessage(g_nppData._nppHandle, NPPM_GETCURRENTLANGTYPE, 0, (LPARAM) &currentLang);
+
+	return langLang[currentLang] == lang;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -58,14 +104,15 @@ static void ClearTree()
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static HTREEITEM InsertTextItem(LPWSTR txt)
+static HTREEITEM InsertTextItem(HTREEITEM hParent, LPCWSTR txt)
 {
 	TVINSERTSTRUCT item;
 	ZeroMemory(&item, sizeof(item));
 
+	item.hParent = hParent;
 	item.hInsertAfter = TVI_ROOT;
 	item.item.mask = TVIF_TEXT;
-	item.item.pszText = txt;
+	item.item.pszText = (LPWSTR ) txt;
 	return TreeView_InsertItem(s_hTree, &item);
 }
 
@@ -123,31 +170,73 @@ static bool AddMembers(HTREEITEM hParent, Tag* pTag)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static void InsertItems(LPCWSTR group, LPCSTR where, bool members)
+static void InsertItems(HTREEITEM hParent, LPCSTR lang, LPCWSTR group, LPCSTR where, bool members)
 {
 	SqliteStatement stmt(g_DB);
 	string sql = "SELECT * FROM Tags WHERE ";
 	sql += where;
 	if (!members)
 		sql += " AND MemberOf IS NULL";
+	if (lang != NULL)
+		sql += " AND Language = @lang";
 	sql += " ORDER BY Tag, Signature";
 	stmt.Prepare(sql.c_str());
+	if (lang != NULL)
+		stmt.Bind("@lang", lang);
 
 	Tag tag;
-	HTREEITEM hParent = NULL;
+	HTREEITEM hGroup = NULL;
 	while (stmt.GetNextRecord())
 	{
 		// Get the information from the database
 		tag.SetFromDB(&stmt);
 
 		// Do we need to add the parent item
-		if (hParent == NULL)
-			hParent = InsertTextItem((LPWSTR) group);
+		if (hGroup == NULL)
+			hGroup = InsertTextItem(hParent, (LPWSTR) group);
 
 		// Now we can add the tag
-		InsertTagItem(hParent, &tag, members);
+		InsertTagItem(hGroup, &tag, members);
 	}
 	stmt.Finalize();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+static void AddTypes(HTREEITEM hParent, LPCSTR lang)
+{
+	InsertItems(hParent, lang, L"Classes", "(Type = 'class' OR Type = 'interface')", true);
+	InsertItems(hParent, lang, L"Structures", "Type = 'struct'", true);
+	InsertItems(hParent, lang, L"Unions", "Type = 'union'", true);
+	InsertItems(hParent, lang, L"Enumerations", "Type = 'enum'", true);
+	InsertItems(hParent, lang, L"Sub routines", "(Type = 'sub' OR Type = 'subroutine')", false);
+	InsertItems(hParent, lang, L"Procedures", "Type = 'procedure'", false);
+	InsertItems(hParent, lang, L"Functions", "Type = 'function'", false);
+	InsertItems(hParent, lang, L"Members", "Type = 'member'", false);
+	InsertItems(hParent, lang, L"Method", "Type = 'method'", false);
+	InsertItems(hParent, lang, L"Variables", "Type = 'variable'", false);
+	InsertItems(hParent, lang, L"Macros", "Type = 'macro'", false);
+	InsertItems(hParent, lang, L"Type definitions", "Type = 'typedef'", false);
+	InsertItems(hParent, lang, L"Label", "Type = 'label'", false);
+	InsertItems(hParent, lang, L"Define", "Type = 'define'", false);
+	InsertItems(hParent, lang, L"Anchor", "Type = 'anchor'", false);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+static void BuildCSharpTree(HTREEITEM hParent)
+{
+	InsertTextItem(hParent, L"Build C# tree");
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+static void BuildJavaTree(HTREEITEM hParent)
+{
+	InsertTextItem(hParent, L"Build Java tree");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -166,39 +255,60 @@ void UpdateTagsTree()
 	// Is there a tags file set?
 	if (wcslen(g_DB->GetFilename()) == 0)
 	{
-		InsertTextItem(L"Tags database not found");
+		InsertTextItem(NULL, L"Tags database not found");
 		return;
 	}
 
-	// Add the tags to the tree (as many as possible)
 	try
 	{
-	g_DB->Open();
-	InsertItems(L"Classes", "Type = 'class' OR Type = 'interface'", true);
-	InsertItems(L"Structures", "Type = 'struct'", true);
-	InsertItems(L"Unions", "Type = 'union'", true);
-	InsertItems(L"Enumerations", "Type = 'enum'", true);
-	InsertItems(L"Sub routines", "(Type = 'sub' OR Type = 'subroutine')", false);
-	InsertItems(L"Procedures", "Type = 'procedure'", false);
-	InsertItems(L"Functions", "Type = 'function'", false);
-	InsertItems(L"Members", "Type = 'member'", false);
-	InsertItems(L"Method", "Type = 'method'", false);
-	InsertItems(L"Variables", "Type = 'variable'", false);
-	InsertItems(L"Macros", "Type = 'macro'", false);
-	InsertItems(L"Type definitions", "Type = 'typedef'", false);
-	InsertItems(L"Label", "Type = 'label'", false);
-	InsertItems(L"Define", "Type = 'define'", false);
-	InsertItems(L"Anchor", "Type = 'anchor'", false);
-	g_DB->Close();
+		g_DB->Open();
+		
+		// SQLite has no way to determine how many row will be returned,
+		// so this extra query is needed.
+		int count = 0;
+		SqliteStatement stmt(g_DB, "SELECT COUNT(*) FROM (SELECT DISTINCT Language FROM Tags)");
+		if (stmt.GetNextRecord())
+		{
+			count = stmt.GetIntColumn(0);
+		}
+		stmt.Finalize();
+
+		// Now go through all the available languages
+		stmt.Prepare("SELECT DISTINCT Language FROM Tags ORDER BY Language");
+		HTREEITEM hLang = NULL;
+		while (stmt.GetNextRecord())
+		{
+			// Only one language, no extra level in tree needed
+			if (count != 1)
+			{
+				// Add the parent item for this language tree
+				wstring wlang = stmt.GetWTextColumn("Language");
+				hLang = InsertTextItem(NULL, wlang.c_str());
+			}
+
+			// Build the tree for the language
+			string lang = stmt.GetTextColumn("Language");
+			if (lang == "C#")
+				BuildCSharpTree(hLang);
+			else if (lang == "Java")
+				BuildJavaTree(hLang);
+			else
+				AddTypes(hLang, lang.c_str());
+
+			// Expand the current language
+			if (hLang != NULL && TagLangEqualsNppLang(lang))
+				TreeView_Expand(s_hTree, hLang, TVE_EXPAND);
+		}
+		stmt.Finalize();
+		g_DB->Close();
 	}
 	catch(SqliteException e)
 	{
-		InsertTextItem(L"Error building tree");
-		return;
+		InsertTextItem(NULL, L"Error building tree");
 	}
 
 	if (TreeView_GetCount(s_hTree) == 0)
-		InsertTextItem(L"No tags found in database");
+		InsertTextItem(NULL, L"No tags found in database");
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -153,7 +153,6 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 			<listitem><para>Auto-completion based upon the tags database.</para></listitem>
 			<listitem><para>"Jump Back" to bring you back to the position where when you jumped to a tag.</para></listitem>
 			<listitem><para>Show the tags in the tree grouped per file (regardless of their extension).</para></listitem>
-			<listitem><para>Show a separate root item per language, if more then one language is found.</para></listitem>
 			<listitem><para>Show details about the selected tag in the tree.</para></listitem>
 			<listitem><para>Options per tags database. Preserve those settings when the database is regenerated.</para></listitem>
 		</itemizedlist>
@@ -176,6 +175,7 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 				<listitem><para>After generating the tags file, it is now converted to a SQLite database. This makes it much easier and faster to build a proper tree.</para></listitem>
 				<listitem><para>Tree filled with common types of tags for various languages. Still far from perfect.</para></listitem>
 				<listitem><para>In the Select Tag dialog, preselect the first tag in the current file.</para></listitem>
+				<listitem><para>Show a separate root item per language, if more then one language is found.</para></listitem>
 				<listitem><para>Using a SVN (rev 804) based build of ctags for better JavaScript support.</para></listitem>
 			</itemizedlist>
 		</sect2>
