@@ -207,14 +207,14 @@ static void InsertItems(HTREEITEM hParent, LPCSTR lang, LPCWSTR group, LPCSTR wh
 static void AddTypes(HTREEITEM hParent, LPCSTR lang)
 {
 	InsertItems(hParent, lang, L"Classes", "(Type = 'class' OR Type = 'interface')", true);
-	InsertItems(hParent, lang, L"Structures", "Type = 'struct'", true);
-	InsertItems(hParent, lang, L"Unions", "Type = 'union'", true);
-	InsertItems(hParent, lang, L"Enumerations", "Type = 'enum'", true);
 	InsertItems(hParent, lang, L"Sub routines", "(Type = 'sub' OR Type = 'subroutine')", false);
 	InsertItems(hParent, lang, L"Procedures", "Type = 'procedure'", false);
 	InsertItems(hParent, lang, L"Functions", "Type = 'function'", false);
 	InsertItems(hParent, lang, L"Members", "Type = 'member'", false);
 	InsertItems(hParent, lang, L"Method", "Type = 'method'", false);
+	InsertItems(hParent, lang, L"Structures", "Type = 'struct'", true);
+	InsertItems(hParent, lang, L"Unions", "Type = 'union'", true);
+	InsertItems(hParent, lang, L"Enumerations", "Type = 'enum'", true);
 	InsertItems(hParent, lang, L"Variables", "Type = 'variable'", false);
 	InsertItems(hParent, lang, L"Macros", "Type = 'macro'", false);
 	InsertItems(hParent, lang, L"Type definitions", "Type = 'typedef'", false);
