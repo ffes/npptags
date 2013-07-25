@@ -161,7 +161,7 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 	<sect1 id="knownissues">
 		<title>Known Issues</title>
 		<itemizedlist>
-			<listitem><para>When you double-click in the tree the focus will not return to the edit window.</para></listitem>
+			<listitem><para>When you double-click in the tree the focus will not return to the edit window. I use the code from NppSnippets where it just works, but here is doesn't work.</para></listitem>
 		</itemizedlist>
 	</sect1>
 
@@ -169,7 +169,7 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 		<title>Revision History</title>
 
 		<sect2 id="v0_2_0">
-			<title>Version 0.2.0, XX July 2013</title>
+			<title>Version 0.2.0, XX August 2013</title>
 			<itemizedlist>
 				<listitem><para>First public release, external proof of concept</para></listitem>
 				<listitem><para>After generating the tags file, it is now converted to a SQLite database. This makes it much easier and faster to build a proper tree.</para></listitem>
