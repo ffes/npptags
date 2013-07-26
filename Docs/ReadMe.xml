@@ -64,7 +64,7 @@
 			OverwriteTags=1
 			DelTags=1
 		</screen>
-		<para>When <computeroutput>OverwriteTags</computeroutput> is set to <computeroutput>0</computeroutput> and a tags file is found the plug-in will not overwrite and regenerate this existing tags file before generating the database.</para>
+		<para>When <computeroutput>OverwriteTags</computeroutput> is set to <computeroutput>0</computeroutput> and a tags file is found the plug-in will not overwrite and regenerate this existing tags file before generating the database. When set to 0, this implies that <computeroutput>DelTags</computeroutput> is set to <computeroutput>0</computeroutput> as well.</para>
 		<para>When <computeroutput>DelTags</computeroutput> is set to <computeroutput>0</computeroutput> the plug-in will not delete the generated tags file after it is converted to the database.</para>
 	</sect1>
 

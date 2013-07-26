@@ -111,6 +111,6 @@ void Options::Read()
 	GetPrivateProfileString(s_szOptions, s_szOptions, L"", _szExtraOptions, MAX_PATH,  _szIniPath);
 
 	// Read Only Debug options
-	deleteTagsFile = GetPrivateProfileBool(s_szDebug, s_szDelTags, true);
 	overwriteExistingTagsFile = GetPrivateProfileBool(s_szDebug, s_szOverwriteTags, true);
+	deleteTagsFile = (overwriteExistingTagsFile ? GetPrivateProfileBool(s_szDebug, s_szDelTags, true) : false);
 }
