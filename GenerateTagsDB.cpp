@@ -133,24 +133,29 @@ static bool GenerateTagsFile()
 			return true;
 	}
 
-	WaitCursor wait;
+	// Get the current directory. Unsaved new files don't have this set!
+	WCHAR curDir[MAX_PATH];
+	SendMessage(g_nppData._nppHandle, NPPM_GETCURRENTDIRECTORY, MAX_PATH, (LPARAM) &curDir);
+	if (wcslen(curDir) == 0)
+		return false;
 
+	// Set the path to ctags.exe
 	WCHAR szExePath[_MAX_PATH];
 	SendMessage(g_nppData._nppHandle, NPPM_GETNPPDIRECTORY, MAX_PATH, (LPARAM) &szExePath);
 	wcsncat(szExePath, L"\\plugins\\NppTags\\ctags", _MAX_PATH);
 
-	WCHAR curDir[MAX_PATH];
-	SendMessage(g_nppData._nppHandle, NPPM_GETCURRENTDIRECTORY, MAX_PATH, (LPARAM) &curDir);
-
+	// Construct the command line
 	wstring cmd;
 	cmd += char(34);
 	cmd += szExePath;
 	cmd += char(34);
-	// Temporary disable this, because the search for the right database file is not done yet!!!
-	//if (g_Options->maxDepth > 0)
-	//	cmd += L" -R";
-	cmd += L" --fields=+i+K+S+l+m+a";
 
+	// Add the options
+	if (g_Options->maxDepth > 0)
+		cmd += L" -R";
+	cmd += L" --fields=+iKSlma";
+
+	// Did the user add any additional options?
 	wstring options = g_Options->GetExtraOptions();
 	if (options.length() > 0)
 	{
@@ -158,11 +163,8 @@ static bool GenerateTagsFile()
 		cmd += options;
 	}
 
-	cmd += L" ";
-	cmd += char(34);
-	cmd += curDir;
-	cmd += L"\\*.*";
-	cmd += char(34);
+	// Add the default search pattern
+	cmd += L" *";
 
 	//MsgBox(cmd.c_str());
 	return(Run(cmd.c_str(), curDir, true) == NOERROR);
@@ -194,6 +196,10 @@ static bool ConvertTagsToDB()
 		SqliteStatement stmt(g_DB);
 		stmt.Prepare("INSERT INTO Tags(Tag, File, Line, Pattern, Type, Language, MemberOf, MemberOfType, Inherits, Signature, Access, Implementation, ThisFileOnly, Unrecognized) VALUES (@tag, @file, @line, @pattern, @type, @language, @memberof, @memberoftype, @inherits, @signature, @access, @implementation, @thisfileonly, @unrecognized)");
 
+		// Get the current directory
+		WCHAR curDir[MAX_PATH];
+		SendMessage(g_nppData._nppHandle, NPPM_GETCURRENTDIRECTORY, MAX_PATH, (LPARAM) &curDir);
+		
 		// Go through the records and save them in the database
 		Tag tag;
 		tagEntry entry;
@@ -208,7 +214,7 @@ static bool ConvertTagsToDB()
 				if (tag.getPattern().length() >= MAX_PATH)
 					continue;
 
-			tag.SaveToDB(&stmt);
+			tag.SaveToDB(&stmt, curDir);
 		}
 		stmt.Finalize();
 		g_DB->CommitTransaction();

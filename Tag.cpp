@@ -307,11 +307,16 @@ std::string Tag::getDetails()
 /////////////////////////////////////////////////////////////////////////////
 //
 
-void Tag::SaveToDB(SqliteStatement* stmt)
+void Tag::SaveToDB(SqliteStatement* stmt, LPCWSTR curDir)
 {
+	// Construct the full pathname
+	std::wstring fullPath = curDir;
+	fullPath += L"\\";
+	fullPath += std::wstring(_file.begin(), _file.end());
+
 	// Bind the values to the parameters
 	stmt->Bind("@tag", _tag.c_str());
-	stmt->Bind("@file", _file.c_str());
+	stmt->Bind("@file", fullPath.c_str());
 	stmt->Bind("@line", _line, _line == 0);
 	stmt->Bind("@pattern", _pattern.c_str());
 	stmt->Bind("@type", _type.c_str());

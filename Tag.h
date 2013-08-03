@@ -34,7 +34,7 @@ public:
 	Tag& operator=(const tagEntry);
 
 	void SetFromDB(SqliteStatement* stmt);
-	void SaveToDB(SqliteStatement* stmt);
+	void SaveToDB(SqliteStatement* stmt, LPCWSTR curDir);
 
 	void empty();
 
