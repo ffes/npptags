@@ -28,6 +28,7 @@
 #include "NPP/menuCmdID.h"
 #include "NPP/Docking.h"
 #include "NppTags.h"
+#include "GenerateTagsDB.h"
 #include "Resource.h"
 #include "Options.h"
 #include "WaitCursor.h"
@@ -343,7 +344,7 @@ static void ShowContextMenu(HWND hwnd, UINT uResID, int xPos, int yPos)
 	HMENU hPopup = GetSubMenu(hMenu, 0);
 
 	// Disable various items of the snippet menu
-	if (uResID == IDCM_SNIPPET)
+	if (uResID == IDCM_TAGS_TREE)
 	{
 /*
 		// Disable the "move up" and "move down" items
@@ -419,7 +420,7 @@ static void OnContextMenu(HWND hWnd, int xPos, int yPos, HWND hChild)
 		DWORD dw = (DWORD) SendMessage(m_hList, LB_ITEMFROMPOINT, 0, MAKELPARAM(pt.x, pt.y));
 */
 
-		//ShowContextMenu(hWnd, IDCM_SNIPPET, xPos, yPos);
+		ShowContextMenu(hWnd, IDCM_TAGS_TREE, xPos, yPos);
 		return;
 	}
 }
@@ -525,14 +526,19 @@ static void OnCommand(HWND hWnd, int ResID, int msg)
 {
 	switch (ResID)
 	{
-		case IDC_TREE:
+		case IDC_JUMP_TO_TAG:
 		{
-			switch (msg)
-			{
-				case LBN_DBLCLK:
-					//OnDblClk_List(hWnd);
-					break;
-			}
+			OnDblClk_Tree();
+			break;
+		}
+		case IDC_REFRESH_TAGS:
+		{
+			GenerateTagsDB();
+			break;
+		}
+		case IDC_DATABASE_OPTIONS:
+		{
+			MsgBox("Not implemented yet!");
 			break;
 		}
 	}

@@ -100,25 +100,15 @@ END
 /////////////////////////////////////////////////////////////////////////////
 // Context Menus
 
-IDCM_SNIPPET MENU PRELOAD DISCARDABLE
+IDCM_TAGS_TREE MENU PRELOAD DISCARDABLE
 BEGIN
 	POPUP "_POPUP_"
 	BEGIN
-		MENUITEM "&Insert",						IDC_SNIPPET_INSERT
+		MENUITEM "&Jump to Tag",				IDC_JUMP_TO_TAG
 		MENUITEM SEPARATOR
-		MENUITEM "&Add...",						IDC_SNIPPET_ADD
-		MENUITEM "&Edit...",					IDC_SNIPPET_EDIT
-		MENUITEM "&Delete...",					IDC_SNIPPET_DELETE
-		MENUITEM "Dup&licate...",				IDC_SNIPPET_DUPLICATE
+		MENUITEM "&Generate tags database",		IDC_REFRESH_TAGS
 		MENUITEM SEPARATOR
-		MENUITEM "Add from &selection...",		IDC_SNIPPET_ADD_SELECTION
-		MENUITEM "Add from &clipboard...",		IDC_SNIPPET_ADD_CLIPBOARD
-		//MENUITEM SEPARATOR
-		//MENUITEM "Copy to another library...",	IDC_SNIPPET_COPY_TO_LIB
-		//MENUITEM "Paste from another library...",	IDC_SNIPPET_PASTE_FROM_LIB
-		MENUITEM SEPARATOR
-		MENUITEM "Move &up...",					IDC_SNIPPET_MOVE_UP
-		MENUITEM "Move d&own...",				IDC_SNIPPET_MOVE_DOWN
+		MENUITEM "&Database options...",		IDC_DATABASE_OPTIONS
 	END
 END
 
