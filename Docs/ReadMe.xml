@@ -148,11 +148,10 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 			<listitem><para>Add an Options dialog</para></listitem>
 			<listitem><para>Better support for C# namespaces and Java packages.</para></listitem>
 			<listitem><para>Better support for sources stored in various subdirectories.</para></listitem>
-			<listitem><para>Add an option to set a path to a secondary tags database. If the tag is not found in the default tags database, the secondary one should be searched. Such a tags database can be created from the root of your programming environment to search the standard libraries. Where to find this secondary database could be based upon the language of current document.</para></listitem>
+			<listitem><para>Add an option to set a path to a secondary tags database. If the tag is not found in the default tags database, the secondary one should be searched. Such a tags database can be created from the root of your programming environment to search the standard libraries. Where to find this secondary database could be based upon the language of current document, or a tags database option.</para></listitem>
 			<listitem><para>Nest enums and structs in C++ classes in the tree.</para></listitem>
 			<listitem><para>Auto-completion based upon the tags database.</para></listitem>
 			<listitem><para>"Jump Back" to bring you back to the position where when you jumped to a tag.</para></listitem>
-			<listitem><para>Show the tags in the tree grouped per file (regardless of their extension).</para></listitem>
 			<listitem><para>Show details about the selected tag in the tree.</para></listitem>
 			<listitem><para>Options per tags database. Preserve those settings when the database is regenerated.</para></listitem>
 		</itemizedlist>
@@ -161,7 +160,7 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 	<sect1 id="knownissues">
 		<title>Known Issues</title>
 		<itemizedlist>
-			<listitem><para>When you double-click in the tree the focus will not return to the edit window. I use the code from NppSnippets where it just works, but here is doesn't work.</para></listitem>
+			<listitem><para>When you double-click in the tree the focus will not return to the edit window. I use the code from NppSnippets where it just works, but here is doesn't work. The context menu item "Jump to Tag" does work as expected.</para></listitem>
 		</itemizedlist>
 	</sect1>
 

@@ -58,7 +58,7 @@ static bool TagLangEqualsNppLang(string lang)
 		std::make_pair(L_PHP,		"PHP"),
 		std::make_pair(L_C,			"C/C++"),
 		std::make_pair(L_CPP,		"C/C++"),
-		std::make_pair(L_OBJC,		"C/C++"),
+		std::make_pair(L_OBJC,		"ObjectiveC"),
 		std::make_pair(L_CS,		"C#"),
 		std::make_pair(L_JAVA,		"Java"),
 		std::make_pair(L_HTML,		"HTML"),
@@ -176,14 +176,12 @@ static void InsertItems(HTREEITEM hParent, LPCSTR lang, LPCWSTR group, LPCSTR wh
 	SqliteStatement stmt(g_DB);
 	string sql = "SELECT * FROM Tags WHERE ";
 	sql += where;
+	sql += " AND Language = @lang";
 	if (!members)
 		sql += " AND MemberOf IS NULL";
-	if (lang != NULL)
-		sql += " AND Language = @lang";
 	sql += " ORDER BY Tag, Signature";
 	stmt.Prepare(sql.c_str());
-	if (lang != NULL)
-		stmt.Bind("@lang", lang);
+	stmt.Bind("@lang", lang);
 
 	Tag tag;
 	HTREEITEM hGroup = NULL;
@@ -537,6 +535,11 @@ static void OnCommand(HWND hWnd, int ResID, int msg)
 			break;
 		}
 		case IDC_DATABASE_OPTIONS:
+		{
+			MsgBox("Not implemented yet!");
+			break;
+		}
+		case IDC_TAG_PROPERTIES:
 		{
 			MsgBox("Not implemented yet!");
 			break;
