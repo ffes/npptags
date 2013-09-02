@@ -171,17 +171,16 @@ static bool AddMembers(HTREEITEM hParent, Tag* pTag)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static void InsertItems(HTREEITEM hParent, LPCSTR lang, LPCWSTR group, LPCSTR where, bool members)
+static void InsertCppItems(HTREEITEM hParent, LPCSTR type, bool members)
 {
 	SqliteStatement stmt(g_DB);
-	string sql = "SELECT * FROM Tags WHERE ";
-	sql += where;
-	sql += " AND Language = @lang";
+	string sql = "SELECT * FROM Tags WHERE Type = @type AND Language = @lang ";
 	if (!members)
-		sql += " AND MemberOf IS NULL";
-	sql += " ORDER BY Tag, Signature";
+		sql += "AND MemberOf IS NULL ";
+	sql += "ORDER BY Tag, Signature";
 	stmt.Prepare(sql.c_str());
-	stmt.Bind("@lang", lang);
+	stmt.Bind("@type", type);
+	stmt.Bind("@lang", "C/C++");
 
 	Tag tag;
 	HTREEITEM hGroup = NULL;
@@ -190,11 +189,15 @@ static void InsertItems(HTREEITEM hParent, LPCSTR lang, LPCWSTR group, LPCSTR wh
 		// Get the information from the database
 		tag.SetFromDB(&stmt);
 
-		// Do we need to add the parent item
+		// Add the group header, JIT
 		if (hGroup == NULL)
-			hGroup = InsertTextItem(hParent, (LPWSTR) group);
+		{
+			string str = type;
+			wstring wstr(str.begin(), str.end());
+			hGroup = InsertTextItem(hParent, (LPWSTR) wstr.c_str());
+		}
 
-		// Now we can add the tag
+		// And can add the tag
 		InsertTagItem(hGroup, &tag, members);
 	}
 	stmt.Finalize();
@@ -203,23 +206,16 @@ static void InsertItems(HTREEITEM hParent, LPCSTR lang, LPCWSTR group, LPCSTR wh
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static void AddTypes(HTREEITEM hParent, LPCSTR lang)
+static void BuildCppTree(HTREEITEM hParent)
 {
-	InsertItems(hParent, lang, L"Classes", "(Type = 'class' OR Type = 'interface')", true);
-	InsertItems(hParent, lang, L"Sub routines", "(Type = 'sub' OR Type = 'subroutine')", false);
-	InsertItems(hParent, lang, L"Procedures", "Type = 'procedure'", false);
-	InsertItems(hParent, lang, L"Functions", "Type = 'function'", false);
-	InsertItems(hParent, lang, L"Members", "Type = 'member'", false);
-	InsertItems(hParent, lang, L"Method", "Type = 'method'", false);
-	InsertItems(hParent, lang, L"Structures", "Type = 'struct'", true);
-	InsertItems(hParent, lang, L"Unions", "Type = 'union'", true);
-	InsertItems(hParent, lang, L"Enumerations", "Type = 'enum'", true);
-	InsertItems(hParent, lang, L"Variables", "Type = 'variable'", false);
-	InsertItems(hParent, lang, L"Macros", "Type = 'macro'", false);
-	InsertItems(hParent, lang, L"Type definitions", "Type = 'typedef'", false);
-	InsertItems(hParent, lang, L"Label", "Type = 'label'", false);
-	InsertItems(hParent, lang, L"Define", "Type = 'define'", false);
-	InsertItems(hParent, lang, L"Anchor", "Type = 'anchor'", false);
+	InsertCppItems(hParent, "class", true);
+	InsertCppItems(hParent, "function", false);
+	InsertCppItems(hParent, "struct", true);
+	InsertCppItems(hParent, "union", true);
+	InsertCppItems(hParent, "enum", true);
+	InsertCppItems(hParent, "variable", false);
+	InsertCppItems(hParent, "macro", false);
+	InsertCppItems(hParent, "typedef", false);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -236,6 +232,37 @@ static void BuildCSharpTree(HTREEITEM hParent)
 static void BuildJavaTree(HTREEITEM hParent)
 {
 	InsertTextItem(hParent, L"Build Java tree");
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+static void AddAllTypes(HTREEITEM hParent, LPCSTR lang)
+{
+	SqliteStatement stmt(g_DB);
+	stmt.Prepare("SELECT * FROM Tags WHERE Language = @lang ORDER BY Type, Tag, Signature");
+	stmt.Bind("@lang", lang);
+
+	Tag tag;
+	HTREEITEM hGroup = NULL;
+	string type = "";
+	while (stmt.GetNextRecord())
+	{
+		// Get the information from the database
+		tag.SetFromDB(&stmt);
+
+		// Do we need to add the parent item?
+		if (tag.getType() != type)
+		{
+			type = tag.getType();
+			wstring wstr(type.begin(), type.end());
+			hGroup = InsertTextItem(hParent, (LPWSTR) wstr.c_str());
+		}
+
+		// Now we can add the tag, classes commonly have members
+		InsertTagItem(hGroup, &tag, type == "class");
+	}
+	stmt.Finalize();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -291,8 +318,10 @@ void UpdateTagsTree()
 				BuildCSharpTree(hLang);
 			else if (lang == "Java")
 				BuildJavaTree(hLang);
+			else if (lang == "C/C++")
+				BuildCppTree(hLang);
 			else
-				AddTypes(hLang, lang.c_str());
+				AddAllTypes(hLang, lang.c_str());
 
 			// Expand the current language
 			if (hLang != NULL && TagLangEqualsNppLang(lang))
