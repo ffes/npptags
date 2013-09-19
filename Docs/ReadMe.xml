@@ -168,7 +168,7 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 		<title>Revision History</title>
 
 		<sect2 id="v0_2_0">
-			<title>Version 0.2.0, XX August 2013</title>
+			<title>Version 0.2.0, XX September 2013</title>
 			<itemizedlist>
 				<listitem><para>First public release, external proof of concept</para></listitem>
 				<listitem><para>After generating the tags file, it is now converted to a SQLite database. This makes it much easier and faster to build a proper tree.</para></listitem>
@@ -176,6 +176,7 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 				<listitem><para>In the Select Tag dialog, preselect the first tag in the current file.</para></listitem>
 				<listitem><para>Show a separate root item per language, if more then one language is found.</para></listitem>
 				<listitem><para>Using a SVN (rev 804) based build of ctags for better JavaScript support.</para></listitem>
+				<listitem><para>Upgrade to SQLite version 3.8.0.2</para></listitem>
 			</itemizedlist>
 		</sect2>
 
