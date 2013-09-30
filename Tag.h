@@ -54,6 +54,8 @@ public:
 	bool isType(LPCSTR);
 	bool thisFileOnly()				{ return _thisFileOnly; };
 
+	void setTag(std::string t)		{ _tag = t; };
+
 protected:
 	int _idx;							// Index field in database
 	std::string _tag;					// Name of the tag

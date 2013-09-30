@@ -223,7 +223,29 @@ static void BuildCppTree(HTREEITEM hParent)
 
 static void BuildCSharpTree(HTREEITEM hParent)
 {
-	InsertTextItem(hParent, L"Build C# tree");
+	// First find the namespace
+	SqliteStatement namespace_stmt(g_DB, "SELECT DISTINCT Tag FROM Tags WHERE Type = 'namespace' AND Language = 'C#' ORDER BY Tag");
+	HTREEITEM hNamespaceGroup = NULL;
+	while (namespace_stmt.GetNextRecord())
+	{
+		wstring namespace_name = namespace_stmt.GetWTextColumn("Tag");
+		hNamespaceGroup = InsertTextItem(hParent, (LPWSTR) namespace_name.c_str());
+
+		// Find the classes of the namespace
+		SqliteStatement class_stmt(g_DB, "SELECT * FROM Tags WHERE Type = 'class' AND Language = 'C#' AND MemberOf = @member");
+		class_stmt.Bind("@member", namespace_name.c_str());
+
+		Tag tag;
+		HTREEITEM hGroup = NULL;
+		while (class_stmt.GetNextRecord())
+		{
+			// Get the information from the database
+			tag.SetFromDB(&class_stmt);
+			hGroup = InsertTagItem(hNamespaceGroup, &tag, true);
+		}
+		class_stmt.Finalize();
+	}
+	namespace_stmt.Finalize();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -525,6 +547,16 @@ static BOOL OnItemExpanding(NMTREEVIEW* pNMTreeView)
 		Tag tag;
 		FindTagInDB(tvi.lParam, &tag);
 		added = AddMembers(tvi.hItem, &tag);
+
+		// Try again with the namespace in front of it
+		if (!added)
+		{
+			std::string tmp = tag.getMemberOf();
+			tmp += ".";
+			tmp += tag.getTag();
+			tag.setTag(tmp);
+			added = AddMembers(tvi.hItem, &tag);
+		}
 	}
 
 	// If we didn't add anything, remove the (+) from the tree
