@@ -30,8 +30,6 @@
 #include "WaitCursor.h"
 using namespace std;
 
-static string s_tagsFile;			// The 'tags' filename
-
 /////////////////////////////////////////////////////////////////////////////
 // Check is a file exists
 
@@ -47,64 +45,8 @@ static bool FileExists(LPCSTR path)
 	return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Set the char-based tags filename upon the wstring based tags db directory
-
-static void SetTagsFile(WCHAR* tagsPath)
-{
-	CHAR curPath[MAX_PATH];
-	Unicode2Ansi(curPath, tagsPath, MAX_PATH);
-
-	s_tagsFile = curPath;
-	s_tagsFile += "\\tags";
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// Get the filename of the tags database file
-
-static wstring GetTagsFilename(bool mustExist)
-{
-	WCHAR curPath[MAX_PATH];
-	SendMessage(g_nppData._nppHandle, NPPM_GETCURRENTDIRECTORY, MAX_PATH, (LPARAM) &curPath);
-
-	// Is the current path set?
-	if (wcslen(curPath) == 0)
-		return L"";
-
-	wstring tagsDB = curPath;
-	tagsDB += L"\\tags.sqlite";
-
-	// When generating a tags file, we're done
-	if (!mustExist)
-	{
-		SetTagsFile(curPath);
-		return tagsDB;
-	}
-
-	// We're reading a tags file. If db not found, look higher in directory tree
-/*
-	WCHAR drive[_MAX_DRIVE];
-	WCHAR dir[_MAX_DIR];
-	WCHAR fname[_MAX_FNAME];
-	WCHAR ext[_MAX_EXT];
-
-	_wsplitpath(tagsDB.c_str(), drive, dir, fname, ext );
-	// Note: _splitpath is deprecated; consider using _splitpath_s instead
-	printf( "Path extracted with _splitpath:\n" );
-	printf( "  Drive: %s\n", drive );
-	printf( "  Dir: %s\n", dir );
-	printf( "  Filename: %s\n", fname );
-	printf( "  Ext: %s\n", ext );
-*/
-
-	SetTagsFile(curPath);
-
-	// If not found, return empty string
-	return (FileExists(tagsDB.c_str()) ? tagsDB : L"");
-}
-
 ////////////////////////////////////////////////////////////////////////////
-//
+// Run a command in a directory
 
 static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 {
@@ -132,113 +74,6 @@ static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 		dwReturn = GetLastError();
 
 	return dwReturn;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// Generate a tags file in the current directory
-
-static bool GenerateTagsFile()
-{
-	// Overwrite an already existing tags file?
-	if (!g_Options->overwriteExistingTagsFile)
-	{
-		if (FileExists(s_tagsFile.c_str()))
-			return true;
-	}
-
-	// Get the current directory. Unsaved new files don't have this set!
-	WCHAR curDir[MAX_PATH];
-	SendMessage(g_nppData._nppHandle, NPPM_GETCURRENTDIRECTORY, MAX_PATH, (LPARAM) &curDir);
-	if (wcslen(curDir) == 0)
-		return false;
-
-	// Set the path to ctags.exe
-	WCHAR szExePath[_MAX_PATH];
-	SendMessage(g_nppData._nppHandle, NPPM_GETNPPDIRECTORY, MAX_PATH, (LPARAM) &szExePath);
-	wcsncat(szExePath, L"\\plugins\\NppTags\\ctags", _MAX_PATH);
-
-	// Construct the command line
-	wstring cmd;
-	cmd += char(34);
-	cmd += szExePath;
-	cmd += char(34);
-
-	// Add the options
-	if (g_Options->maxDepth > 0)
-		cmd += L" -R";
-	cmd += L" --fields=+iKSlma";
-
-	// Add the default search pattern
-	cmd += L" *";
-
-	//MsgBox(cmd.c_str());
-	return(Run(cmd.c_str(), curDir, true) == NOERROR);
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// Convert the tags file to a SQLite database
-
-static bool ConvertTagsToDB()
-{
-	// Open the file
-	tagFileInfo info;
-	tagFile *const file = tagsOpen(s_tagsFile.c_str(), &info);
-	if (file == NULL)
-	{
-		MsgBox("Something went wrong opening generated tags file");
-		return false;
-	}
-
-	try
-	{
-		// First delete the old database (if any)
-		g_DB->Delete();
-
-		// Create the new database
-		g_DB->Open();
-
-		// Prepare the statement
-		SqliteStatement stmt(g_DB);
-		stmt.Prepare("INSERT INTO Tags(Tag, File, Line, Pattern, Type, Language, MemberOf, MemberOfType, Inherits, Signature, Access, Implementation, ThisFileOnly, Unrecognized) VALUES (@tag, @file, @line, @pattern, @type, @language, @memberof, @memberoftype, @inherits, @signature, @access, @implementation, @thisfileonly, @unrecognized)");
-
-		// Get the current directory
-		WCHAR curDir[MAX_PATH];
-		SendMessage(g_nppData._nppHandle, NPPM_GETCURRENTDIRECTORY, MAX_PATH, (LPARAM) &curDir);
-		
-		// Go through the records and save them in the database
-		Tag tag;
-		tagEntry entry;
-		g_DB->BeginTransaction();
-		while (tagsNext(file, &entry) == TagSuccess)
-		{
-			// Put it in the array		
-			tag = entry;
-
-			// Is there anything to search for?
-			if (tag.getPattern().length() == 0 && tag.getLine() == 0)
-				continue;
-
-			// Very long search pattern in JavaScript, minimized?
-			if (tag.getLanguage() == "JavaScript")
-				if (tag.getPattern().length() >= MAX_PATH)
-					continue;
-
-			tag.SaveToDB(&stmt, curDir);
-		}
-		stmt.Finalize();
-		g_DB->CommitTransaction();
-		g_DB->Close();
-	}
-	catch(SqliteException e)
-	{
-		tagsClose(file);
-		MsgBoxf("Something went wrong convert tags file to database!\n%s", e.what());
-		return false;
-	}
-
-	// Close the tags file
-	tagsClose(file);
-	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -314,31 +149,32 @@ void TagsDatabase::InsertPragmas()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// (Re)generate the database
 
 void TagsDatabase::Generate()
 {
+	// If the database filename is not set, generate if
+	if (wcslen(_dbFile) == 0)
+		SetFilename(GetTagsFilename(false).c_str());
+
+	// If the database filename is stll not set, do nothing
+	if (wcslen(_dbFile) == 0)
+		return;
+
 	// First we need to generate a (temp) tags file
 	if (!GenerateTagsFile())
-	{
-		MsgBox("Something went wrong generating tags file!");
-		return;
-	}
-
-	// Make sure the database filename is set properly
-	SetFilename(GetTagsFilename(false).c_str());
+		throw SqliteException("Something went wrong generating tags file!");
 
 	// Now we can convert the tags file to a SQLite database
-	if (!ConvertTagsToDB())
+	if (!ImportTags())
 		return;
 
 	// Delete the temp tags file
 	if (g_Options->deleteTagsFile)
-		DeleteFileA(s_tagsFile.c_str());
+		DeleteFileA(_tagsFile.c_str());
 
-	// After that update the global tags filename and the tree
-	SetFilename(L"");
-	UpdateFilename();
+	// After that, update the tree
+	UpdateTagsTree();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -352,4 +188,158 @@ void TagsDatabase::UpdateFilename()
 		SetFilename(newfile.c_str());
 		UpdateTagsTree();
 	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Set the char-based tags filename upon the wstring based tags db directory
+
+void TagsDatabase::SetTagsFile(WCHAR* tagsPath)
+{
+	_curDir = tagsPath;
+
+	CHAR curPath[MAX_PATH];
+	Unicode2Ansi(curPath, tagsPath, MAX_PATH);
+
+	_tagsFile = curPath;
+	_tagsFile += "\\tags";
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Get the filename of the tags database file
+
+std::wstring TagsDatabase::GetTagsFilename(bool mustExist)
+{
+	// Get the current directory. Unsaved new files don't have this set!
+	WCHAR curPath[MAX_PATH];
+	SendMessage(g_nppData._nppHandle, NPPM_GETCURRENTDIRECTORY, MAX_PATH, (LPARAM) &curPath);
+	if (wcslen(curPath) == 0)
+		return L"";
+
+	wstring tagsDB = curPath;
+	tagsDB += L"\\tags.sqlite";
+
+	// When generating a tags file, we're done
+	if (!mustExist)
+	{
+		SetTagsFile(curPath);
+		return tagsDB;
+	}
+
+	// We're reading a tags file. If db not found, look higher in directory tree
+/*
+	WCHAR drive[_MAX_DRIVE];
+	WCHAR dir[_MAX_DIR];
+	WCHAR fname[_MAX_FNAME];
+	WCHAR ext[_MAX_EXT];
+
+	_wsplitpath(tagsDB.c_str(), drive, dir, fname, ext );
+	// Note: _splitpath is deprecated; consider using _splitpath_s instead
+	printf( "Path extracted with _splitpath:\n" );
+	printf( "  Drive: %s\n", drive );
+	printf( "  Dir: %s\n", dir );
+	printf( "  Filename: %s\n", fname );
+	printf( "  Ext: %s\n", ext );
+*/
+
+	SetTagsFile(curPath);
+
+	// If not found, return empty string
+	return (FileExists(tagsDB.c_str()) ? tagsDB : L"");
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Generate a tags file in the current directory
+
+bool TagsDatabase::GenerateTagsFile()
+{
+	// Overwrite an already existing tags file?
+	if (!g_Options->overwriteExistingTagsFile)
+	{
+		if (FileExists(_tagsFile.c_str()))
+			return true;
+	}
+
+	// Set the path to ctags.exe
+	WCHAR szExePath[_MAX_PATH];
+	SendMessage(g_nppData._nppHandle, NPPM_GETNPPDIRECTORY, MAX_PATH, (LPARAM) &szExePath);
+	wcsncat(szExePath, L"\\plugins\\NppTags\\ctags", _MAX_PATH);
+
+	// Construct the command line
+	wstring cmd;
+	cmd += char(34);
+	cmd += szExePath;
+	cmd += char(34);
+
+	// Add the options
+	if (g_Options->maxDepth > 0)
+		cmd += L" -R";
+	cmd += L" --fields=+iKSlma";
+
+	// Add the default search pattern
+	cmd += L" *";
+
+	//MsgBox(cmd.c_str());
+	return(Run(cmd.c_str(), _curDir.c_str(), true) == NOERROR);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Import the tags file in the database
+
+bool TagsDatabase::ImportTags()
+{
+	// Open the file
+	tagFileInfo info;
+	tagFile *const file = tagsOpen(_tagsFile.c_str(), &info);
+	if (file == NULL)
+	{
+		MsgBox("Something went wrong opening generated tags file");
+		return false;
+	}
+
+	try
+	{
+		// First delete the old database (if any)
+		Delete();
+
+		// Create the new database
+		Open();
+
+		// Prepare the statement
+		SqliteStatement stmt(this);
+		stmt.Prepare("INSERT INTO Tags(Tag, File, Line, Pattern, Type, Language, MemberOf, MemberOfType, Inherits, Signature, Access, Implementation, ThisFileOnly, Unrecognized) VALUES (@tag, @file, @line, @pattern, @type, @language, @memberof, @memberoftype, @inherits, @signature, @access, @implementation, @thisfileonly, @unrecognized)");
+
+		// Go through the records and save them in the database
+		Tag tag;
+		tagEntry entry;
+		BeginTransaction();
+		while (tagsNext(file, &entry) == TagSuccess)
+		{
+			// Put it in the array		
+			tag = entry;
+
+			// Is there anything to search for?
+			if (tag.getPattern().length() == 0 && tag.getLine() == 0)
+				continue;
+
+			// Very long search pattern in JavaScript, minimized?
+			if (tag.getLanguage() == "JavaScript")
+				if (tag.getPattern().length() >= MAX_PATH)
+					continue;
+
+			tag.SaveToDB(&stmt, _curDir);
+		}
+		stmt.Finalize();
+		CommitTransaction();
+		Close();
+	}
+	catch (SqliteException e)
+	{
+		tagsClose(file);
+		MsgBoxf("Something went wrong convert tags file to database!\n%s", e.what());
+		return false;
+	}
+
+	// Close the tags file
+	tagsClose(file);
+	return true;
 }

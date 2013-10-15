@@ -307,7 +307,7 @@ std::string Tag::getDetails()
 /////////////////////////////////////////////////////////////////////////////
 //
 
-void Tag::SaveToDB(SqliteStatement* stmt, LPCWSTR curDir)
+void Tag::SaveToDB(SqliteStatement* stmt, std::wstring curDir)
 {
 	// Construct the full pathname
 	std::wstring fullPath = curDir;

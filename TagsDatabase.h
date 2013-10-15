@@ -39,5 +39,12 @@ protected:
 	void Init();
 	void SetValues();
 
-	int _dbVersion;
+	void SetTagsFile(WCHAR* tagsPath);
+	std::wstring GetTagsFilename(bool mustExist);
+	bool GenerateTagsFile();
+	bool ImportTags();
+
+	int _dbVersion;				// The schema version
+	std::string _tagsFile;		// The 'tags' filename
+	std::wstring _curDir;		// The current directory
 };
