@@ -28,7 +28,6 @@
 #include "NPP/menuCmdID.h"
 #include "NPP/Docking.h"
 #include "NppTags.h"
-#include "GenerateTagsDB.h"
 #include "Resource.h"
 #include "Options.h"
 #include "WaitCursor.h"
@@ -614,7 +613,7 @@ static void OnCommand(HWND hWnd, int ResID, int msg)
 		}
 		case IDC_REFRESH_TAGS:
 		{
-			GenerateTagsDB();
+			g_DB->Generate();
 			break;
 		}
 		case IDC_DATABASE_OPTIONS:

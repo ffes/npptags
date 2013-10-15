@@ -34,7 +34,6 @@ using namespace std;
 #include "DlgAbout.h"
 #include "DlgTree.h"
 #include "DlgSelectTag.h"
-#include "GenerateTagsDB.h"
 #include "Options.h"
 #include "Tag.h"
 #include "WaitCursor.h"
@@ -143,7 +142,7 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification* notifyCode)
 
 		case NPPN_BUFFERACTIVATED:
 		{
-			UpdateTagsFilename();
+			g_DB->UpdateFilename();
 			break;
 		}
 	}
@@ -304,6 +303,14 @@ void JumpToTag(Tag* pTag)
 		if (pos >= 0)
 			SendMsg(SCI_GOTOPOS, pos);
 	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Simple placeholders
+
+static void GenerateTagsDB()
+{
+	g_DB->Generate();
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -32,6 +32,9 @@ public:
 	virtual void Open();
 	void InsertPragmas();
 
+	void Generate();
+	void UpdateFilename();
+
 protected:
 	void Init();
 	void SetValues();

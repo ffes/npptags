@@ -102,7 +102,6 @@
     <ClCompile Include="DlgAbout.cpp" />
     <ClCompile Include="DlgSelectTag.cpp" />
     <ClCompile Include="DlgTree.cpp" />
-    <ClCompile Include="GenerateTagsDB.cpp" />
     <ClCompile Include="NppTags.cpp" />
     <ClCompile Include="Options.cpp" />
     <ClCompile Include="readtags.c" />
@@ -117,7 +116,6 @@
     <ClInclude Include="DlgAbout.h" />
     <ClInclude Include="DlgSelectTag.h" />
     <ClInclude Include="DlgTree.h" />
-    <ClInclude Include="GenerateTagsDB.h" />
     <ClInclude Include="NppTags.h" />
     <ClInclude Include="Options.h" />
     <ClInclude Include="readtags.h" />
