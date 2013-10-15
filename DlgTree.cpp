@@ -253,7 +253,29 @@ static void BuildCSharpTree(HTREEITEM hParent)
 
 static void BuildJavaTree(HTREEITEM hParent)
 {
-	InsertTextItem(hParent, L"Build Java tree");
+	// First find the namespace
+	SqliteStatement interface_stmt(g_DB, "SELECT DISTINCT Tag FROM Tags WHERE Type = 'interface' AND Language = 'Java' ORDER BY Tag");
+	HTREEITEM hInterfaceGroup = NULL;
+	while (interface_stmt.GetNextRecord())
+	{
+		wstring interface_name = interface_stmt.GetWTextColumn("Tag");
+		hInterfaceGroup = InsertTextItem(hParent, (LPWSTR) interface_name.c_str());
+
+		// Find the classes of the namespace
+		SqliteStatement class_stmt(g_DB, "SELECT * FROM Tags WHERE Type = 'class' AND Language = 'Java' AND MemberOf = @member");
+		class_stmt.Bind("@member", interface_name.c_str());
+
+		Tag tag;
+		HTREEITEM hGroup = NULL;
+		while (class_stmt.GetNextRecord())
+		{
+			// Get the information from the database
+			tag.SetFromDB(&class_stmt);
+			hGroup = InsertTagItem(hInterfaceGroup, &tag, true);
+		}
+		class_stmt.Finalize();
+	}
+	interface_stmt.Finalize();
 }
 
 /////////////////////////////////////////////////////////////////////////////
