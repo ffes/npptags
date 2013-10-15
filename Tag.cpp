@@ -367,25 +367,33 @@ void Tag::TrimPattern()
 	if (_pattern.length() == 0)
 		return;
 
-	// Remove the regex helper from begin and end
-	_pattern.erase(0, 2);									// First two chars are /^
-	_pattern.erase(_pattern.end() - 2, _pattern.end());		// Last two chars are $/
-
-	// Fix all escaped slashes
-	std::string::size_type pos = 0;
-	std::string from = "\\/", to = "/";
-	while ((pos = _pattern.find(from, pos)) != std::string::npos)
+	try
 	{
-		_pattern.replace(pos, from.length(), to);
-		pos += to.length();
+		// Remove the regex helper from begin and end
+		_pattern.erase(0, 2);									// First two chars are /^
+		_pattern.erase(_pattern.end() - 2, _pattern.end());		// Last two chars are $/
+
+		// Fix all escaped slashes
+		std::string::size_type pos = 0;
+		std::string from = "\\/", to = "/";
+		while ((pos = _pattern.find(from, pos)) != std::string::npos)
+		{
+			_pattern.replace(pos, from.length(), to);
+			pos += to.length();
+		}
+
+		// Trim right side of pattern
+		std::string whiteSpaces(" \f\n\r\t\v");
+		pos = _pattern.find_last_not_of(whiteSpaces);
+		_pattern.erase(pos + 1);
+
+		// Trim from the left
+		pos = _pattern.find_first_not_of(whiteSpaces);
+		_pattern.erase(0, pos);
 	}
-
-	// Trim right side of pattern
-	std::string whiteSpaces(" \f\n\r\t\v");
-	pos = _pattern.find_last_not_of(whiteSpaces);
-	_pattern.erase(pos + 1);
-
-	// Trim from the left
-	pos = _pattern.find_first_not_of(whiteSpaces);
-	_pattern.erase(0, pos);
+	catch(std::exception&)
+	{
+		// There must be something wrong with the pattern, don't use it!
+		_pattern.clear();
+	}
 }

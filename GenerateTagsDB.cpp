@@ -201,6 +201,10 @@ static bool ConvertTagsToDB()
 			// Put it in the array		
 			tag = entry;
 
+			// Is there anything to search for?
+			if (tag.getPattern().length() == 0 && tag.getLine() == 0)
+				continue;
+
 			// Very long search pattern in JavaScript, minimized?
 			if (tag.getLanguage() == "JavaScript")
 				if (tag.getPattern().length() >= MAX_PATH)
