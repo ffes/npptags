@@ -61,11 +61,11 @@
 		<para>For debugging it can be necessary to see the raw tags file. You can manually add an extra section with read-only options to the <computeroutput>NppTags.ini</computeroutput> to control what happens to the automatically generated tags file. These are the default settings:</para>
 		<screen>
 			[Debug]
-			OverwriteTags=1
 			DelTags=1
+			OverwriteTags=1
 		</screen>
-		<para>When <computeroutput>OverwriteTags</computeroutput> is set to <computeroutput>0</computeroutput> and a tags file is found the plug-in will not overwrite and regenerate this existing tags file before generating the database. When set to 0, this implies that <computeroutput>DelTags</computeroutput> is set to <computeroutput>0</computeroutput> as well.</para>
 		<para>When <computeroutput>DelTags</computeroutput> is set to <computeroutput>0</computeroutput> the plug-in will not delete the generated tags file after it is converted to the database.</para>
+		<para>When <computeroutput>OverwriteTags</computeroutput> is set to <computeroutput>0</computeroutput> and a tags file is found the plug-in will not overwrite and regenerate this existing tags file before generating the database. When set to 0, this implies that <computeroutput>DelTags</computeroutput> is set to <computeroutput>0</computeroutput> as well.</para>
 	</sect1>
 
 	<sect1 id="contact">
@@ -103,19 +103,13 @@
 			</qandaentry-->
 			<qandaentry>
 				<question id="faq_general_3"><para>
-					I want to add extra command line options the ctags generates the tags file. Can this be done?
+					I want to add extra command line options when ctags generates the tags file. Can this be done?
 				</para></question>
-				<answer><!--para>
-					There are several ways:
-					<itemizedlist>
-						<listitem><para>
-							Options
-						</para></listitem>
-						<listitem--><para>
-							If you want to add extra command line options to ctags, use a ctags.cnf file. See the <ulink url="http://ctags.sourceforge.net/ctags.html#FILES">Files section</ulink> in the documentation of ctags for more details.
-						</para><!--/listitem>
-					</itemizedlist>
-				</para--></answer>
+				<answer>
+					<para>
+						If you want to add extra command line options to ctags, use a ctags.cnf file. It can be placed in the current directory for local settings or in your user directory for global settings. See the <ulink url="http://ctags.sourceforge.net/ctags.html#FILES">Files section</ulink> in the documentation of ctags for more details.
+					</para>
+				</answer>
 			</qandaentry>
 			<qandaentry>
 				<question id="faq_general_4"><para>
