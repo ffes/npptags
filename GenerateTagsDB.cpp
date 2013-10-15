@@ -155,14 +155,6 @@ static bool GenerateTagsFile()
 		cmd += L" -R";
 	cmd += L" --fields=+iKSlma";
 
-	// Did the user add any additional options?
-	wstring options = g_Options->GetExtraOptions();
-	if (options.length() > 0)
-	{
-		cmd += L" ";
-		cmd += options;
-	}
-
 	// Add the default search pattern
 	cmd += L" *";
 

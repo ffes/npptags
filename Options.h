@@ -40,7 +40,6 @@ public:
 	bool overwriteExistingTagsFile;
 
 	WCHAR* GetPrevVersion() { return _szPrevVersion; };
-	WCHAR* GetExtraOptions() { return _szExtraOptions; };
 
 	void Write();
 	void Read();
@@ -52,7 +51,6 @@ private:
 
 	WCHAR _szIniPath[MAX_PATH];
 	WCHAR _szPrevVersion[MAX_PATH];
-	WCHAR _szExtraOptions[MAX_PATH];
 };
 
 #endif // __OPTIONS_H__
