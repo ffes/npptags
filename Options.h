@@ -32,14 +32,15 @@ public:
 	~Options();
 
 	// General options
-	bool showTreeDlg;
-	int maxDepth;
+	bool GetShowTreeDlg()				{ return _showTreeDlg; };
+	int  GetMaxDepth()					{ return _maxDepth; };
+	WCHAR* GetPrevVersion() 			{ return _szPrevVersion; };
+
+	void SetShowTreeDlg(bool b)			{ _showTreeDlg = b; };
 
 	// Debug options
-	bool deleteTagsFile;
-	bool overwriteExistingTagsFile;
-
-	WCHAR* GetPrevVersion() { return _szPrevVersion; };
+	bool GetDeleteTagsFile()			{ return _deleteTagsFile; };
+	bool GetOverwriteExistingTagsFile()	{ return _overwriteExistingTagsFile; };
 
 	void Write();
 	void Read();
@@ -51,6 +52,14 @@ private:
 
 	WCHAR _szIniPath[MAX_PATH];
 	WCHAR _szPrevVersion[MAX_PATH];
+
+	// General options
+	bool _showTreeDlg;
+	int _maxDepth;
+
+	// Debug options
+	bool _deleteTagsFile;
+	bool _overwriteExistingTagsFile;
 };
 
 #endif // __OPTIONS_H__

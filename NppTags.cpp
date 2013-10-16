@@ -106,7 +106,7 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification* notifyCode)
 			// Initialize the options
 			g_Options = new Options();
 
-			if (g_Options->showTreeDlg)
+			if (g_Options->GetShowTreeDlg())
 				TagsTree();
 
 			// Check if we are running a newer version

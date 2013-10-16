@@ -658,7 +658,7 @@ static BOOL CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		case WM_CLOSE:
 		{
 			OnClose(hWnd);
-			g_Options->showTreeDlg = s_bTreeVisible;
+			g_Options->SetShowTreeDlg(s_bTreeVisible);
 			break;
 		}
 		case WM_NOTIFY:
@@ -742,7 +742,7 @@ void TagsTree()
 	}
 
 	// Store the visiblity in the options
-	g_Options->showTreeDlg = s_bTreeVisible;
+	g_Options->SetShowTreeDlg(s_bTreeVisible);
 }
 
 /////////////////////////////////////////////////////////////////////////////

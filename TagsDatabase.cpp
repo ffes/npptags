@@ -170,7 +170,7 @@ void TagsDatabase::Generate()
 		return;
 
 	// Delete the temp tags file
-	if (g_Options->deleteTagsFile)
+	if (g_Options->GetDeleteTagsFile())
 		DeleteFileA(_tagsFile.c_str());
 
 	// After that, update the tree
@@ -253,7 +253,7 @@ std::wstring TagsDatabase::GetTagsFilename(bool mustExist)
 bool TagsDatabase::GenerateTagsFile()
 {
 	// Overwrite an already existing tags file?
-	if (!g_Options->overwriteExistingTagsFile)
+	if (!g_Options->GetOverwriteExistingTagsFile())
 	{
 		if (FileExists(_tagsFile.c_str()))
 			return true;
@@ -271,7 +271,7 @@ bool TagsDatabase::GenerateTagsFile()
 	cmd += char(34);
 
 	// Add the options
-	if (g_Options->maxDepth > 0)
+	if (g_Options->GetMaxDepth() > 0)
 		cmd += L" -R";
 	cmd += L" --fields=+iKSlma";
 

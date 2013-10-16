@@ -93,8 +93,8 @@ void Options::WritePrivateProfileInt(WCHAR* szAppName, WCHAR* szKeyName, int val
 
 void Options::Write()
 {
-	WritePrivateProfileBool(s_szOptions, s_szShow, showTreeDlg);
-	WritePrivateProfileInt(s_szOptions, s_szDepth, maxDepth);
+	WritePrivateProfileBool(s_szOptions, s_szShow, _showTreeDlg);
+	WritePrivateProfileInt(s_szOptions, s_szDepth, _maxDepth);
 	WritePrivateProfileString(s_szOptions, s_szVersion, VERSION_NUMBER_WSTR, _szIniPath);
 }
 
@@ -103,11 +103,11 @@ void Options::Write()
 
 void Options::Read()
 {
-	showTreeDlg = GetPrivateProfileBool(s_szOptions, s_szShow, true);
-	maxDepth = GetPrivateProfileInt(s_szOptions, s_szDepth, 3, _szIniPath);
+	_showTreeDlg = GetPrivateProfileBool(s_szOptions, s_szShow, true);
+	_maxDepth = GetPrivateProfileInt(s_szOptions, s_szDepth, 3, _szIniPath);
 	GetPrivateProfileString(s_szOptions, s_szVersion, L"", _szPrevVersion, MAX_PATH,  _szIniPath);
 
 	// Read Only Debug options
-	overwriteExistingTagsFile = GetPrivateProfileBool(s_szDebug, s_szOverwriteTags, true);
-	deleteTagsFile = (overwriteExistingTagsFile ? GetPrivateProfileBool(s_szDebug, s_szDelTags, true) : false);
+	_overwriteExistingTagsFile = GetPrivateProfileBool(s_szDebug, s_szOverwriteTags, true);
+	_deleteTagsFile = (_overwriteExistingTagsFile ? GetPrivateProfileBool(s_szDebug, s_szDelTags, true) : false);
 }
