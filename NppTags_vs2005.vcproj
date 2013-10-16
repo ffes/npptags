@@ -196,10 +196,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\GenerateTagsDB.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\NppTags.cpp"
 				>
 			</File>
@@ -251,10 +247,6 @@
 			</File>
 			<File
 				RelativePath=".\DlgTree.h"
-				>
-			</File>
-			<File
-				RelativePath=".\GenerateTagsDB.h"
 				>
 			</File>
 			<File
