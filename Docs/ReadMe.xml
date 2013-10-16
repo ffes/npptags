@@ -84,48 +84,44 @@
 		<title>Frequently Asked Questions</title>
 		<qandaset>
 			<qandaentry>
-				<question id="faq_general_1"><para>
-					Does NppTags recognize tags in language 'XYZ'?
-				</para></question>
-				<answer><para>
-					NppTags relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> for the recognition of tags. So please check the documentation of Exuberant CTags to see if your language is supported by Exuberant CTags. If not, you have to contact the Exuberant CTags team to see if they want to add support for your programming language. If Exuberant CTags supports your language "Jump to Tag" should have no problems, but the tree could not show all tags.
-				</para></answer>
+				<question id="faq_general_1">
+					<para>Does NppTags recognize tags in language 'XYZ'?</para>
+				</question>
+				<answer>
+					<para>NppTags relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> for the recognition of tags. So please check the documentation of Exuberant CTags to see if your language is supported by Exuberant CTags. If not, you have to contact the Exuberant CTags team to see if they want to add support for your programming language. If Exuberant CTags supports your language "Jump to Tag" should have no problems, but the tree could not show all tags.</para>
+				</answer>
 			</qandaentry>
-			<!--qandaentry>
-				<question id="faq_general_2"><para>
-					How can I use NppTags when the sources are in a directory tree?
-				</para></question>
-				<answer><para>
-					There are several ways. When you want to use one tags file for the entire tree, you need to set the Initial Folder of the Tools and set 'Always use full paths in the tags file' in the options.<br/>
-					When you work with only one directory tree, you can set the Initial Folder to a full path.<br/>
-					When you don't want this you could use a Workspace (located in the root of this directory tree) and set the Initial Folder to $WspDir. When you have a workspace loaded, this will put the tags in the same directory where the workspace is located. But if no workspace is loaded, it will work just like $FileDir.
-				</para></answer>
-			</qandaentry-->
+			<qandaentry>
+				<question id="faq_general_2">
+					<para>How can I use NppTags when the sources are in a directory tree?</para>
+				</question>
+				<answer>
+					<para>Make sure you generate the database from the root of your directory tree. When you open a file in a subdirectory NppTags will first look in the current directory for a tags database. If it cannot find one and the depth is greater than zero, is will go up one directory and see if a database can be found there. It will go up "depth" times to check the directory. At the moment the default depth is set to 3 directories and you need to manually edit the .ini file (when Notepad++ is closed) to change this. A UI for options is planned.</para>
+				</answer>
+			</qandaentry>
 			<qandaentry>
 				<question id="faq_general_3"><para>
 					I want to add extra command line options when ctags generates the tags file. Can this be done?
 				</para></question>
 				<answer>
-					<para>
-						If you want to add extra command line options to ctags, use a ctags.cnf file. It can be placed in the current directory for local settings or in your user directory for global settings. See the <ulink url="http://ctags.sourceforge.net/ctags.html#FILES">Files section</ulink> in the documentation of ctags for more details.
-					</para>
+					<para>If you want to add extra command line options to ctags, use a ctags.cnf file. It can be placed in the current directory for local settings or in your user directory for global settings. See the <ulink url="http://ctags.sourceforge.net/ctags.html#FILES">Files section</ulink> in the documentation of ctags for more details.</para>
 				</answer>
 			</qandaentry>
 			<qandaentry>
-				<question id="faq_general_4"><para>
-					Why are the languages C and C++ are displayed as 'C/C++'?
-				</para></question>
-				<answer><para>
-					This is done because .h files are standard marked as C++ by ctags. And for tags there is not too much difference between C and C++ to not combine them.
-				</para></answer>
+				<question id="faq_general_4">
+					<para>Why are the languages C and C++ are displayed as 'C/C++'?</para>
+				</question>
+				<answer>
+					<para>This is done because .h files are standard marked as C++ by ctags. And for tags there is not too much difference between C and C++ to not combine them.</para>
+				</answer>
 			</qandaentry>
 			<qandaentry>
-				<question id="faq_general_5"><para>
-					When I jump to a tag it misses it by a few lines or it can not find it at all.
-				</para></question>
-				<answer><para>
-					You probably need to regenerate the tags database by pressing generate button.
-				</para></answer>
+				<question id="faq_general_5">
+					<para>When I jump to a tag it misses it by a few lines or it can not find it at all.</para>
+				</question>
+				<answer>
+					<para>You probably need to regenerate the tags database by pressing generate button.</para>
+				</answer>
 			</qandaentry>
 
 <!--
