@@ -153,19 +153,16 @@ void TagsDatabase::InsertPragmas()
 
 void TagsDatabase::Generate()
 {
-	// If the database filename is not set, generate if
+	// If the database filename is not set, generate it
 	if (wcslen(_dbFile) == 0)
-		SetFilename(GetTagsFilename(false).c_str());
-
-	// If the database filename is stll not set, do nothing
-	if (wcslen(_dbFile) == 0)
-		return;
+		if (!GetTagsFilename(false))
+			return;
 
 	// First we need to generate a (temp) tags file
 	if (!GenerateTagsFile())
 		throw SqliteException("Something went wrong generating tags file!");
 
-	// Now we can convert the tags file to a SQLite database
+	// Now we import the tags file into the database
 	if (!ImportTags())
 		return;
 
@@ -182,12 +179,8 @@ void TagsDatabase::Generate()
 
 void TagsDatabase::UpdateFilename()
 {
-	wstring newfile = GetTagsFilename(true);
-	if (newfile != _dbFile)
-	{
-		SetFilename(newfile.c_str());
+	if (GetTagsFilename(true))
 		UpdateTagsTree();
-	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -195,6 +188,10 @@ void TagsDatabase::UpdateFilename()
 
 void TagsDatabase::SetTagsFile(WCHAR* tagsPath)
 {
+	wstring dbFile = tagsPath;
+	dbFile += L"\\tags.sqlite";
+	SetFilename(dbFile.c_str());
+
 	_curDir = tagsPath;
 
 	CHAR curPath[MAX_PATH];
@@ -205,46 +202,57 @@ void TagsDatabase::SetTagsFile(WCHAR* tagsPath)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Get the filename of the tags database file
+// Get the filename of the tags database file, return true if members with
+// the filenames are set/changed.
 
-std::wstring TagsDatabase::GetTagsFilename(bool mustExist)
+bool TagsDatabase::GetTagsFilename(bool mustExist)
 {
+	if (g_Options == NULL)
+		return false;
+
 	// Get the current directory. Unsaved new files don't have this set!
 	WCHAR curPath[MAX_PATH];
 	SendMessage(g_nppData._nppHandle, NPPM_GETCURRENTDIRECTORY, MAX_PATH, (LPARAM) &curPath);
 	if (wcslen(curPath) == 0)
-		return L"";
-
-	wstring tagsDB = curPath;
-	tagsDB += L"\\tags.sqlite";
+		return false;
 
 	// When generating a tags file, we're done
 	if (!mustExist)
 	{
 		SetTagsFile(curPath);
-		return tagsDB;
+		return true;
 	}
 
-	// We're reading a tags file. If db not found, look higher in directory tree
-/*
-	WCHAR drive[_MAX_DRIVE];
-	WCHAR dir[_MAX_DIR];
-	WCHAR fname[_MAX_FNAME];
-	WCHAR ext[_MAX_EXT];
+	// Initialize path variables
+	wstring tagsDir = curPath;
+	wstring tagsDB = tagsDir;
+	tagsDB += L"\\tags.sqlite";
 
-	_wsplitpath(tagsDB.c_str(), drive, dir, fname, ext );
-	// Note: _splitpath is deprecated; consider using _splitpath_s instead
-	printf( "Path extracted with _splitpath:\n" );
-	printf( "  Drive: %s\n", drive );
-	printf( "  Dir: %s\n", dir );
-	printf( "  Filename: %s\n", fname );
-	printf( "  Ext: %s\n", ext );
-*/
+	// We're looking for the tags db. If db not found, look higher in directory tree
+	int curDepth = g_Options->GetMaxDepth();
+	while (!FileExists(tagsDB.c_str()))
+	{
+		if (curDepth == 0)
+			break;
+		curDepth--;
+
+		WCHAR full[_MAX_PATH];
+		tagsDir += L"\\..";
+		tagsDB = tagsDir + L"\\tags.sqlite";
+		_wfullpath(full, tagsDB.c_str(), _MAX_PATH);
+		tagsDB = full;
+	}
+
+	// When reading the database must exist
+	if (!FileExists(tagsDB.c_str()))
+		return false;
+
+	// The same file found, do nothing
+	if (tagsDB == _dbFile)
+		return false;
 
 	SetTagsFile(curPath);
-
-	// If not found, return empty string
-	return (FileExists(tagsDB.c_str()) ? tagsDB : L"");
+	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////

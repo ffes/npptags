@@ -107,7 +107,10 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification* notifyCode)
 			g_Options = new Options();
 
 			if (g_Options->GetShowTreeDlg())
+			{
+				g_DB->UpdateFilename();
 				TagsTree();
+			}
 
 			// Check if we are running a newer version
 			Version curVer, prevVer(g_Options->GetPrevVersion());

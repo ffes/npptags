@@ -40,7 +40,7 @@ protected:
 	void SetValues();
 
 	void SetTagsFile(WCHAR* tagsPath);
-	std::wstring GetTagsFilename(bool mustExist);
+	bool GetTagsFilename(bool mustExist);
 	bool GenerateTagsFile();
 	bool ImportTags();
 
