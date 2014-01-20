@@ -19,7 +19,7 @@ WINDRES = $(ARCH)-windres
 CFLAGS = -c -O2 -DUNICODE -mtune=i686
 CXXFLAGS = $(CFLAGS) -W -Wall -Wno-write-strings -gstabs -mwindows
 RESFLAGS = -O coff
-LIBS = -lws2_32 -lm -Wl,-Map,$@.map,--cref -static-libgcc -lshlwapi -lgdi32 -lkernel32 -luuid -lwinmm -lcomdlg32 -lole32 -loleaut32 -lcomctl32 -luuid -lwininet -lwsock32
+LIBS = -static-libgcc -lshlwapi -lgdi32 -lcomctl32
 LDFLAGS = -Wl,--out-implib,$(TARGET) -shared -mthreads
 
 .c.o:
@@ -42,7 +42,6 @@ PROGRAM_SRCS_CPP = \
 	DlgAbout.cpp \
 	DlgSelectTag.cpp \
 	DlgTree.cpp \
-	GenerateTagsDB.cpp \
 	NppTags.cpp \
 	SqliteDatabase.cpp \
 	Tag.cpp \
