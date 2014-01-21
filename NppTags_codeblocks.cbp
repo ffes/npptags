@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="NppTags" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release">
+				<Option output="Release/NppTags" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release" />
+				<Option type="3" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Os" />
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="Debug">
+				<Option output="Debug/NppTags" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Debug" />
+				<Option type="3" />
+				<Option host_application="C:/Program Files (x86)/Notepad++/notepad++.exe" />
+				<Option run_host_application_in_terminal="0" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-O0" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-W" />
+			<Add option="-D_WIN32_WINNT=0x501" />
+			<Add option="-DUNICODE" />
+		</Compiler>
+		<Linker>
+			<Add option="-static" />
+			<Add library="shlwapi" />
+			<Add library="comctl32" />
+			<Add library="gdi32" />
+		</Linker>
+		<Unit filename="DlgAbout.cpp" />
+		<Unit filename="DlgAbout.h" />
+		<Unit filename="DlgSelectTag.cpp" />
+		<Unit filename="DlgSelectTag.h" />
+		<Unit filename="DlgTree.cpp" />
+		<Unit filename="DlgTree.h" />
+		<Unit filename="NppTags.cpp" />
+		<Unit filename="NppTags.h" />
+		<Unit filename="NppTags_res.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="Options.cpp" />
+		<Unit filename="Options.h" />
+		<Unit filename="Resource.h" />
+		<Unit filename="SqliteDatabase.cpp" />
+		<Unit filename="SqliteDatabase.h" />
+		<Unit filename="Tag.cpp" />
+		<Unit filename="Tag.h" />
+		<Unit filename="TagsDatabase.cpp" />
+		<Unit filename="TagsDatabase.h" />
+		<Unit filename="Version.cpp" />
+		<Unit filename="Version.h" />
+		<Unit filename="WaitCursor.cpp" />
+		<Unit filename="WaitCursor.h" />
+		<Unit filename="readtags.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="readtags.h" />
+		<Unit filename="sqlite3.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sqlite3.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
