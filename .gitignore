@@ -9,5 +9,6 @@ __*
 [Rr]elease/
 [Dd]ebug/
 ipch/
-*.deps
+*.depend
+*.layout
 tags.sqlite
