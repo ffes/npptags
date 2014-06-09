@@ -120,6 +120,7 @@ IDCM_TAGS_TREE MENU PRELOAD DISCARDABLE
 IDB_SHOW_TAGS	  	BITMAP	DISCARDABLE		"Res/MainToolbar_ShowTags.bmp"
 IDB_REFRESH_TAGS  	BITMAP	DISCARDABLE		"Res/MainToolbar_RefreshTags.bmp"
 IDB_JUMP_TO_TAG  	BITMAP	DISCARDABLE		"Res/MainToolbar_JumpToTag.bmp"
+IDB_JUMP_BACK	  	BITMAP	DISCARDABLE		"Res/MainToolbar_JumpBack.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 // Icons

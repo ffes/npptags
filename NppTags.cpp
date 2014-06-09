@@ -43,9 +43,9 @@ using namespace std;
 #endif
 
 static const TCHAR PLUGIN_NAME[] = L"NppTags";
-static const int nbFunc = 6;
-static int s_iShowTagsIndex, s_iRefreshTagsIndex, s_iJumpToTagIndex;
-static HBITMAP s_hbmpShowTags, s_hbmpRefreshTags, s_hbmpJumpToTag;
+static const int nbFunc = 7;
+static int s_iShowTagsIndex, s_iRefreshTagsIndex, s_iJumpToTagIndex, s_iJumpBackIndex;
+static HBITMAP s_hbmpShowTags, s_hbmpRefreshTags, s_hbmpJumpToTag, s_hbmpJumpBack;
 
 HINSTANCE g_hInst;
 NppData g_nppData;
@@ -84,6 +84,17 @@ extern "C" __declspec(dllexport) FuncItem* getFuncsArray(int *nbF)
 HWND getCurrentHScintilla(int which)
 {
 	return (which == 0) ? g_nppData._scintillaMainHandle : g_nppData._scintillaSecondHandle;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+static void AddToolbarButton(SCNotification* notifyCode, int index, HBITMAP hbmp)
+{
+	toolbarIcons tbiFolder;
+	tbiFolder.hToolbarIcon = NULL;
+	tbiFolder.hToolbarBmp = hbmp;
+	SendMessage((HWND) notifyCode->nmhdr.hwndFrom, NPPM_ADDTOOLBARICON, (WPARAM) g_funcItem[index]._cmdID, (LPARAM) &tbiFolder);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -130,16 +141,10 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification* notifyCode)
 		case NPPN_TBMODIFICATION:
 		{
 			// Add the button to the toolbar
-			toolbarIcons tbiFolder;
-			tbiFolder.hToolbarIcon = NULL;
-			tbiFolder.hToolbarBmp = s_hbmpShowTags;
-			SendMessage((HWND) notifyCode->nmhdr.hwndFrom, NPPM_ADDTOOLBARICON, (WPARAM) g_funcItem[s_iShowTagsIndex]._cmdID, (LPARAM) &tbiFolder);
-
-			tbiFolder.hToolbarBmp = s_hbmpJumpToTag;
-			SendMessage((HWND) notifyCode->nmhdr.hwndFrom, NPPM_ADDTOOLBARICON, (WPARAM) g_funcItem[s_iJumpToTagIndex]._cmdID, (LPARAM) &tbiFolder);
-
-			tbiFolder.hToolbarBmp = s_hbmpRefreshTags;
-			SendMessage((HWND) notifyCode->nmhdr.hwndFrom, NPPM_ADDTOOLBARICON, (WPARAM) g_funcItem[s_iRefreshTagsIndex]._cmdID, (LPARAM) &tbiFolder);
+			AddToolbarButton(notifyCode, s_iShowTagsIndex, s_hbmpShowTags);
+			AddToolbarButton(notifyCode, s_iJumpToTagIndex, s_hbmpJumpToTag);
+			AddToolbarButton(notifyCode, s_iJumpBackIndex, s_hbmpJumpBack);
+			AddToolbarButton(notifyCode, s_iRefreshTagsIndex, s_hbmpRefreshTags);
 			break;
 		}
 
@@ -309,6 +314,13 @@ void JumpToTag(Tag* pTag)
 }
 
 /////////////////////////////////////////////////////////////////////////////
+//
+
+static void JumpBack()
+{
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // Simple placeholders
 
 static void GenerateTagsDB()
@@ -357,6 +369,18 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 			s_iJumpToTagIndex = index;
 			index++;
 
+			// The basic jump-back handling
+			g_funcItem[index]._pFunc = JumpBack;
+			wcscpy(g_funcItem[index]._itemName, L"Jump Back");
+			g_funcItem[index]._init2Check = false;
+			g_funcItem[index]._pShKey = new ShortcutKey;
+			g_funcItem[index]._pShKey->_isAlt = true;
+			g_funcItem[index]._pShKey->_isCtrl = true;
+			g_funcItem[index]._pShKey->_isShift = false;
+			g_funcItem[index]._pShKey->_key = 'Q';
+			s_iJumpBackIndex = index;
+			index++;
+
 			// The basic jump-to-tag handling
 			g_funcItem[index]._pFunc = GenerateTagsDB;
 			wcscpy(g_funcItem[index]._itemName, L"Generate tags database");
@@ -384,6 +408,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 			s_hbmpShowTags = CreateMappedBitmap(g_hInst, IDB_SHOW_TAGS, 0, 0, 0);
 			s_hbmpRefreshTags = CreateMappedBitmap(g_hInst, IDB_REFRESH_TAGS, 0, 0, 0);
 			s_hbmpJumpToTag = CreateMappedBitmap(g_hInst, IDB_JUMP_TO_TAG, 0, 0, 0);
+			s_hbmpJumpBack = CreateMappedBitmap(g_hInst, IDB_JUMP_BACK, 0, 0, 0);
 
 			// Allocate the database class
 			g_DB = new TagsDatabase();

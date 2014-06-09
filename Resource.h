@@ -14,6 +14,7 @@
 #define IDB_SHOW_TAGS				260
 #define IDB_REFRESH_TAGS			261
 #define IDB_JUMP_TO_TAG				262
+#define IDB_JUMP_BACK				263
 
 // Icon for docking window
 #define IDI_TAGS					270
