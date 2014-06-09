@@ -463,6 +463,34 @@ static void SetFocusOnEditor()
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// Open a message box to show the tags property
+
+static void ShowTagsProperties()
+{
+	TVITEM tvi;
+	ZeroMemory(&tvi, sizeof(TVITEM));
+
+	tvi.hItem = (HTREEITEM) TreeView_GetSelection(s_hTree);
+	tvi.mask = TVIF_PARAM;
+	int err = TreeView_GetItem(s_hTree, &tvi);
+
+	if (tvi.lParam != 0)
+	{
+		Tag tag;
+		FindTagInDB(tvi.lParam, &tag);
+
+		std::string str = "Tag Name: " + tag.getFullTag();
+		str += "\r\nType: " + tag.getType();
+		str += "\r\nFile: " + tag.getFile();
+		if (tag.getMemberOf().length() != 0)
+			str += "\r\nMember of: " + tag.getMemberOf();
+		if (tag.getDetails().length() != 0)
+			str += "\r\nDetails: " + tag.getDetails();
+		MsgBox(str.c_str());
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
 //
 
 #define SPACER 4
@@ -623,7 +651,7 @@ static void OnCommand(HWND hWnd, int ResID, int msg)
 		}
 		case IDC_TAG_PROPERTIES:
 		{
-			MsgBox("Not implemented yet!");
+			ShowTagsProperties();
 			break;
 		}
 	}
