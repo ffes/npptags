@@ -21,7 +21,7 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include "SqliteDatabase.h"
+#include "SqliteDB.h"
 using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////

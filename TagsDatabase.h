@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "SqliteDatabase.h"
+#include "SqliteDB.h"
 
 class TagsDatabase : public SqliteDatabase
 {

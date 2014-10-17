@@ -48,7 +48,7 @@
     <ClCompile Include="TagsDatabase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SqliteDatabase.cpp">
+    <ClCompile Include="SqliteDB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,7 +89,7 @@
     <ClInclude Include="TagsDatabase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SqliteDatabase.h">
+    <ClInclude Include="SqliteDB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
