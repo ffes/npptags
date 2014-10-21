@@ -157,10 +157,19 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 	<sect1 id="revhistory">
 		<title>Revision History</title>
 
-		<sect2 id="v0_2_0">
-			<title>Version 0.2.0, XX October 2013</title>
+		<sect2 id="v0_3_0">
+			<title>Version 0.3.0, XX October 2014</title>
 			<itemizedlist>
-				<listitem><para>First public release, external proof of concept</para></listitem>
+				<listitem><para>Jump back</para></listitem>
+				<listitem><para>Very simple Tags Properties MessageBox</para></listitem>
+				<listitem><para>Updated to recent <ulink url="https://github.com/fishman/ctags/">fishman ctags</ulink> build.</para></listitem>
+				<listitem><para>Upgrade to SQLite version 3.8.7</para></listitem>
+			</itemizedlist>
+		</sect2>
+
+		<sect2 id="v0_2_0">
+			<title>Version 0.2.0, 23 October 2013</title>
+			<itemizedlist>
 				<listitem><para>After generating the tags file, it is now converted to a SQLite database. This makes it much easier and faster to build a proper tree.</para></listitem>
 				<listitem><para>Tree filled with common types of tags for various languages. Still far from perfect.</para></listitem>
 				<listitem><para>In the Select Tag dialog, preselect the first tag in the current file.</para></listitem>
