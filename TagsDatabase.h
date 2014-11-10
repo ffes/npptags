@@ -39,7 +39,7 @@ protected:
 	void Init();
 	void SetValues();
 
-	void SetTagsFile(WCHAR* tagsPath);
+	void SetTagsFile(const WCHAR* tagsPath);
 	bool GetTagsFilename(bool mustExist);
 	bool GenerateTagsFile();
 	bool ImportTags();

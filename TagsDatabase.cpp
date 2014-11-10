@@ -186,7 +186,7 @@ void TagsDatabase::UpdateFilename()
 /////////////////////////////////////////////////////////////////////////////
 // Set the char-based tags filename upon the wstring based tags db directory
 
-void TagsDatabase::SetTagsFile(WCHAR* tagsPath)
+void TagsDatabase::SetTagsFile(const WCHAR* tagsPath)
 {
 	wstring dbFile = tagsPath;
 	dbFile += L"\\tags.sqlite";
@@ -238,9 +238,9 @@ bool TagsDatabase::GetTagsFilename(bool mustExist)
 
 		WCHAR full[_MAX_PATH];
 		tagsDir += L"\\..";
+		_wfullpath(full, tagsDir.c_str(), _MAX_PATH);
+		tagsDir = full;
 		tagsDB = tagsDir + L"\\tags.sqlite";
-		_wfullpath(full, tagsDB.c_str(), _MAX_PATH);
-		tagsDB = full;
 	}
 
 	// When reading the database must exist
@@ -251,7 +251,7 @@ bool TagsDatabase::GetTagsFilename(bool mustExist)
 	if (tagsDB == _dbFile)
 		return false;
 
-	SetTagsFile(curPath);
+	SetTagsFile(tagsDir.c_str());
 	return true;
 }
 
