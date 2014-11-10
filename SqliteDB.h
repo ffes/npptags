@@ -41,7 +41,7 @@ class SqliteDatabase
 public:
 	SqliteDatabase();
 	SqliteDatabase(LPCWSTR file);
-	~SqliteDatabase();
+	virtual ~SqliteDatabase();
 
 	virtual void Open();
 	virtual void Open(LPCWSTR file);
