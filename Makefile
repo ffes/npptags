@@ -43,7 +43,7 @@ PROGRAM_SRCS_CPP = \
 	DlgSelectTag.cpp \
 	DlgTree.cpp \
 	NppTags.cpp \
-	SqliteDatabase.cpp \
+	SqliteDB.cpp \
 	Tag.cpp \
 	TagsDatabase.cpp \
 	Options.cpp \
