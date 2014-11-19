@@ -480,6 +480,7 @@ static void ShowTagsProperties()
 		FindTagInDB(tvi.lParam, &tag);
 
 		std::string str = "Tag Name: " + tag.getFullTag();
+		str += "\r\nLanguage: " + tag.getLanguage();
 		str += "\r\nType: " + tag.getType();
 		str += "\r\nFile: " + tag.getFile();
 		if (tag.getMemberOf().length() != 0)
