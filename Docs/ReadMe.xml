@@ -70,14 +70,14 @@
 
 	<sect1 id="contact">
 		<title>Contact</title>
-		<para>The plug-in's web page can be found at <ulink url="https://code.google.com/p/npptags/">https://code.google.com/p/npptags/</ulink>. The downloads and issue tracker can be found there as well. The git repository is at <ulink url="https://github.com/ffes/npptags">https://github.com/ffes/npptags</ulink>.</para>
-		<para>If you have problems with, questions about or suggestions for NppTags and you want to contact me directly, you can send me an email at <ulink url="mailto:fesevur@gmail.com">fesevur@gmail.com</ulink>.</para>
+		<para>The plug-in's web page can be found at <ulink url="https://github.com/ffes/npptags">https://github.com/ffes/npptags</ulink>.</para>
+		<para>If you have problems with, questions about or suggestions for NppTags please use <ulink url="https://github.com/ffes/npptags">GitHub</ulink>. This is by far the best way to contact me. Pull requests are much appreciated! If for some reason you want to contact me directly, you can send me an email at <ulink url="mailto:fesevur@gmail.com">fesevur@gmail.com</ulink>.</para>
 	</sect1>
 
 	<sect1 id="license">
 		<title>License</title>
-		<para>This plug-in is published under the GPL-2 license. See <xref linkend="gpl"/> for the full license agreement. You can find the sources of the latest version at the <ulink url="https://code.google.com/p/npptags/">Google code project page</ulink> or find the latest developments at <ulink url="https://github.com/ffes/npptags">GitHub</ulink>.</para>
-		<para>This plug-in relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> to recognise the tags. Exuberant CTags is released under GPL-2 as well and the source code of Exuberant CTags can be found at their <ulink url="http://ctags.sourceforge.net/">website</ulink>.</para>
+		<para>This plug-in is published under the GPL-2 license. See <xref linkend="gpl"/> for the full license agreement. You can find the sources of the latest version and the current developments at <ulink url="https://github.com/ffes/npptags">GitHub</ulink>.</para>
+		<para>This plug-in relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> to recognize the tags. Exuberant CTags is released under GPL-2 as well and the source code of Exuberant CTags can be found at their <ulink url="http://ctags.sourceforge.net/">website</ulink>.</para>
 	</sect1>
 
 	<sect1 id="faq">
@@ -93,18 +93,18 @@
 			</qandaentry>
 			<qandaentry>
 				<question id="faq_general_2">
-					<para>How can I use NppTags when the sources are in a directory tree?</para>
+					<para>How can I use NppTags when the source files are in a directory tree?</para>
 				</question>
 				<answer>
-					<para>Make sure you generate the database from the root of your directory tree. When you open a file in a subdirectory NppTags will first look in the current directory for a tags database. If it cannot find one and the depth is greater than zero, is will go up one directory and see if a database can be found there. It will go up "depth" times to check the directory. At the moment the default depth is set to 3 directories and you need to manually edit the .ini file (when Notepad++ is closed) to change this. A UI for options is planned.</para>
+					<para>Make sure you generate the database from the root directory of your project, that means with a file in that directory active. When you have generated the database and you open a file in a sub-directory NppTags will first look in the current directory for a tags database. If it cannot find one, it will go up one directory and see if a database can be found there. It will go up <computeroutput>depth</computeroutput> times to check the directory. At the moment the default depth is set to 3 directories and you need to manually edit the .ini file (when Notepad++ is closed) to change this. Do not try to generate a tags database from the root directory (like c:\) of your harddisk. Because of the <computeroutput>ctags -R</computeroutput> flag it will search your entire disk for source files.</para>
 				</answer>
 			</qandaentry>
 			<qandaentry>
 				<question id="faq_general_3"><para>
-					I want to add extra command line options when ctags generates the tags file. Can this be done?
+					I want to ignore some files when ctags generates the tags file. Can I add extra command line options?
 				</para></question>
 				<answer>
-					<para>If you want to add extra command line options to ctags, use a ctags.cnf file. It can be placed in the current directory for local settings or in your user directory for global settings. See the <ulink url="http://ctags.sourceforge.net/ctags.html#FILES">Files section</ulink> in the documentation of ctags for more details.</para>
+					<para>If you want to add extra command line options to ctags, use a <computeroutput>.ctags</computeroutput> or <computeroutput>ctags.cnf</computeroutput> file. It can be placed in the current directory for local settings or in your user directory for global settings. See the <ulink url="http://ctags.sourceforge.net/ctags.html#FILES">Files section</ulink> in the documentation of ctags for more details.</para>
 				</answer>
 			</qandaentry>
 			<qandaentry>
@@ -123,11 +123,6 @@
 					<para>You probably need to regenerate the tags database by pressing generate button.</para>
 				</answer>
 			</qandaentry>
-
-<!--
-Do not try to use this tool in the root directory (c:\) of a harddisk. Because of the ctags -R flag it will search your entire disk for source files.
--->
-
 		</qandaset>
 	</sect1>
 
@@ -137,12 +132,9 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 			<listitem><para>Internally always use WCHARS for filenames</para></listitem>
 			<listitem><para>Add an Options dialog</para></listitem>
 			<listitem><para>Building better trees for many languages, like C# namespaces, Java packages, JavaScript classes.</para></listitem>
-			<listitem><para>Better support for sources stored in various subdirectories.</para></listitem>
 			<listitem><para>Add an option to set a path to a secondary tags database. If the tag is not found in the default tags database, the secondary one should be searched. Such a tags database can be created from the root of your programming environment to search the standard libraries. Where to find this secondary database could be based upon the language of current document, or a tags database option.</para></listitem>
 			<listitem><para>Nest enums and structs in C++ classes in the tree.</para></listitem>
 			<listitem><para>Auto-completion based upon the tags database.</para></listitem>
-			<listitem><para>"Jump Back" to bring you back to the position where when you jumped to a tag.</para></listitem>
-			<listitem><para>Show details about the selected tag in the tree.</para></listitem>
 			<listitem><para>Options per tags database. Preserve those settings when the database is regenerated.</para></listitem>
 		</itemizedlist>
 	</sect1>
@@ -158,9 +150,10 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 		<title>Revision History</title>
 
 		<sect2 id="v0_3_0">
-			<title>Version 0.3.0, XX October 2014</title>
+			<title>Version <ulink url="https://github.com/ffes/npptags/releases/tag/v0.3.0">0.3.0</ulink>, XX October 2014</title>
 			<itemizedlist>
-				<listitem><para>Jump back</para></listitem>
+				<listitem><para>"Jump Back" to bring you back to the position where when you jumped to a tag.</para></listitem>
+				<listitem><para>Better support for sources stored in various sub-directories.</para></listitem>
 				<listitem><para>Very simple Tags Properties MessageBox</para></listitem>
 				<listitem><para>Updated to recent <ulink url="https://github.com/fishman/ctags/">fishman ctags</ulink> build.</para></listitem>
 				<listitem><para>Upgrade to SQLite version 3.8.7</para></listitem>
@@ -168,7 +161,7 @@ Do not try to use this tool in the root directory (c:\) of a harddisk. Because o
 		</sect2>
 
 		<sect2 id="v0_2_0">
-			<title>Version 0.2.0, 23 October 2013</title>
+			<title>Version <ulink url="https://github.com/ffes/npptags/releases/tag/v0.2.0">0.2.0</ulink>, 23 October 2013</title>
 			<itemizedlist>
 				<listitem><para>After generating the tags file, it is now converted to a SQLite database. This makes it much easier and faster to build a proper tree.</para></listitem>
 				<listitem><para>Tree filled with common types of tags for various languages. Still far from perfect.</para></listitem>
