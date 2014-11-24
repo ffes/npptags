@@ -47,7 +47,7 @@ static const TCHAR PLUGIN_NAME[] = L"NppTags";
 static const int nbFunc = 7;
 static int s_iShowTagsIndex, s_iRefreshTagsIndex, s_iJumpToTagIndex, s_iJumpBackIndex;
 static HBITMAP s_hbmpShowTags, s_hbmpRefreshTags, s_hbmpJumpToTag, s_hbmpJumpBack;
-static std::vector<Tag> s_jumpbackList;
+static std::vector<Tag> s_JumpBackStack;
 
 HINSTANCE g_hInst;
 NppData g_nppData;
@@ -306,12 +306,12 @@ static void StoreCurrentPosition()
 	Tag tag;
 	tag.setLine(line + 1);		// Line number from Scintilla is 0-based
 	tag.setFile(curFile);
-	s_jumpbackList.push_back(tag);
+	s_JumpBackStack.push_back(tag);
 
 	// Don't let the stack get too big
 	// This number '3' needs to become an option
-	if (s_jumpbackList.size() > 3)
-		s_jumpbackList.erase(s_jumpbackList.begin());
+	if (s_JumpBackStack.size() > 3)
+		s_JumpBackStack.erase(s_JumpBackStack.begin());
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -356,15 +356,15 @@ void JumpToTag(Tag* pTag, bool storeCurPos)
 static void JumpBack()
 {
 	// Is there anything to jump back to?
-	if (s_jumpbackList.empty())
+	if (s_JumpBackStack.empty())
 		return;
 
 	// Get the stored tag from our stack
 	Tag tag;
-	tag = s_jumpbackList[s_jumpbackList.size() - 1];
+	tag = s_JumpBackStack[s_JumpBackStack.size() - 1];
 
 	// Erase the tag from the list
-	s_jumpbackList.pop_back();
+	s_JumpBackStack.pop_back();
 
 	// And jump to this tag
 	JumpToTag(&tag, false);
