@@ -34,6 +34,7 @@ public:
 	// General options
 	bool GetShowTreeDlg()				{ return _showTreeDlg; };
 	int  GetMaxDepth()					{ return _maxDepth; };
+	int  GetJumpBackStack()				{ return _jumpBackStack; };
 	WCHAR* GetPrevVersion() 			{ return _szPrevVersion; };
 
 	void SetShowTreeDlg(bool b)			{ _showTreeDlg = b; };
@@ -56,6 +57,7 @@ private:
 	// General options
 	bool _showTreeDlg;
 	int _maxDepth;
+	int _jumpBackStack;
 
 	// Debug options
 	bool _deleteTagsFile;

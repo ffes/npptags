@@ -309,8 +309,7 @@ static void StoreCurrentPosition()
 	s_JumpBackStack.push_back(tag);
 
 	// Don't let the stack get too big
-	// This number '3' needs to become an option
-	if (s_JumpBackStack.size() > 3)
+	if ((int) s_JumpBackStack.size() > g_Options->GetJumpBackStack())
 		s_JumpBackStack.erase(s_JumpBackStack.begin());
 }
 

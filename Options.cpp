@@ -33,6 +33,7 @@ static WCHAR s_szOptions[]			= L"Options";
 static WCHAR s_szShow[]				= L"Show";
 static WCHAR s_szVersion[]			= L"Version";
 static WCHAR s_szDepth[]			= L"Depth";
+static WCHAR s_szJumpBackStack[]	= L"JumpBackStack";
 static WCHAR s_szDebug[]			= L"Debug";
 static WCHAR s_szDelTags[]			= L"DelTags";
 static WCHAR s_szOverwriteTags[]	= L"OverwriteTags";
@@ -95,6 +96,7 @@ void Options::Write()
 {
 	WritePrivateProfileBool(s_szOptions, s_szShow, _showTreeDlg);
 	WritePrivateProfileInt(s_szOptions, s_szDepth, _maxDepth);
+	WritePrivateProfileInt(s_szOptions, s_szJumpBackStack, _jumpBackStack);
 	WritePrivateProfileString(s_szOptions, s_szVersion, VERSION_NUMBER_WSTR, _szIniPath);
 }
 
@@ -105,6 +107,7 @@ void Options::Read()
 {
 	_showTreeDlg = GetPrivateProfileBool(s_szOptions, s_szShow, true);
 	_maxDepth = GetPrivateProfileInt(s_szOptions, s_szDepth, 3, _szIniPath);
+	_jumpBackStack = GetPrivateProfileInt(s_szOptions, s_szJumpBackStack, 4, _szIniPath);
 	GetPrivateProfileString(s_szOptions, s_szVersion, L"", _szPrevVersion, MAX_PATH,  _szIniPath);
 
 	// Read Only Debug options
