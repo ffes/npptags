@@ -351,10 +351,23 @@ void JumpToTag(Tag* pTag, bool storeCurPos)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Jump back to the place where we came from
 
 static void JumpBack()
 {
+	// Is there anything to jump back to?
+	if (s_jumpbackList.empty())
+		return;
+
+	// Get the stored tag from our stack
+	Tag tag;
+	tag = s_jumpbackList[s_jumpbackList.size() - 1];
+
+	// Erase the tag from the list
+	s_jumpbackList.pop_back();
+
+	// And jump to this tag
+	JumpToTag(&tag, false);
 }
 
 /////////////////////////////////////////////////////////////////////////////
