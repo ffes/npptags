@@ -39,7 +39,7 @@ extern NppData g_nppData;
 extern FuncItem g_funcItem[];
 
 class Tag;
-extern void JumpToTag(Tag* pTag);
+extern void JumpToTag(Tag* pTag, bool storeCurPos = true);
 
 class Options;
 extern Options *g_Options;

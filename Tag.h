@@ -55,6 +55,8 @@ public:
 	bool thisFileOnly()				{ return _thisFileOnly; };
 
 	void setTag(std::string t)		{ _tag = t; };
+	void setFile(std::string f)		{ _file = f; };
+	void setLine(int i)				{ _line = i; };
 
 protected:
 	int _idx;							// Index field in database

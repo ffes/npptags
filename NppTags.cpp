@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string>
+#include <vector>
 using namespace std;
 
 #include "NPP/PluginInterface.h"
@@ -46,6 +47,7 @@ static const TCHAR PLUGIN_NAME[] = L"NppTags";
 static const int nbFunc = 7;
 static int s_iShowTagsIndex, s_iRefreshTagsIndex, s_iJumpToTagIndex, s_iJumpBackIndex;
 static HBITMAP s_hbmpShowTags, s_hbmpRefreshTags, s_hbmpJumpToTag, s_hbmpJumpBack;
+static std::vector<Tag*> s_jumpbackList;
 
 HINSTANCE g_hInst;
 NppData g_nppData;
@@ -282,10 +284,45 @@ WCHAR* GetDlgText(HWND hDlg, UINT uID)
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// Store the current position for JumpBack
+
+static void StoreCurrentPosition()
+{
+	// Get the current line
+	long pos = SendMsg(SCI_GETCURRENTPOS);
+	long line = SendMsg(SCI_LINEFROMPOSITION, pos);
+	if (line == 0)
+		return;
+
+	// Get the current filename
+	WCHAR wcurFile[MAX_PATH];
+	SendMessage(g_nppData._nppHandle, NPPM_GETFULLCURRENTPATH, MAX_PATH, (LPARAM) &wcurFile);
+	if (wcslen(wcurFile) == 0)
+		return;
+	CHAR curFile[MAX_PATH];
+	Unicode2Ansi(curFile, wcurFile, MAX_PATH);
+
+	// Store the information
+	Tag tag;
+	tag.setLine(line + 1);		// Line number from Scintilla is 0-based
+	tag.setFile(curFile);
+	s_jumpbackList.push_back(&tag);
+
+	// Don't let the stack get too big
+	// This number '3' needs to become an option
+	if (s_jumpbackList.size() > 3)
+		s_jumpbackList.erase(s_jumpbackList.begin());
+}
+
+/////////////////////////////////////////////////////////////////////////////
 //
 
-void JumpToTag(Tag* pTag)
+void JumpToTag(Tag* pTag, bool storeCurPos)
 {
+	// Do we need to store the current position for JumpBack?
+	if (storeCurPos)
+		StoreCurrentPosition();
+
 	// Open the file
 	string str = pTag->getFile();
 	wstring wstr(str.begin(), str.end());
