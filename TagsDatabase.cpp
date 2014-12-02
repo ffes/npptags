@@ -278,9 +278,14 @@ bool TagsDatabase::GenerateTagsFile()
 	cmd += szExePath;
 	cmd += char(34);
 
-	// Add the options
+	// Add the options. Recurse into subdirectories?
 	if (g_Options->GetMaxDepth() > 0)
 		cmd += L" -R";
+	// We don't keep the tags file and everything is imported into the database,
+	// so no need to let ctags do the sort
+	if (g_Options->GetDeleteTagsFile())
+		cmd += L" -u";
+	// Let the fields be as informative as possible
 	cmd += L" --fields=+iKSlma";
 
 	// Add the default search pattern
