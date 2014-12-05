@@ -54,35 +54,56 @@ static bool TagLangEqualsNppLang(string lang)
 {
 	std::pair<int, std::string> langMap[] =
 	{
-		std::make_pair(L_PHP,		"PHP"),
-		std::make_pair(L_C,			"C/C++"),
-		std::make_pair(L_CPP,		"C/C++"),
-		std::make_pair(L_OBJC,		"ObjectiveC"),
-		std::make_pair(L_CS,		"C#"),
-		std::make_pair(L_JAVA,		"Java"),
-		std::make_pair(L_HTML,		"HTML"),
-		std::make_pair(L_MAKEFILE,	"Make"),
-		std::make_pair(L_PASCAL,	"Pascal"),
-		std::make_pair(L_BATCH,		"DosBatch"),
-		std::make_pair(L_ASP,		"Asp"),
-		std::make_pair(L_SQL,		"SQL"),
-		std::make_pair(L_VB,		"Basic"),
-		std::make_pair(L_JS,		"JavaScript"),
-		std::make_pair(L_PERL,		"Perl"),
-		std::make_pair(L_PYTHON,	"Python"),
-		std::make_pair(L_LUA,		"Lua"),
-		std::make_pair(L_TEX,		"Tex"),
-		std::make_pair(L_FORTRAN,	"Fortran"),
-		std::make_pair(L_BASH,		"Sh"),
-		std::make_pair(L_TCL,		"Tcl"),
-		std::make_pair(L_LISP,		"Lisp"),
-		std::make_pair(L_SCHEME,	"Scheme"),
+		std::make_pair(L_ADA,		"Ada"),
 		std::make_pair(L_ASM,		"Asm"),
-		std::make_pair(L_RUBY,		"Ruby"),
-		std::make_pair(L_VHDL,		"VHDL"),
-		std::make_pair(L_VERILOG,	"Verilog"),
+		std::make_pair(L_ASP,		"Asp"),
+		//L_AU3,
+		std::make_pair(L_BASH,		"Sh"),
+		std::make_pair(L_BATCH,		"DosBatch"),
+		std::make_pair(L_C,			"C/C++"),
+		std::make_pair(L_CAML,		"OCaml"),
+		//L_CMAKE
+		std::make_pair(L_COBOL,		"Cobol"),
+		std::make_pair(L_CPP,		"C/C++"),
+		std::make_pair(L_CS,		"C#"),
+		std::make_pair(L_CSS,		"CSS"),
+		std::make_pair(L_D,			"D"),
+		//L_DIFF
+		std::make_pair(L_FLASH,		"Flex"),
+		std::make_pair(L_FORTRAN,	"Fortran"),
+		//L_HASKELL
+		std::make_pair(L_HTML,		"HTML"),
+		//L_INI
+		//L_INNO
+		std::make_pair(L_JAVA,		"Java"),
+		std::make_pair(L_JS,		"JavaScript"),
+		//L_JSP
+		//L_KIX
+		std::make_pair(L_LISP,		"Lisp"),
+		std::make_pair(L_LUA,		"Lua"),
+		std::make_pair(L_MAKEFILE,	"Make"),
 		std::make_pair(L_MATLAB,	"MatLab"),
-		std::make_pair(L_COBOL,		"Cobol")
+		std::make_pair(L_OBJC,		"ObjectiveC"),
+		//L_NSIS
+		std::make_pair(L_PASCAL,	"Pascal"),
+		std::make_pair(L_PERL,		"Perl"),
+		std::make_pair(L_PHP,		"PHP"),
+		//L_POWERSHELL
+		//L_PS
+		std::make_pair(L_PYTHON,	"Python"),
+		//L_R
+		std::make_pair(L_RC,		"WindRes"),
+		std::make_pair(L_RUBY,		"Ruby"),
+		std::make_pair(L_SCHEME,	"Scheme"),
+		//L_SMALLTALK
+		std::make_pair(L_SQL,		"SQL"),
+		std::make_pair(L_TCL,		"Tcl"),
+		std::make_pair(L_TEX,		"Tex"),
+		std::make_pair(L_VB,		"Basic"),
+		std::make_pair(L_VERILOG,	"Verilog"),
+		std::make_pair(L_VHDL,		"VHDL")
+		//L_YAML
+		//L_XML
 	};
 
 	std::map<int, std::string> langLang(langMap, langMap + sizeof langMap / sizeof langMap[0]);
