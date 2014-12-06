@@ -50,28 +50,61 @@ static bool FileExists(LPCSTR path)
 
 static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 {
-	TCHAR szCmd[_MAX_PATH];
-	lstrcpy(szCmd, szCmdLine);
+	TCHAR szPath[_MAX_PATH];
+	DWORD dwFlags = STARTF_USESHOWWINDOW;
+	HANDLE hStdOut = NULL;
+
+	// Open the file to redirect stdout to
+	if (g_Options->GetCtagsVerbose())
+	{
+		SECURITY_ATTRIBUTES sa;
+		ZeroMemory(&sa, sizeof(SECURITY_ATTRIBUTES));
+		sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+		sa.lpSecurityDescriptor = NULL;
+		sa.bInheritHandle = TRUE;
+
+		// Construct the filename
+		wcsncpy(szPath, szDir, _MAX_PATH);
+		wcsncat(szPath, L"\\tags.out", _MAX_PATH);
+
+		// Create the file
+		hStdOut = CreateFile(szPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+								&sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+		dwFlags |= STARTF_USESTDHANDLES;
+	}
 
 	STARTUPINFO si;
 	ZeroMemory(&si, sizeof(STARTUPINFO));
-	si.dwFlags = STARTF_USESHOWWINDOW;
-	si.wShowWindow = SW_HIDE;
 	si.cb = sizeof(STARTUPINFO);
+	si.dwFlags = dwFlags;
+	si.wShowWindow = SW_HIDE;
+	si.hStdOutput = hStdOut;
 
 	PROCESS_INFORMATION pi;
 	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
 
+	// The command line can't be a LPCWSTR
+	wcsncpy(szPath, szCmdLine, _MAX_PATH);
+
+	// Show the wait cursor
 	WaitCursor wait;
 
+	// Run the command
 	DWORD dwReturn = NOERROR;
-	if (CreateProcess(NULL, szCmd, NULL, NULL, FALSE, CREATE_DEFAULT_ERROR_MODE, NULL, szDir, &si, &pi))
+	if (CreateProcess(NULL, szPath, NULL, NULL, TRUE, CREATE_DEFAULT_ERROR_MODE, NULL, szDir, &si, &pi))
 	{
 		if (waitFinish)
 			WaitForSingleObject(pi.hProcess, INFINITE);
+
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
 	}
 	else
 		dwReturn = GetLastError();
+
+	if (hStdOut != NULL)
+		CloseHandle(hStdOut);
 
 	return dwReturn;
 }
@@ -278,7 +311,10 @@ bool TagsDatabase::GenerateTagsFile()
 	cmd += szExePath;
 	cmd += char(34);
 
-	// Add the options. Recurse into subdirectories?
+	// Add the options. Add (short) --verbose flag?
+	if (g_Options->GetCtagsVerbose())
+		cmd += L" -V";
+	// Recurse into subdirectories?
 	if (g_Options->GetMaxDepth() > 0)
 		cmd += L" -R";
 	// We don't keep the tags file and everything is imported into the database,
@@ -291,7 +327,6 @@ bool TagsDatabase::GenerateTagsFile()
 	// Add the default search pattern
 	cmd += L" *";
 
-	//MsgBox(cmd.c_str());
 	return(Run(cmd.c_str(), _curDir.c_str(), true) == NOERROR);
 }
 
