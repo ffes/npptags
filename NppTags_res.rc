@@ -93,8 +93,8 @@ CAPTION "Select Tag"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 {
 	CONTROL			"List1", IDC_TAG_LIST, "SysListView32", LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOLABELWRAP | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP, 7, 7, 351, 109
-	DEFPUSHBUTTON	"&Goto",IDOK,93,122,50,14
-	PUSHBUTTON		"&Cancel",IDCANCEL,153,122,50,14
+	DEFPUSHBUTTON	"&Goto",IDOK,127,122,50,14
+	PUSHBUTTON		"&Cancel",IDCANCEL,187,122,50,14
 }
 
 /////////////////////////////////////////////////////////////////////////////
