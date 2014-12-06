@@ -36,6 +36,7 @@ static WCHAR s_szDepth[]			= L"Depth";
 static WCHAR s_szJumpBackStack[]	= L"JumpBackStack";
 static WCHAR s_szDebug[]			= L"Debug";
 static WCHAR s_szDelTags[]			= L"DelTags";
+static WCHAR s_szCtagsVerbose[]		= L"CtagsVerbose";
 static WCHAR s_szOverwriteTags[]	= L"OverwriteTags";
 
 /////////////////////////////////////////////////////////////////////////////
@@ -113,4 +114,5 @@ void Options::Read()
 	// Read Only Debug options
 	_overwriteExistingTagsFile = GetPrivateProfileBool(s_szDebug, s_szOverwriteTags, true);
 	_deleteTagsFile = (_overwriteExistingTagsFile ? GetPrivateProfileBool(s_szDebug, s_szDelTags, true) : false);
+	_ctagsVerbose = GetPrivateProfileBool(s_szDebug, s_szCtagsVerbose, false);
 }

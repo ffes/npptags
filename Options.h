@@ -42,6 +42,7 @@ public:
 	// Debug options
 	bool GetDeleteTagsFile()			{ return _deleteTagsFile; };
 	bool GetOverwriteExistingTagsFile()	{ return _overwriteExistingTagsFile; };
+	bool GetCtagsVerbose()				{ return _ctagsVerbose; };
 
 	void Write();
 	void Read();
@@ -62,6 +63,7 @@ private:
 	// Debug options
 	bool _deleteTagsFile;
 	bool _overwriteExistingTagsFile;
+	bool _ctagsVerbose;
 };
 
 #endif // __OPTIONS_H__
