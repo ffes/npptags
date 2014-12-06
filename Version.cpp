@@ -22,10 +22,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
-#include "NPP/PluginInterface.h"
-#include "NppTags.h"
 #include "Version.h"
-#include "Options.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
