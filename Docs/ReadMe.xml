@@ -58,14 +58,16 @@
 
 	<sect1 id="inidebug">
 		<title>Debug section in NppTags.ini</title>
-		<para>For debugging it can be necessary to see the raw tags file. You can manually add an extra section with read-only options to the <computeroutput>NppTags.ini</computeroutput> to control what happens to the automatically generated tags file. These are the default settings:</para>
+		<para>For debugging it can be necessary to see the raw tags file or see what ctags is exactly doing. You can manually add an extra section with read-only options to the <computeroutput>NppTags.ini</computeroutput> to control what happens to the automatically generated tags file. These are the default settings:</para>
 		<screen>
 			[Debug]
 			DelTags=1
 			OverwriteTags=1
+			CtagsVerbose=0
 		</screen>
 		<para>When <computeroutput>DelTags</computeroutput> is set to <computeroutput>0</computeroutput> the plug-in will not delete the generated tags file after it is converted to the database.</para>
-		<para>When <computeroutput>OverwriteTags</computeroutput> is set to <computeroutput>0</computeroutput> and a tags file is found the plug-in will not overwrite and regenerate this existing tags file before generating the database. When set to 0, this implies that <computeroutput>DelTags</computeroutput> is set to <computeroutput>0</computeroutput> as well.</para>
+		<para>When <computeroutput>OverwriteTags</computeroutput> is set to <computeroutput>0</computeroutput> and a tags file is found the plug-in will not overwrite and regenerate this existing tags file before generating the database. When set to 0, this implies that <computeroutput>DelTags</computeroutput> is set to <computeroutput>0</computeroutput> as well. Can be useful when regenerating the tree but you don't want to execute ctags every time.</para>
+		<para>When <computeroutput>CtagsVerbose</computeroutput> is set to <computeroutput>1</computeroutput> the <computeroutput>--verbose</computeroutput> flag is added when ctags is executed. The output is written to <computeroutput>tags.out</computeroutput>.</para>
 	</sect1>
 
 	<sect1 id="contact">
