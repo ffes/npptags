@@ -67,7 +67,7 @@ depend: $(PROGRAM_SRCS_CPP)
 	$(CXX) -MM $^ > Makefile.depend
 
 clean:
-	rm -f $(PROGRAM_OBJS_CPP) $(PROGRAM_OBJS_C) $(PROGRAM_OBJS_RC) $(PROGRAM).dll $(PROGRAM).a tags tags.sqlite Makefile.depend
+	rm -f $(PROGRAM_OBJS_CPP) $(PROGRAM_OBJS_C) $(PROGRAM_OBJS_RC) $(PROGRAM).dll $(PROGRAM).a tags tags.out tags.sqlite Makefile.depend
 	touch Makefile.depend
 
 ### code dependencies ###
