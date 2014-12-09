@@ -122,7 +122,7 @@
 					<para>When I jump to a tag it misses it by a few lines or it can not find it at all.</para>
 				</question>
 				<answer>
-					<para>You probably need to regenerate the tags database by pressing generate button. Another problem may be that there is no unique search pattern for this tag. An option to always use line numbers instead of seach patterns is planned.</para>
+					<para>You probably need to regenerate the tags database by pressing generate button. Another problem may be that there is no unique search pattern for this tag. An option to use line numbers instead of seach patterns is planned.</para>
 				</answer>
 			</qandaentry>
 		</qandaset>
@@ -140,7 +140,7 @@
 			<listitem><para>Auto-completion based upon the tags database.</para></listitem>
 			<listitem><para>Options per tags database. Preserve those settings when the database is regenerated.</para></listitem>
 			<listitem><para>Optional set the hidden attribute for <computeroutput>tags.sqlite</computeroutput>.</para></listitem>
-			<listitem><para>Optional always use line numbers instead of search patterns.</para></listitem>
+			<listitem><para>Option to use line numbers instead of search patterns. Note that adding <computeroutput>-n</computeroutput> to a <computeroutput>.ctags</computeroutput> file already gives you this result.</para></listitem>
 		</itemizedlist>
 	</sect1>
 
