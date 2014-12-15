@@ -50,7 +50,9 @@ Options::Options()
 
 	// Get the directory from NP++ and add the filename of the settings file
 	SendMessage(g_nppData._nppHandle, NPPM_GETPLUGINSCONFIGDIR, MAX_PATH, (LPARAM) &_szIniPath);
-	wcsncat(_szIniPath, L"\\NppTags.ini", MAX_PATH);
+	wcsncat(_szIniPath, L"\\", MAX_PATH);
+	wcsncat(_szIniPath, getName(), MAX_PATH);
+	wcsncat(_szIniPath, L".ini", MAX_PATH);
 
 	// Read the settings from the file
 	Read();

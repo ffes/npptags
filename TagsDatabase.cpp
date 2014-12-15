@@ -303,7 +303,9 @@ bool TagsDatabase::GenerateTagsFile()
 	// Set the path to ctags.exe
 	WCHAR szExePath[_MAX_PATH];
 	SendMessage(g_nppData._nppHandle, NPPM_GETNPPDIRECTORY, MAX_PATH, (LPARAM) &szExePath);
-	wcsncat(szExePath, L"\\plugins\\NppTags\\ctags", _MAX_PATH);
+	wcsncat(szExePath, L"\\plugins\\", _MAX_PATH);
+	wcsncat(szExePath, getName(), _MAX_PATH);
+	wcsncat(szExePath, L"\\ctags", _MAX_PATH);
 
 	// Construct the command line
 	wstring cmd;

@@ -23,6 +23,7 @@
 #define __NPPTAGS_H__
 
 extern HWND getCurrentHScintilla(int which);
+extern const TCHAR* getName();
 extern LRESULT SendMsg(UINT Msg, WPARAM wParam = 0, LPARAM lParam = 0, int count = 1);
 
 extern void Ansi2Unicode(LPWSTR wszStr, LPCSTR szStr, int iSize);
