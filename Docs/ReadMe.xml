@@ -156,11 +156,12 @@
 		<title>Revision History</title>
 
 		<sect2 id="v0_3_0">
-			<title>Version <ulink url="https://github.com/ffes/npptags/releases/tag/v0.3.0">0.3.0</ulink>, XX December 2014</title>
+			<title>Version <ulink url="https://github.com/ffes/npptags/releases/tag/v0.3.0">0.3.0</ulink>, XX January 2015</title>
 			<itemizedlist>
 				<listitem><para>"Jump Back" to bring you back to the position where when you jumped to a tag.</para></listitem>
 				<listitem><para>Better support for sources stored in various sub-directories.</para></listitem>
 				<listitem><para>Very simple Tags Properties MessageBox</para></listitem>
+				<listitem><para>Add debug option to store the output of <computeroutput>ctags --verbose</computeroutput>.</para></listitem>
 				<listitem><para>Updated to recent <ulink url="https://github.com/fishman/ctags/">fishman ctags</ulink> build.</para></listitem>
 				<listitem><para>Upgrade to SQLite version 3.8.7</para></listitem>
 			</itemizedlist>
