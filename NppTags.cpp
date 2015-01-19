@@ -482,6 +482,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 			DeleteObject(s_hbmpShowTags);
 			DeleteObject(s_hbmpRefreshTags);
 			DeleteObject(s_hbmpJumpToTag);
+			DeleteObject(s_hbmpJumpBack);
 
 			// Clean up the options
 			delete g_Options;
