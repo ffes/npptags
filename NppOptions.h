@@ -19,47 +19,27 @@
 //                                                                         //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __OPTIONS_H__
-#define __OPTIONS_H__
-
-#include "NppOptions.h"
+#ifndef __NPPOPTIONS_H__
+#define __NPPOPTIONS_H__
 
 /////////////////////////////////////////////////////////////////////////////
 //
 
-class Options : public NppOptions
+class NppOptions
 {
 public:
-	Options();
-	~Options();
+	NppOptions();
 
-	// General options
-	bool GetShowTreeDlg()				{ return _showTreeDlg; };
-	int  GetMaxDepth()					{ return _maxDepth; };
-	int  GetJumpBackStack()				{ return _jumpBackStack; };
-	WCHAR* GetPrevVersion() 			{ return _szPrevVersion; };
+protected:
+	bool GetBool(WCHAR* szAppName, WCHAR* szKeyName, bool def);
+	int GetInt(WCHAR* szAppName, WCHAR* szKeyName, int def);
+	void GetString(WCHAR* szAppName, WCHAR* szKeyName, WCHAR* szReturnedString, DWORD nSize, WCHAR* def);
 
-	void SetShowTreeDlg(bool b)			{ _showTreeDlg = b; };
+	void WriteBool(WCHAR* szAppName, WCHAR* szKeyName, bool val);
+	void WriteInt(WCHAR* szAppName, WCHAR* szKeyName, int val);
+	void WriteString(WCHAR* szAppName, WCHAR* szKeyName, WCHAR* val);
 
-	// Debug options
-	bool GetDeleteTagsFile()			{ return _deleteTagsFile; };
-	bool GetOverwriteExistingTagsFile()	{ return _overwriteExistingTagsFile; };
-	bool GetCtagsVerbose()				{ return _ctagsVerbose; };
-
-	void Read();
-	void Write();
-
-private:
-	// General options
-	bool _showTreeDlg;
-	int _maxDepth;
-	int _jumpBackStack;
-	WCHAR _szPrevVersion[MAX_PATH];
-
-	// Debug options
-	bool _deleteTagsFile;
-	bool _overwriteExistingTagsFile;
-	bool _ctagsVerbose;
+	WCHAR _szIniPath[MAX_PATH];
 };
 
-#endif // __OPTIONS_H__
+#endif // __NPPOPTIONS_H__

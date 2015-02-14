@@ -21,65 +21,71 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include "Options.h"
-#include "Version.h"
-
-/////////////////////////////////////////////////////////////////////////////
-// Strings used in the ini file
-
-static WCHAR s_szOptions[]			= L"Options";
-static WCHAR s_szShow[]				= L"Show";
-static WCHAR s_szVersion[]			= L"Version";
-static WCHAR s_szDepth[]			= L"Depth";
-static WCHAR s_szJumpBackStack[]	= L"JumpBackStack";
-static WCHAR s_szDebug[]			= L"Debug";
-static WCHAR s_szDelTags[]			= L"DelTags";
-static WCHAR s_szCtagsVerbose[]		= L"CtagsVerbose";
-static WCHAR s_szOverwriteTags[]	= L"OverwriteTags";
+#include "NppOptions.h"
+#include "NPP/PluginInterface.h"
+#include "NppTags.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Constructor: read the settings
 
-Options::Options() : NppOptions()
+NppOptions::NppOptions()
 {
-	// First make sure the string is empty
-	_szPrevVersion[0] = 0;
+	// First make sure the path is empty
+	_szIniPath[0] = 0;
 
-	// Read the settings from the ini file
-	Read();
+	// Get the directory from NP++ and add the filename of the settings file
+	SendMessage(g_nppData._nppHandle, NPPM_GETPLUGINSCONFIGDIR, MAX_PATH, (LPARAM) &_szIniPath);
+	wcsncat(_szIniPath, L"\\", MAX_PATH);
+	wcsncat(_szIniPath, getName(), MAX_PATH);
+	wcsncat(_szIniPath, L".ini", MAX_PATH);
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Destructor: write the settings
+// Read a boolean from the ini file
 
-Options::~Options()
+bool NppOptions::GetBool(WCHAR* szAppName, WCHAR* szKeyName, bool def)
 {
-	Write();
+	return(GetPrivateProfileInt(szAppName, szKeyName, def ? 1 : 0, _szIniPath) > 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Write the options to the ini-file
+// Read a int from the ini file
 
-void Options::Write()
+int NppOptions::GetInt(WCHAR* szAppName, WCHAR* szKeyName, int def)
 {
-	WriteBool(s_szOptions, s_szShow, _showTreeDlg);
-	WriteInt(s_szOptions, s_szDepth, _maxDepth);
-	WriteInt(s_szOptions, s_szJumpBackStack, _jumpBackStack);
-	WriteString(s_szOptions, s_szVersion, VERSION_NUMBER_WSTR);
+	return GetPrivateProfileInt(szAppName, szKeyName, def, _szIniPath);
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Read the options from the ini-file
+// Read a string from the ini file
 
-void Options::Read()
+void NppOptions::GetString(WCHAR* szAppName, WCHAR* szKeyName, WCHAR* szReturnedString, DWORD nSize, WCHAR* def)
 {
-	_showTreeDlg = GetBool(s_szOptions, s_szShow, true);
-	_maxDepth = GetInt(s_szOptions, s_szDepth, 3);
-	_jumpBackStack = GetInt(s_szOptions, s_szJumpBackStack, 4);
-	GetString(s_szOptions, s_szVersion, _szPrevVersion, MAX_PATH, L"");
+	GetPrivateProfileString(szAppName, szKeyName, def, szReturnedString, nSize, _szIniPath);
+}
 
-	// Read Only Debug options
-	_overwriteExistingTagsFile = GetBool(s_szDebug, s_szOverwriteTags, true);
-	_deleteTagsFile = (_overwriteExistingTagsFile ? GetBool(s_szDebug, s_szDelTags, true) : false);
-	_ctagsVerbose = GetBool(s_szDebug, s_szCtagsVerbose, false);
+/////////////////////////////////////////////////////////////////////////////
+// Write a boolean to the ini file
+
+void NppOptions::WriteBool(WCHAR* szAppName, WCHAR* szKeyName, bool val)
+{
+	WritePrivateProfileString(szAppName, szKeyName, val ? L"1" : L"0", _szIniPath);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Write an integer to the ini file
+
+void NppOptions::WriteInt(WCHAR* szAppName, WCHAR* szKeyName, int val)
+{
+	WCHAR temp[256];
+	snwprintf(temp, 256, L"%d", val);
+	WritePrivateProfileString(szAppName, szKeyName, temp, _szIniPath);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Write a string to the ini file
+
+void NppOptions::WriteString(WCHAR* szAppName, WCHAR* szKeyName, WCHAR* val)
+{
+	WritePrivateProfileString(szAppName, szKeyName, val, _szIniPath);
 }
