@@ -8,14 +8,14 @@
 
 	<articleinfo>
 		<title>NppTags</title>
-		<subtitle>Exuberant CTags plug-in for Notepad++</subtitle>
+		<subtitle>Universal Ctags plug-in for Notepad++</subtitle>
 		<author><firstname>Frank</firstname><surname>Fesevur</surname></author>
 		<pubdate>2013-07-14</pubdate>
 	</articleinfo>
 
 	<sect1 id="introduction">
 		<title>Introduction</title>
-		<para>NppTags is a <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> plug-in for <ulink url="http://www.notepad-plus-plus.org/">Notepad++</ulink>.</para>
+		<para>NppTags is a <ulink url="https://ctags.io/">Universal Ctags</ulink> plug-in for <ulink url="http://www.notepad-plus-plus.org/">Notepad++</ulink>.</para>
 		<para>When you use Notepad++ to program in a popular programming language (like C, C++, Java, JavaScript, PHP), ctags can be very useful for you. It creates a so called tags file that can be used to navigate through your sources. This plug-in can help you to jump to a selected function / variable / class / etc in your code by pressing just one key!</para>
 	</sect1>
 
@@ -79,7 +79,7 @@
 	<sect1 id="license">
 		<title>License</title>
 		<para>This plug-in is published under the GPL-2 license. See <xref linkend="gpl"/> for the full license agreement. You can find the sources of the latest version and the current developments at <ulink url="https://github.com/ffes/npptags">GitHub</ulink>.</para>
-		<para>This plug-in relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> to recognize the tags. Exuberant CTags is released under GPL-2 as well and the source code of Exuberant CTags can be found at their <ulink url="http://ctags.sourceforge.net/">website</ulink>.</para>
+		<para>This plug-in relies on <ulink url="https://ctags.io/">Universal Ctags</ulink> to recognize the tags. Universal Ctags is released under GPL-2 as well and the source code of Universal Ctags can be found at <ulink url="https://guthub.com/universal-ctags/ctags/">GitHub</ulink>.</para>
 	</sect1>
 
 	<sect1 id="faq">
@@ -90,7 +90,7 @@
 					<para>Does NppTags recognize tags in language 'XYZ'?</para>
 				</question>
 				<answer>
-					<para>NppTags relies on <ulink url="http://ctags.sourceforge.net/">Exuberant CTags</ulink> for the recognition of tags. So please check the documentation of Exuberant CTags to see if your language is supported by Exuberant CTags. If not, you have to contact the Exuberant CTags team to see if they want to add support for your programming language. If Exuberant CTags supports your language "Jump to Tag" should have no problems, but the tree could not show all tags.</para>
+					<para>NppTags relies on <ulink url="https://ctags.io/">Universal Ctags</ulink> for the recognition of tags. So please check the documentation of Universal Ctags to see if your language is supported by Universal Ctags. If not, you have to contact the Universal Ctags team to see if they want to add support for your programming language. If Universal Ctags supports your language "Jump to Tag" should have no problems, but the tree could not show all tags.</para>
 				</answer>
 			</qandaentry>
 			<qandaentry>
@@ -162,7 +162,7 @@
 				<listitem><para>Better support for sources stored in various sub-directories.</para></listitem>
 				<listitem><para>Very simple Tags Properties MessageBox</para></listitem>
 				<listitem><para>Add debug option to store the output of <computeroutput>ctags --verbose</computeroutput>.</para></listitem>
-				<listitem><para>Updated to recent <ulink url="https://github.com/fishman/ctags/">fishman ctags</ulink> build.</para></listitem>
+				<listitem><para>Updated to recent <ulink url="https://github.com/universal-ctags/ctags/">Universal Ctags</ulink> build.</para></listitem>
 				<listitem><para>Upgrade to SQLite version 3.8.7</para></listitem>
 			</itemizedlist>
 		</sect2>
