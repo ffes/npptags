@@ -2,8 +2,10 @@ Version History
 ===============
 
 
-Version `0.3.0`_, XX XXXXXXX 2015
----------------------------------
+Version `0.3.0`_, Yet To Be Released
+------------------------------------
+
+-  Converted DocBook documentation to reStructedText and publish it at `Read the Docs`_.
 
 -  "Jump Back" to bring you back to the position where when you jumped to a tag.
 
@@ -52,6 +54,7 @@ Version 0.1.0, 30 June 2013
 -  Internal proof of concept
 
 
+.. _Read the Docs: http://npptags.readthedocs.org/
 .. _Universal Ctags: https://ctags.io/
 .. _0.3.0: https://github.com/ffes/npptags/releases/tag/v0.3.0
 .. _0.2.0: https://github.com/ffes/npptags/releases/tag/v0.2.0
