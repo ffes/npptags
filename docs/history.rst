@@ -5,6 +5,8 @@ Version History
 Version `0.3.0`_, Yet To Be Released
 ------------------------------------
 
+-  Add a basic ``reStructuredText`` tree.
+
 -  Add an :ref:`option <options>` to specify the path to ``ctags.exe``
 
 -  Converted DocBook documentation to reStructedText and publish it at `Read the Docs`_.

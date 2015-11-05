@@ -31,6 +31,9 @@
 #define MEMBER_OF_ENUM			4
 #define MEMBER_OF_INTERFACE		5
 #define MEMBER_OF_NAMESPACE		6
+#define MEMBER_OF_CHAPTER		7
+#define MEMBER_OF_SECTION		8
+#define MEMBER_OF_SUBSECTION	9
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -146,6 +149,22 @@ Tag& Tag::operator=(const tagEntry tag)
 			continue;
 		}
 
+		// Is it member of a chapter?
+		if (strcmp(tag.fields.list[i].key, "chapter") == 0)
+		{
+			_memberOf = tag.fields.list[i].value;
+			_memberOfType = MEMBER_OF_CHAPTER;
+			continue;
+		}
+
+		// Is it member of a section?
+		if (strcmp(tag.fields.list[i].key, "section") == 0)
+		{
+			_memberOf = tag.fields.list[i].value;
+			_memberOfType = MEMBER_OF_SECTION;
+			continue;
+		}
+
 		// What does class this class inherit?
 		if (strcmp(tag.fields.list[i].key, "inherits") == 0)
 		{
@@ -219,16 +238,16 @@ std::string Tag::getBaseFile()
 std::string Tag::getFullBaseFile()
 {
 	// Split the filename
-	char szSpoolDrive[_MAX_DRIVE];
-	char szSpoolDir[_MAX_DIR];
-	char szSpoolFile[_MAX_FNAME];
-	char szSpoolExt[_MAX_EXT];
-	_splitpath(_file.c_str(), szSpoolDrive, szSpoolDir, szSpoolFile, szSpoolExt);
+	char szDrive[_MAX_DRIVE];
+	char szDir[_MAX_DIR];
+	char szFile[_MAX_FNAME];
+	char szExt[_MAX_EXT];
+	_splitpath(_file.c_str(), szDrive, szDir, szFile, szExt);
 
 	// Reconstruct the base filename
-	std::string ret = szSpoolDrive;
-	ret += szSpoolDir;
-	ret += szSpoolFile;
+	std::string ret = szDrive;
+	ret += szDir;
+	ret += szFile;
 	return ret;
 }
 

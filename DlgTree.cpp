@@ -304,6 +304,36 @@ static void BuildJavaTree(HTREEITEM hParent)
 /////////////////////////////////////////////////////////////////////////////
 //
 
+static void BuildRstTree(HTREEITEM hParent)
+{
+	// First find the chapters
+	SqliteStatement chapter_stmt(g_DB, "SELECT * FROM Tags WHERE Type = 'chapter' AND Language = 'reStructuredText' ORDER BY Tag");
+	Tag tag;
+	while (chapter_stmt.GetNextRecord())
+	{
+		// Fill the class from the database
+		tag.SetFromDB(&chapter_stmt);
+
+		// Are there any sections of this chapter
+		SqliteStatement section_stmt(g_DB, "SELECT COUNT(*) FROM Tags WHERE Type = 'section' AND Language = 'reStructuredText' AND MemberOf = @member");
+		section_stmt.Bind("@member", tag.getTag().c_str());
+
+		bool members = false;
+		if (section_stmt.GetNextRecord())
+		{
+			int count = section_stmt.GetIntColumn(0);
+			members = (count > 0);
+		}
+		section_stmt.Finalize();
+
+		InsertTagItem(hParent, &tag, members);
+	}
+	chapter_stmt.Finalize();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
 static void AddAllTypes(HTREEITEM hParent, LPCSTR lang)
 {
 	SqliteStatement stmt(g_DB);
@@ -387,6 +417,8 @@ void UpdateTagsTree()
 				BuildJavaTree(hLang);
 			else if (lang == "C/C++")
 				BuildCppTree(hLang);
+			else if (lang == "reStructuredText")
+				BuildRstTree(hLang);
 			else
 				AddAllTypes(hLang, lang.c_str());
 
