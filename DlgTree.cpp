@@ -64,6 +64,7 @@ static bool TagLangEqualsNppLang(string lang)
 		std::make_pair(L_CAML,		"OCaml"),
 		//L_CMAKE
 		std::make_pair(L_COBOL,		"Cobol"),
+		//L_COFFEESCRIPT
 		std::make_pair(L_CPP,		"C/C++"),
 		std::make_pair(L_CS,		"C#"),
 		std::make_pair(L_CSS,		"CSS"),
@@ -77,6 +78,8 @@ static bool TagLangEqualsNppLang(string lang)
 		//L_INNO
 		std::make_pair(L_JAVA,		"Java"),
 		std::make_pair(L_JS,		"JavaScript"),
+		std::make_pair(L_JAVASCRIPT,"JavaScript"),
+		std::make_pair(L_JSON,		"JSON"),
 		//L_JSP
 		//L_KIX
 		std::make_pair(L_LISP,		"Lisp"),
