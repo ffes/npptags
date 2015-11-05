@@ -10,7 +10,7 @@ Welcome to NppTags documentation!
     introduction.rst
     installation.rst
     how-to-use.rst
-    debug.rst
+    options.rst
     faq.rst
     wishlist.rst
     known-issues.rst

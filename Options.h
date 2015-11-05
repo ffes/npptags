@@ -19,8 +19,7 @@
 //                                                                         //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __OPTIONS_H__
-#define __OPTIONS_H__
+#pragma once
 
 #include "NppOptions.h"
 
@@ -37,7 +36,8 @@ public:
 	bool GetShowTreeDlg()				{ return _showTreeDlg; };
 	int  GetMaxDepth()					{ return _maxDepth; };
 	int  GetJumpBackStack()				{ return _jumpBackStack; };
-	WCHAR* GetPrevVersion() 			{ return _szPrevVersion; };
+	WCHAR* GetPrevVersion() 			{ return _prevVersion; };
+	WCHAR* GetCtagsPath() 				{ return _ctagsPath; };
 
 	void SetShowTreeDlg(bool b)			{ _showTreeDlg = b; };
 
@@ -54,12 +54,11 @@ private:
 	bool _showTreeDlg;
 	int _maxDepth;
 	int _jumpBackStack;
-	WCHAR _szPrevVersion[MAX_PATH];
+	WCHAR _ctagsPath[MAX_PATH];
+	WCHAR _prevVersion[MAX_PATH];
 
 	// Debug options
 	bool _deleteTagsFile;
 	bool _overwriteExistingTagsFile;
 	bool _ctagsVerbose;
 };
-
-#endif // __OPTIONS_H__

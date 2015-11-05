@@ -32,6 +32,7 @@ static WCHAR s_szShow[]				= L"Show";
 static WCHAR s_szVersion[]			= L"Version";
 static WCHAR s_szDepth[]			= L"Depth";
 static WCHAR s_szJumpBackStack[]	= L"JumpBackStack";
+static WCHAR s_szCtagsPath[]		= L"CtagsPath";
 static WCHAR s_szDebug[]			= L"Debug";
 static WCHAR s_szDelTags[]			= L"DelTags";
 static WCHAR s_szCtagsVerbose[]		= L"CtagsVerbose";
@@ -42,8 +43,9 @@ static WCHAR s_szOverwriteTags[]	= L"OverwriteTags";
 
 Options::Options() : NppOptions()
 {
-	// First make sure the string is empty
-	_szPrevVersion[0] = 0;
+	// First make sure the strings are empty
+	_prevVersion[0] = 0;
+	_ctagsPath[0] = 0;
 
 	// Read the settings from the ini file
 	Read();
@@ -76,7 +78,8 @@ void Options::Read()
 	_showTreeDlg = GetBool(s_szOptions, s_szShow, true);
 	_maxDepth = GetInt(s_szOptions, s_szDepth, 3);
 	_jumpBackStack = GetInt(s_szOptions, s_szJumpBackStack, 4);
-	GetString(s_szOptions, s_szVersion, _szPrevVersion, MAX_PATH, L"");
+	GetString(s_szOptions, s_szVersion, _prevVersion, MAX_PATH, L"");
+	GetString(s_szOptions, s_szCtagsPath, _ctagsPath, MAX_PATH, L"");
 
 	// Read Only Debug options
 	_overwriteExistingTagsFile = GetBool(s_szDebug, s_szOverwriteTags, true);

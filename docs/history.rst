@@ -5,9 +5,12 @@ Version History
 Version `0.3.0`_, Yet To Be Released
 ------------------------------------
 
+-  Add an :ref:`option <options>` to specify the path to ``ctags.exe``
+
 -  Converted DocBook documentation to reStructedText and publish it at `Read the Docs`_.
 
--  "Jump Back" to bring you back to the position where when you jumped to a tag.
+-  ``Jump Back`` to bring you back to the position where you were when you
+   jumped to a tag.
 
 -  Better support for sources stored in various sub-directories.
 
@@ -18,6 +21,10 @@ Version `0.3.0`_, Yet To Be Released
 -  Updated to recent `Universal Ctags`_ build.
 
 -  Upgrade to SQLite version 3.8.7
+
+.. _Read the Docs: http://npptags.readthedocs.org/
+.. _Universal Ctags: https://ctags.io/
+.. _0.3.0: https://github.com/ffes/npptags/releases/tag/v0.3.0
 
 
 Version `0.2.0`_, 23 October 2013
@@ -34,10 +41,12 @@ Version `0.2.0`_, 23 October 2013
 
 -  Show a separate root item per language, if more then one language is found.
 
--  Using a SVN (rev 804) based build of ctags.exe for better JavaScript
+-  Using a SVN (rev 804) based build of ``ctags.exe`` for better JavaScript
    support and two personal patches.
 
 -  Upgrade to SQLite version 3.8.1
+
+.. _0.2.0: https://github.com/ffes/npptags/releases/tag/v0.2.0
 
 
 Version 0.1.1, 5 July 2013
@@ -52,9 +61,3 @@ Version 0.1.0, 30 June 2013
 ---------------------------
 
 -  Internal proof of concept
-
-
-.. _Read the Docs: http://npptags.readthedocs.org/
-.. _Universal Ctags: https://ctags.io/
-.. _0.3.0: https://github.com/ffes/npptags/releases/tag/v0.3.0
-.. _0.2.0: https://github.com/ffes/npptags/releases/tag/v0.2.0

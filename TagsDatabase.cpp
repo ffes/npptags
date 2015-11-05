@@ -300,12 +300,18 @@ bool TagsDatabase::GenerateTagsFile()
 			return true;
 	}
 
-	// Set the path to ctags.exe
+	// Is there a path to a specific ctags.exe?
 	WCHAR szExePath[_MAX_PATH];
-	SendMessage(g_nppData._nppHandle, NPPM_GETNPPDIRECTORY, MAX_PATH, (LPARAM) &szExePath);
-	wcsncat(szExePath, L"\\plugins\\", _MAX_PATH);
-	wcsncat(szExePath, getName(), _MAX_PATH);
-	wcsncat(szExePath, L"\\ctags", _MAX_PATH);
+	wcsncpy(szExePath, g_Options->GetCtagsPath(), _MAX_PATH);
+
+	// If not, try the default location
+	if (wcslen(szExePath) == 0)
+	{
+		SendMessage(g_nppData._nppHandle, NPPM_GETNPPDIRECTORY, MAX_PATH, (LPARAM) &szExePath);
+		wcsncat(szExePath, L"\\plugins\\", _MAX_PATH);
+		wcsncat(szExePath, getName(), _MAX_PATH);
+		wcsncat(szExePath, L"\\ctags", _MAX_PATH);
+	}
 
 	// Construct the command line
 	wstring cmd;
