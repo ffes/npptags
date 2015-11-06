@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //                                                                         //
 //  NppTags - CTags plugin for Notepad++                                   //
-//  Copyright (C) 2013 Frank Fesevur                                       //
+//  Copyright (C) 2013-2015 Frank Fesevur                                  //
 //                                                                         //
 //  This program is free software; you can redistribute it and/or modify   //
 //  it under the terms of the GNU General Public License as published by   //
@@ -19,8 +19,14 @@
 //                                                                         //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __NPPTAGS_H__
-#define __NPPTAGS_H__
+#pragma once
+
+// Types needed in this file
+class Tag;
+class Options;
+class TagsDatabase;
+struct NppData;
+struct FuncItem;
 
 extern HWND getCurrentHScintilla(int which);
 extern const TCHAR* getName();
@@ -35,22 +41,16 @@ extern void MsgBoxf(const char* szFmt, ...);
 extern void CenterWindow(HWND hDlg);
 extern WCHAR* GetDlgText(HWND hDlg, UINT uID);
 
+extern void JumpToTag(Tag* pTag, bool storeCurPos = true);
+
+// Various global variables
 extern HINSTANCE g_hInst;
 extern NppData g_nppData;
 extern FuncItem g_funcItem[];
-
-class Tag;
-extern void JumpToTag(Tag* pTag, bool storeCurPos = true);
-
-class Options;
 extern Options *g_Options;
-
-class TagsDatabase;
 extern TagsDatabase* g_DB;
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
 #define snwprintf swprintf
 #endif
-
-#endif // __NPPTAGS_H__
