@@ -8,7 +8,4 @@ _*
 *.sdf
 [Rr]elease/
 [Dd]ebug/
-ipch/
-*.depend
-*.layout
-tags.sqlite
+tags.*
