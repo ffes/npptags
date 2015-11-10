@@ -43,6 +43,11 @@ Tag::Tag()
 	empty();
 }
 
+Tag::Tag(SqliteStatement* stmt)
+{
+	SetFromDB(stmt);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Make sure all members of the class are empty
 
