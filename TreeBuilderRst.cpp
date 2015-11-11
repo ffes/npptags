@@ -83,7 +83,7 @@ bool TreeBuilderRst::AddItems(LPCSTR type, LPCSTR subtype)
 	string sql = "SELECT * FROM Tags WHERE Language = @lang AND Type = @type ";
 	if (_depth > 1)
 		sql += "AND MemberOf = @member ";
-	sql += "ORDER BY Type";
+	sql += "ORDER BY Tag";
 
 	SqliteStatement stmt(g_DB, sql.c_str());
 	stmt.Bind("@lang", _lang.c_str());
