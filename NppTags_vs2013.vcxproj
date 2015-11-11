@@ -111,6 +111,7 @@
     <ClCompile Include="SqliteDB.cpp" />
     <ClCompile Include="Tag.cpp" />
     <ClCompile Include="TagsDatabase.cpp" />
+    <ClCompile Include="TreeBuilder.cpp" />
     <ClCompile Include="Version.cpp" />
     <ClCompile Include="WaitCursor.cpp" />
   </ItemGroup>
@@ -127,6 +128,7 @@
     <ClInclude Include="SqliteDB.h" />
     <ClInclude Include="Tag.h" />
     <ClInclude Include="TagsDatabase.h" />
+    <ClInclude Include="TreeBuilder.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="WaitCursor.h" />
   </ItemGroup>

@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //                                                                         //
 //  NppTags - CTags plugin for Notepad++                                   //
-//  Copyright (C) 2013 Frank Fesevur                                       //
+//  Copyright (C) 2013-2015 Frank Fesevur                                  //
 //                                                                         //
 //  This program is free software; you can redistribute it and/or modify   //
 //  it under the terms of the GNU General Public License as published by   //
@@ -32,6 +32,7 @@
 #include "Options.h"
 #include "WaitCursor.h"
 #include "Tag.h"
+#include "TreeBuilder.h"
 using namespace std;
 
 #ifdef _MSC_VER
@@ -39,10 +40,14 @@ using namespace std;
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
+// The HWND to the tree
+
+HWND g_hTree = NULL;
+
+/////////////////////////////////////////////////////////////////////////////
 // Various static variables
 
 static HWND s_hDlg = NULL;					// The HWND to the dialog
-static HWND s_hTree = NULL;					// The HWND to the tree
 static HICON s_hTabIcon = NULL;				// The icon on the docking tab
 static bool s_bTreeInitialized = false;		// Is the tree initialized?
 static bool s_bTreeVisible = false;			// Is the tree visible?
@@ -122,24 +127,25 @@ static bool TagLangEqualsNppLang(string lang)
 
 static void ClearTree()
 {
-	TreeView_DeleteAllItems(s_hTree);
+	CleanBuilders();
+	TreeView_DeleteAllItems(g_hTree);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static HTREEITEM InsertTextItem(HTREEITEM hParent, LPCWSTR txt)
+static HTREEITEM InsertTextItem(LPCWSTR txt)
 {
 	TVINSERTSTRUCT item;
 	ZeroMemory(&item, sizeof(item));
 
-	item.hParent = hParent;
 	item.hInsertAfter = TVI_ROOT;
 	item.item.mask = TVIF_TEXT;
 	item.item.pszText = (LPWSTR ) txt;
-	return TreeView_InsertItem(s_hTree, &item);
+	return TreeView_InsertItem(g_hTree, &item);
 }
 
+/*
 /////////////////////////////////////////////////////////////////////////////
 //
 
@@ -162,7 +168,7 @@ static HTREEITEM InsertTagItem(HTREEITEM hParent, Tag* pTag, bool members)
 		item.item.cChildren = 1;
 	}
 
-	return TreeView_InsertItem(s_hTree, &item);
+	return TreeView_InsertItem(g_hTree, &item);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -361,6 +367,7 @@ static void AddAllTypes(HTREEITEM hParent, LPCSTR lang)
 	}
 	stmt.Finalize();
 }
+*/
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -378,39 +385,20 @@ void UpdateTagsTree()
 	// Is there a tags file set?
 	if (wcslen(g_DB->GetFilename()) == 0)
 	{
-		InsertTextItem(NULL, L"Tags database not found");
+		InsertTextItem(L"Tags database not found");
 		return;
 	}
 
 	try
 	{
+		// Go through all the available languages
 		g_DB->Open();
-		
-		// SQLite has no way to determine how many row will be returned,
-		// so this extra query is needed.
-		int count = 0;
-		SqliteStatement stmt(g_DB, "SELECT COUNT(*) FROM (SELECT DISTINCT Language FROM Tags)");
-		if (stmt.GetNextRecord())
-		{
-			count = stmt.GetIntColumn(0);
-		}
-		stmt.Finalize();
-
-		// Now go through all the available languages
-		stmt.Prepare("SELECT DISTINCT Language FROM Tags ORDER BY Language");
-		HTREEITEM hLang = NULL;
+		SqliteStatement stmt(g_DB, "SELECT DISTINCT Language FROM Tags ORDER BY Language");
 		while (stmt.GetNextRecord())
 		{
-			// Only one language, no extra level in tree needed
-			if (count != 1)
-			{
-				// Add the parent item for this language tree
-				wstring wlang = stmt.GetWTextColumn("Language");
-				hLang = InsertTextItem(NULL, wlang.c_str());
-			}
-
 			// Build the tree for the language
 			string lang = stmt.GetTextColumn("Language");
+/*
 			if (lang == "C#")
 				BuildCSharpTree(hLang);
 			else if (lang == "Java")
@@ -421,39 +409,23 @@ void UpdateTagsTree()
 				BuildRstTree(hLang);
 			else
 				AddAllTypes(hLang, lang.c_str());
+*/
+			TreeBuilderGeneric* builder = new TreeBuilderGeneric(lang.c_str());
 
 			// Expand the current language
-			if (hLang != NULL && TagLangEqualsNppLang(lang))
-				TreeView_Expand(s_hTree, hLang, TVE_EXPAND);
+			if (TagLangEqualsNppLang(lang) && builder != NULL)
+				TreeView_Expand(g_hTree, builder->GetHItem(), TVE_EXPAND);
 		}
 		stmt.Finalize();
 		g_DB->Close();
 	}
 	catch(SqliteException e)
 	{
-		InsertTextItem(NULL, L"Error building tree");
+		InsertTextItem(L"Error building tree");
 	}
 
-	if (TreeView_GetCount(s_hTree) == 0)
-		InsertTextItem(NULL, L"No tags found in database");
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-static void FindTagInDB(int idx, Tag* pTag)
-{
-	g_DB->Open();
-	SqliteStatement stmt(g_DB);
-	stmt.Prepare("SELECT * FROM Tags WHERE Idx = @idx");
-	stmt.Bind("@idx", idx);
-
-	if (stmt.GetNextRecord())
-	{
-		pTag->SetFromDB(&stmt);
-	}
-	stmt.Finalize();
-	g_DB->Close();
+	if (TreeView_GetCount(g_hTree) == 0)
+		InsertTextItem(L"No tags found in database");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -526,24 +498,26 @@ static void ShowTagsProperties()
 	TVITEM tvi;
 	ZeroMemory(&tvi, sizeof(TVITEM));
 
-	tvi.hItem = (HTREEITEM) TreeView_GetSelection(s_hTree);
+	tvi.hItem = (HTREEITEM) TreeView_GetSelection(g_hTree);
 	tvi.mask = TVIF_PARAM;
-	int err = TreeView_GetItem(s_hTree, &tvi);
+	int err = TreeView_GetItem(g_hTree, &tvi);
 
-	if (tvi.lParam != 0)
+	if (tvi.lParam != NULL)
 	{
-		Tag tag;
-		FindTagInDB(tvi.lParam, &tag);
-
-		std::string str = "Tag Name: " + tag.getFullTag();
-		str += "\r\nLanguage: " + tag.getLanguage();
-		str += "\r\nType: " + tag.getType();
-		str += "\r\nFile: " + tag.getFile();
-		if (tag.getMemberOf().length() != 0)
-			str += "\r\nMember of: " + tag.getMemberOf();
-		if (tag.getDetails().length() != 0)
-			str += "\r\nDetails: " + tag.getDetails();
-		MsgBox(str.c_str());
+		TreeBuilder* builder = (TreeBuilder*) tvi.lParam;
+		Tag* tag = builder->GetTag();
+		if (tag != NULL)
+		{
+			std::string str = "Tag Name: " + tag->getFullTag();
+			str += "\r\nLanguage: " + tag->getLanguage();
+			str += "\r\nType: " + tag->getType();
+			str += "\r\nFile: " + tag->getFile();
+			if (tag->getMemberOf().length() != 0)
+				str += "\r\nMember of: " + tag->getMemberOf();
+			if (tag->getDetails().length() != 0)
+				str += "\r\nDetails: " + tag->getDetails();
+			MsgBox(str.c_str());
+		}
 	}
 }
 
@@ -555,7 +529,7 @@ static void ShowTagsProperties()
 static void OnSize(HWND hWnd, int iWidth, int iHeight)
 {
 	UNREFERENCED_PARAMETER(hWnd);
-	SetWindowPos(s_hTree, 0, 0, SPACER, iWidth, iHeight - SPACER, SWP_NOACTIVATE | SWP_NOZORDER);
+	SetWindowPos(g_hTree, 0, 0, SPACER, iWidth, iHeight - SPACER, SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -564,7 +538,7 @@ static void OnSize(HWND hWnd, int iWidth, int iHeight)
 
 static void OnContextMenu(HWND hWnd, int xPos, int yPos, HWND hChild)
 {
-	if (hChild == s_hTree)
+	if (hChild == g_hTree)
 	{
 /*
 		// Find out where the cursor was and select that item from the list
@@ -589,7 +563,7 @@ static BOOL OnInitDialog(HWND hWnd)
 	InitCommonControls();
 
 	// Store the DlgItems
-	s_hTree = GetDlgItem(hWnd, IDC_TREE);
+	g_hTree = GetDlgItem(hWnd, IDC_TREE);
 
 	// Let windows set focus
 	return TRUE;
@@ -600,6 +574,8 @@ static BOOL OnInitDialog(HWND hWnd)
 
 static void OnClose(HWND hWnd)
 {
+	ClearTree();
+
 	if (s_hTabIcon != NULL)
 	{
 		DestroyIcon(s_hTabIcon);
@@ -617,18 +593,22 @@ static BOOL OnDblClk_Tree()
 	TVITEM tvi;
 	ZeroMemory(&tvi, sizeof(TVITEM));
 
-	tvi.hItem = (HTREEITEM) TreeView_GetSelection(s_hTree);
+	tvi.hItem = (HTREEITEM) TreeView_GetSelection(g_hTree);
 	tvi.mask = TVIF_PARAM;
-	int err = TreeView_GetItem(s_hTree, &tvi);
+	TreeView_GetItem(g_hTree, &tvi);
 
-	if (tvi.lParam != 0)
-	{
-		Tag tag;
-		FindTagInDB(tvi.lParam, &tag);
-		JumpToTag(&tag);
-		SetFocusOnEditor();
-	}
+	// No object found, nothing to do
+	if (tvi.lParam == NULL)
+		return TRUE;
 
+	// Is there a tag in the TreeBuilder object?
+	TreeBuilder* builder = (TreeBuilder*) tvi.lParam;
+	Tag* tag = builder->GetTag();
+	if (tag == NULL)
+		return TRUE;
+
+	JumpToTag(tag);
+	SetFocusOnEditor();
 	return TRUE;
 }
 
@@ -647,22 +627,12 @@ static BOOL OnItemExpanding(NMTREEVIEW* pNMTreeView)
 		return FALSE;
 
 	// Is this a tag
-	bool added = true;
-	if (tvi.lParam != 0)
+	bool added = false;
+	if (tvi.lParam != NULL)
 	{
-		Tag tag;
-		FindTagInDB(tvi.lParam, &tag);
-		added = AddMembers(tvi.hItem, &tag);
-
-		// Try again with the namespace in front of it
-		if (!added)
-		{
-			std::string tmp = tag.getMemberOf();
-			tmp += ".";
-			tmp += tag.getTag();
-			tag.setTag(tmp);
-			added = AddMembers(tvi.hItem, &tag);
-		}
+		// Get the object from the treeitem and expand it
+		TreeBuilder* builder = (TreeBuilder*) tvi.lParam;
+		added = builder->Expand();
 	}
 
 	// If we didn't add anything, remove the (+) from the tree
@@ -670,7 +640,7 @@ static BOOL OnItemExpanding(NMTREEVIEW* pNMTreeView)
 	{
 		tvi.mask = TVIF_CHILDREN;
 		tvi.cChildren = 0;
-		TreeView_SetItem(s_hTree, &tvi);
+		TreeView_SetItem(g_hTree, &tvi);
 	}
 
 	return FALSE;
@@ -740,6 +710,7 @@ static BOOL CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			OnContextMenu(hWnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), (HWND) wParam);
 			break;
 		}
+		case WM_DESTROY:
 		case WM_CLOSE:
 		{
 			OnClose(hWnd);

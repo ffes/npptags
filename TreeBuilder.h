@@ -21,8 +21,51 @@
 
 #pragma once
 
-extern HWND g_hTree;
+extern void CleanBuilders();
 
-extern void TagsTree();
-extern void CreateTreeDlg();
-extern void UpdateTagsTree();
+class Tag;
+
+/////////////////////////////////////////////////////////////////////////////
+// The base class for all tree builders
+
+class TreeBuilder
+{
+public:
+	TreeBuilder(LPCSTR lang);
+	virtual ~TreeBuilder();
+
+	// Pure virtual function. This is called by the treeview
+	virtual bool Expand() = 0;
+
+	Tag* GetTag()			{ return _tag; };
+	HTREEITEM GetHItem()	{ return _hItem; };
+
+protected:
+	TreeBuilder();
+
+	HTREEITEM _hItem;
+	Tag* _tag;
+	std::string _lang;
+	int _depth;
+
+	HTREEITEM InsertItem(TreeBuilder* builder, LPCWSTR txt, bool members = true);
+	HTREEITEM InsertItem(TreeBuilder* builder, bool members = true);
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// The class that builds any language that doesn't have its own builder
+
+class TreeBuilderGeneric : public TreeBuilder
+{
+public:
+	TreeBuilderGeneric(LPCSTR lang);
+
+	virtual bool Expand();
+
+private:
+	TreeBuilderGeneric();
+
+	bool AddTypes();
+	bool AddTypeMembers();
+	bool AddMembers();
+};
