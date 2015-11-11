@@ -84,6 +84,15 @@ TreeBuilder::TreeBuilder(LPCSTR lang)
 	_hItem = TreeView_InsertItem(g_hTree, &item);
 }
 
+TreeBuilder::TreeBuilder(Tag* tag)
+{
+	_hItem = NULL;
+	_tag = tag;
+	_depth = 0;
+
+	AddToBuilders(this);
+}
+
 TreeBuilder::~TreeBuilder()
 {
 	if (_tag != NULL)
@@ -140,6 +149,10 @@ TreeBuilderGeneric::TreeBuilderGeneric(LPCSTR lang) : TreeBuilder(lang)
 {
 }
 
+TreeBuilderGeneric::TreeBuilderGeneric(Tag* tag) : TreeBuilder(tag)
+{
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 
@@ -181,8 +194,7 @@ bool TreeBuilderGeneric::AddTypes()
 	{
 		TreeBuilderGeneric* builder = new TreeBuilderGeneric();
 		wstring type = stmt.GetWTextColumn("Type");
-		InsertItem(builder, type.c_str());
-		added = true;
+		added = (InsertItem(builder, type.c_str()) != NULL);
 	}
 	stmt.Finalize();
 
@@ -217,10 +229,9 @@ bool TreeBuilderGeneric::AddTypeMembers()
 	while (stmt.GetNextRecord())
 	{
 		// Get the tag from the database and add to tree
-		TreeBuilderGeneric* builder = new TreeBuilderGeneric();
-		builder->_tag = new Tag(&stmt);
-		InsertItem(builder, members);
-		added = true;
+		Tag* tag = new Tag(&stmt);
+		TreeBuilderGeneric* builder = new TreeBuilderGeneric(tag);
+		added = (InsertItem(builder, members) != NULL);
 	}
 	stmt.Finalize();
 
@@ -241,10 +252,9 @@ bool TreeBuilderGeneric::AddMembers()
 	while (stmt.GetNextRecord())
 	{
 		// Get the tag from the database and add to tree
-		TreeBuilderGeneric* builder = new TreeBuilderGeneric();
-		builder->_tag = new Tag(&stmt);
-		InsertItem(builder, false);
-		added = true;
+		Tag* tag = new Tag(&stmt);
+		TreeBuilderGeneric* builder = new TreeBuilderGeneric(tag);
+		added = (InsertItem(builder, false) != NULL);
 	}
 	stmt.Finalize();
 

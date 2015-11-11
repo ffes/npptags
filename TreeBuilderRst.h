@@ -21,53 +21,21 @@
 
 #pragma once
 
-extern void CleanBuilders();
-
+class TreeBuilder;
 class Tag;
 
 /////////////////////////////////////////////////////////////////////////////
-// The base class for all tree builders
+// The reStructedText builder
 
-class TreeBuilder
+class TreeBuilderRst : public TreeBuilder
 {
 public:
-	TreeBuilder(LPCSTR lang);
-	virtual ~TreeBuilder();
-
-	// Pure virtual function. This is called by the treeview
-	virtual bool Expand() = 0;
-
-	Tag* GetTag()			{ return _tag; };
-	HTREEITEM GetHItem()	{ return _hItem; };
-
-protected:
-	TreeBuilder();
-	TreeBuilder(Tag* tag);
-
-	HTREEITEM _hItem;
-	Tag* _tag;
-	std::string _lang;
-	int _depth;
-
-	HTREEITEM InsertItem(TreeBuilder* builder, LPCWSTR txt, bool members = true);
-	HTREEITEM InsertItem(TreeBuilder* builder, bool members = true);
-};
-
-/////////////////////////////////////////////////////////////////////////////
-// The class that builds any language that doesn't have its own builder
-
-class TreeBuilderGeneric : public TreeBuilder
-{
-public:
-	TreeBuilderGeneric(LPCSTR lang);
+	TreeBuilderRst();
 
 	virtual bool Expand();
 
 private:
-	TreeBuilderGeneric();
-	TreeBuilderGeneric(Tag* tag);
+	TreeBuilderRst(Tag* tag);
 
-	bool AddTypes();
-	bool AddTypeMembers();
-	bool AddMembers();
+	bool AddItems(LPCSTR type, LPCSTR subtype);
 };

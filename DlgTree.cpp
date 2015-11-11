@@ -33,6 +33,7 @@
 #include "WaitCursor.h"
 #include "Tag.h"
 #include "TreeBuilder.h"
+#include "TreeBuilderRst.h"
 using namespace std;
 
 #ifdef _MSC_VER
@@ -146,31 +147,6 @@ static HTREEITEM InsertTextItem(LPCWSTR txt)
 }
 
 /*
-/////////////////////////////////////////////////////////////////////////////
-//
-
-static HTREEITEM InsertTagItem(HTREEITEM hParent, Tag* pTag, bool members)
-{
-	TVINSERTSTRUCT item;
-	ZeroMemory(&item, sizeof(item));
-
-	item.hParent = hParent;
-	string str = pTag->getFullTag();
-	wstring wstr(str.begin(), str.end());
-	item.item.mask = TVIF_TEXT | TVIF_PARAM;
-	item.item.pszText = (LPWSTR) wstr.c_str();
-	item.item.lParam = pTag->getIdx();
-
-	// Add a (+) before this item, handled in OnItemExpanding()
-	if (members)
-	{
-		item.item.mask |= TVIF_CHILDREN;
-		item.item.cChildren = 1;
-	}
-
-	return TreeView_InsertItem(g_hTree, &item);
-}
-
 /////////////////////////////////////////////////////////////////////////////
 //
 
@@ -306,67 +282,6 @@ static void BuildJavaTree(HTREEITEM hParent)
 	}
 	interface_stmt.Finalize();
 }
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-static void BuildRstTree(HTREEITEM hParent)
-{
-	// First find the chapters
-	SqliteStatement chapter_stmt(g_DB, "SELECT * FROM Tags WHERE Type = 'chapter' AND Language = 'reStructuredText' ORDER BY Tag");
-	Tag tag;
-	while (chapter_stmt.GetNextRecord())
-	{
-		// Fill the class from the database
-		tag.SetFromDB(&chapter_stmt);
-
-		// Are there any sections of this chapter
-		SqliteStatement section_stmt(g_DB, "SELECT COUNT(*) FROM Tags WHERE Type = 'section' AND Language = 'reStructuredText' AND MemberOf = @member");
-		section_stmt.Bind("@member", tag.getTag().c_str());
-
-		bool members = false;
-		if (section_stmt.GetNextRecord())
-		{
-			int count = section_stmt.GetIntColumn(0);
-			members = (count > 0);
-		}
-		section_stmt.Finalize();
-
-		InsertTagItem(hParent, &tag, members);
-	}
-	chapter_stmt.Finalize();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-static void AddAllTypes(HTREEITEM hParent, LPCSTR lang)
-{
-	SqliteStatement stmt(g_DB);
-	stmt.Prepare("SELECT * FROM Tags WHERE Language = @lang ORDER BY Type, Tag, Signature");
-	stmt.Bind("@lang", lang);
-
-	Tag tag;
-	HTREEITEM hGroup = NULL;
-	string type = "";
-	while (stmt.GetNextRecord())
-	{
-		// Get the information from the database
-		tag.SetFromDB(&stmt);
-
-		// Do we need to add the parent item?
-		if (tag.getType() != type)
-		{
-			type = tag.getType();
-			wstring wstr(type.begin(), type.end());
-			hGroup = InsertTextItem(hParent, (LPWSTR) wstr.c_str());
-		}
-
-		// Now we can add the tag, classes commonly have members
-		InsertTagItem(hGroup, &tag, type == "class");
-	}
-	stmt.Finalize();
-}
 */
 
 /////////////////////////////////////////////////////////////////////////////
@@ -398,19 +313,12 @@ void UpdateTagsTree()
 		{
 			// Build the tree for the language
 			string lang = stmt.GetTextColumn("Language");
-/*
-			if (lang == "C#")
-				BuildCSharpTree(hLang);
-			else if (lang == "Java")
-				BuildJavaTree(hLang);
-			else if (lang == "C/C++")
-				BuildCppTree(hLang);
-			else if (lang == "reStructuredText")
-				BuildRstTree(hLang);
+
+			TreeBuilder* builder = NULL;
+			if (lang == "reStructuredText")
+				builder = (TreeBuilder*) new TreeBuilderRst();
 			else
-				AddAllTypes(hLang, lang.c_str());
-*/
-			TreeBuilderGeneric* builder = new TreeBuilderGeneric(lang.c_str());
+				builder = (TreeBuilderGeneric*) new TreeBuilderGeneric(lang.c_str());
 
 			// Expand the current language
 			if (TagLangEqualsNppLang(lang) && builder != NULL)
