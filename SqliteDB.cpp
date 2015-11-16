@@ -1,28 +1,46 @@
 /////////////////////////////////////////////////////////////////////////////
 //                                                                         //
-//  NppTags - CTags plugin for Notepad++                                   //
-//  Copyright (C) 2013 Frank Fesevur                                       //
+// SqliteDB Classes                                                        //
+// Version 1.1, 16-Nov-2015                                                //
 //                                                                         //
-//  This program is free software; you can redistribute it and/or modify   //
-//  it under the terms of the GNU General Public License as published by   //
-//  the Free Software Foundation; either version 2 of the License, or      //
-//  (at your option) any later version.                                    //
+// Copyright (c) 2013-2015, Frank Fesevur <http://www.fesevur.com>         //
+// All rights reserved.                                                    //
 //                                                                         //
-//  This program is distributed in the hope that it will be useful,        //
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of         //
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           //
-//  GNU General Public License for more details.                           //
+// Redistribution and use in source and binary forms, with or without      //
+// modification, are permitted provided that the following conditions      //
+// are met:                                                                //
 //                                                                         //
-//  You should have received a copy of the GNU General Public License      //
-//  along with this program; if not, write to the Free Software            //
-//  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              //
+// 1. Redistributions of source code must retain the above copyright       //
+//    notice, this list of conditions and the following disclaimer.        //
+// 2. Redistributions in binary form must reproduce the above copyright    //
+//    notice, this list of conditions and the following disclaimer in the  //
+//    documentation and/or other materials provided with the distribution. //
+//                                                                         //
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS     //
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT       //
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR   //
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT    //
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,   //
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT        //
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,   //
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY   //
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT     //
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE   //
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.    //
 //                                                                         //
 /////////////////////////////////////////////////////////////////////////////
 
 #include <windows.h>
+#include <wchar.h>
 #include <stdio.h>
 #include "SqliteDB.h"
 using namespace std;
+
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#define snwprintf swprintf
+#define wunlink _wunlink
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -105,6 +123,29 @@ void SqliteDatabase::Delete()
 }
 
 /////////////////////////////////////////////////////////////////////////////
+//
+
+void SqliteDatabase::Attach(LPCWSTR file, LPCWSTR alias)
+{
+	SqliteStatement stmt(this, "ATTACH DATABASE @file AS @alias");
+	stmt.Bind("@file", file);
+	stmt.Bind("@alias", alias);
+	stmt.SaveRecord();
+	stmt.Finalize();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+void SqliteDatabase::Detach(LPCWSTR alias)
+{
+	SqliteStatement stmt(this, "DETACH DATABASE @alias");
+	stmt.Bind("@alias", alias);
+	stmt.SaveRecord();
+	stmt.Finalize();
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // Compress the database
 
 void SqliteDatabase::Vacuum()
@@ -154,19 +195,24 @@ void SqliteDatabase::Execute(LPCSTR szSQL)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-void SqliteDatabase::SetUserVersion(long version)
+void SqliteDatabase::SetUserVersion(long version, const char* dbname)
 {
 	char sql[MAX_PATH];
-	_snprintf(sql, MAX_PATH, "PRAGMA user_version = %ld;", version);
+	snprintf(sql, MAX_PATH, "PRAGMA %s.user_version = %ld;", dbname == NULL ? "main" : dbname, version);
 	Execute(sql);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 
-long SqliteDatabase::GetUserVersion()
+long SqliteDatabase::GetUserVersion(const char* dbname)
 {
-	SqliteStatement stmt(this, "PRAGMA user_version;");
+	char sql[MAX_PATH];
+	strncpy(sql, "PRAGMA ", MAX_PATH);
+	strncat(sql, dbname == NULL ? "main" : dbname, MAX_PATH);
+	strncat(sql, ".user_version;", MAX_PATH);
+
+	SqliteStatement stmt(this, sql);
 	stmt.GetNextRecord();
 	return stmt.GetIntColumn(0);
 }
@@ -217,13 +263,21 @@ void SqliteStatement::Prepare(const char* sql)
 /////////////////////////////////////////////////////////////////////////////
 //
 
+void SqliteStatement::Reset()
+{
+	if (sqlite3_reset(_stmt) != SQLITE_OK)
+		throw SqliteException(sqlite3_errmsg(_db));
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
 void SqliteStatement::SaveRecord()
 {
 	if (sqlite3_step(_stmt) != SQLITE_DONE)
 		throw SqliteException(sqlite3_errmsg(_db));
 
-	if (sqlite3_reset(_stmt) != SQLITE_OK)
-		throw SqliteException(sqlite3_errmsg(_db));
+	Reset();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -259,13 +313,24 @@ void SqliteStatement::Finalize()
 }
 
 /////////////////////////////////////////////////////////////////////////////
+//
+
+int SqliteStatement::GetBindParameterIndex(std::string col)
+{
+	return sqlite3_bind_parameter_index(_stmt, col.c_str());
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // Binds a wchar string to the given parameter. Empty strings are bound
 // as null
 
 void SqliteStatement::Bind(const char* param, const WCHAR* val)
 {
-	int col = sqlite3_bind_parameter_index(_stmt, param);
-	
+	Bind(GetBindParameterIndex(param), val);
+}
+
+void SqliteStatement::Bind(int col, const WCHAR* val)
+{
 	int res = SQLITE_OK;
 	if (val == NULL)
 	{
@@ -290,15 +355,17 @@ void SqliteStatement::Bind(const char* param, const WCHAR* val)
 
 void SqliteStatement::Bind(const char* param, const char *val)
 {
-	int col = sqlite3_bind_parameter_index(_stmt, param);
+	Bind(GetBindParameterIndex(param), val);
+}
 
+void SqliteStatement::Bind(int col, const char *val)
+{
 	int res = SQLITE_OK;
 	if (val == NULL)
 	{
 		res = sqlite3_bind_null(_stmt, col);
 	}
-	else
-	if (strlen(val) == 0)
+	else if (strlen(val) == 0)
 	{
 		res = sqlite3_bind_null(_stmt, col);
 	}
@@ -315,11 +382,14 @@ void SqliteStatement::Bind(const char* param, const char *val)
 // Bind an integer to the given parameter. If optional "bool null" is true,
 // null is bound. Use like this: stmt.Bind("col", var, var == 0);
 
-void SqliteStatement::Bind(const char* param, const int val, bool null)
+void SqliteStatement::Bind(const char* param, int val, bool null)
 {
-	int col = sqlite3_bind_parameter_index(_stmt, param);
-	int res = (null ? sqlite3_bind_null(_stmt, col) : sqlite3_bind_int(_stmt, col, val));
+	Bind(GetBindParameterIndex(param), val, null);
+}
 
+void SqliteStatement::Bind(int col, int val, bool null)
+{
+	int res = (null ? sqlite3_bind_null(_stmt, col) : sqlite3_bind_int(_stmt, col, val));
 	if (res != SQLITE_OK)
 		throw SqliteException(sqlite3_errmsg(_db));
 }
@@ -327,12 +397,14 @@ void SqliteStatement::Bind(const char* param, const int val, bool null)
 /////////////////////////////////////////////////////////////////////////////
 // Binds 1 for true and 0 for false to the given parameter
 
-void SqliteStatement::Bind(const char* param, const bool val)
+void SqliteStatement::Bind(const char* param, bool val)
 {
-	int col = sqlite3_bind_parameter_index(_stmt, param);
-	int res = sqlite3_bind_int(_stmt, col, val ? 1 : 0);
+	Bind(GetBindParameterIndex(param), val);
+}
 
-	if (res != SQLITE_OK)
+void SqliteStatement::Bind(int col, bool val)
+{
+	if (sqlite3_bind_int(_stmt, col, val ? 1 : 0) != SQLITE_OK)
 		throw SqliteException(sqlite3_errmsg(_db));
 }
 
@@ -341,10 +413,12 @@ void SqliteStatement::Bind(const char* param, const bool val)
 
 void SqliteStatement::Bind(const char* param)
 {
-	int col = sqlite3_bind_parameter_index(_stmt, param);
-	int res = sqlite3_bind_null(_stmt, col);
+	Bind(GetBindParameterIndex(param));
+}
 
-	if (res != SQLITE_OK)
+void SqliteStatement::Bind(int col)
+{
+	if (sqlite3_bind_null(_stmt, col) != SQLITE_OK)
 		throw SqliteException(sqlite3_errmsg(_db));
 }
 
@@ -353,12 +427,17 @@ void SqliteStatement::Bind(const char* param)
 
 void SqliteStatement::ResolveColumnNames()
 {
-	for (int i = 0; i < sqlite3_column_count(_stmt); i++)
+	for (int i = 0; i < GetColumnCount(); i++)
 		_colNames[sqlite3_column_name(_stmt, i)] =  i;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
+
+int SqliteStatement::GetColumnCount()
+{
+	return sqlite3_column_count(_stmt);
+}
 
 std::string SqliteStatement::GetTextColumn(int col)
 {
