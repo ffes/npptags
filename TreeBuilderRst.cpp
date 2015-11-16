@@ -21,6 +21,7 @@
 
 #include <windows.h>
 #include <commctrl.h>
+#include <assert.h>
 
 #include "TagsDatabase.h"
 #include "TreeBuilder.h"
@@ -73,6 +74,22 @@ bool TreeBuilderRst::Expand()
 		g_DB->Close();
 
 	return added;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// These functions are not used in this class
+
+TreeBuilder* TreeBuilderRst::New()
+{
+	assert(false);
+	return NULL;
+}
+
+TreeBuilder* TreeBuilderRst::New(Tag* tag)
+{
+	UNREFERENCED_PARAMETER(tag);
+	assert(false);
+	return NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////

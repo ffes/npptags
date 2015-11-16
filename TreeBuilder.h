@@ -44,6 +44,13 @@ protected:
 	TreeBuilder();
 	TreeBuilder(Tag* tag);
 
+	// These are called by AddTypeMembers() and AddMembers()
+	virtual TreeBuilder* New() = 0;
+	virtual TreeBuilder* New(Tag* tag) = 0;
+
+	virtual bool AddTypeMembers();
+	virtual bool AddMembers();
+
 	HTREEITEM _hItem;
 	Tag* _tag;
 	std::string _lang;
@@ -67,7 +74,8 @@ private:
 	TreeBuilderGeneric();
 	TreeBuilderGeneric(Tag* tag);
 
+	virtual TreeBuilder* New();
+	virtual TreeBuilder* New(Tag* tag);
+
 	bool AddTypes();
-	bool AddTypeMembers();
-	bool AddMembers();
 };

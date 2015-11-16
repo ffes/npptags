@@ -37,5 +37,8 @@ public:
 private:
 	TreeBuilderRst(Tag* tag);
 
+	virtual TreeBuilder* New();
+	virtual TreeBuilder* New(Tag* tag);
+
 	bool AddItems(LPCSTR type, LPCSTR subtype);
 };

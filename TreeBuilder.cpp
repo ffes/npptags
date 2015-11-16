@@ -102,6 +102,66 @@ TreeBuilder::~TreeBuilder()
 /////////////////////////////////////////////////////////////////////////////
 //
 
+bool TreeBuilder::AddTypeMembers()
+{
+	// Get the text from the current item
+	TV_ITEM item;
+	ZeroMemory(&item, sizeof(item));
+	item.mask = TVIF_TEXT;
+	item.hItem = _hItem;
+
+	WCHAR buf[_MAX_PATH + 1];
+	item.pszText = buf;
+	item.cchTextMax = _MAX_PATH;
+	TreeView_GetItem(g_hTree, &item);
+
+	SqliteStatement stmt(g_DB);
+	stmt.Prepare("SELECT * FROM Tags WHERE Type = @type AND Language = @lang ORDER BY Tag, Signature");
+	stmt.Bind("@type", item.pszText);
+	stmt.Bind("@lang", _lang.c_str());
+
+	// In most languages classes have members
+	bool members = (wcsicmp(item.pszText, L"class") == 0);
+
+	bool added = false;
+	while (stmt.GetNextRecord())
+	{
+		// Get the tag from the database and add to tree
+		Tag* tag = new Tag(&stmt);
+		TreeBuilder* builder = New(tag);
+		added = (InsertItem(builder, members) != NULL);
+	}
+	stmt.Finalize();
+
+	return added;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+bool TreeBuilder::AddMembers()
+{
+	SqliteStatement stmt(g_DB);
+	stmt.Prepare("SELECT * FROM Tags WHERE MemberOf = @memberof AND Language = @lang ORDER BY Tag, Signature");
+	stmt.Bind("@memberof", _tag->getTag().c_str());
+	stmt.Bind("@lang", _lang.c_str());
+
+	bool added = false;
+	while (stmt.GetNextRecord())
+	{
+		// Get the tag from the database and add to tree
+		Tag* tag = new Tag(&stmt);
+		TreeBuilder* builder = New(tag);
+		added = (InsertItem(builder, false) != NULL);
+	}
+	stmt.Finalize();
+
+	return added;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
 HTREEITEM TreeBuilder::InsertItem(TreeBuilder* builder, LPCWSTR txt, bool members)
 {
 	TVINSERTSTRUCT item;
@@ -183,6 +243,19 @@ bool TreeBuilderGeneric::Expand()
 /////////////////////////////////////////////////////////////////////////////
 //
 
+TreeBuilder* TreeBuilderGeneric::New()
+{
+	return new TreeBuilderGeneric();
+}
+
+TreeBuilder* TreeBuilderGeneric::New(Tag* tag)
+{
+	return new TreeBuilderGeneric(tag);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
 bool TreeBuilderGeneric::AddTypes()
 {
 	SqliteStatement stmt(g_DB);
@@ -195,66 +268,6 @@ bool TreeBuilderGeneric::AddTypes()
 		TreeBuilderGeneric* builder = new TreeBuilderGeneric();
 		wstring type = stmt.GetWTextColumn("Type");
 		added = (InsertItem(builder, type.c_str()) != NULL);
-	}
-	stmt.Finalize();
-
-	return added;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-bool TreeBuilderGeneric::AddTypeMembers()
-{
-	// Get the text from the current item
-	TV_ITEM item;
-	ZeroMemory(&item, sizeof(item));
-	item.mask = TVIF_TEXT;
-	item.hItem = _hItem;
-
-	WCHAR buf[_MAX_PATH + 1];
-	item.pszText = buf;
-	item.cchTextMax = _MAX_PATH;
-	TreeView_GetItem(g_hTree, &item);
-
-	SqliteStatement stmt(g_DB);
-	stmt.Prepare("SELECT * FROM Tags WHERE Type = @type AND Language = @lang ORDER BY Tag, Signature");
-	stmt.Bind("@type", item.pszText);
-	stmt.Bind("@lang", _lang.c_str());
-
-	// In most languages classes have members
-	bool members = (wcsicmp(item.pszText, L"class") == 0);
-
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		// Get the tag from the database and add to tree
-		Tag* tag = new Tag(&stmt);
-		TreeBuilderGeneric* builder = new TreeBuilderGeneric(tag);
-		added = (InsertItem(builder, members) != NULL);
-	}
-	stmt.Finalize();
-
-	return added;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-bool TreeBuilderGeneric::AddMembers()
-{
-	SqliteStatement stmt(g_DB);
-	stmt.Prepare("SELECT * FROM Tags WHERE MemberOf = @memberof AND Language = @lang ORDER BY Tag, Signature");
-	stmt.Bind("@memberof", _tag->getTag().c_str());
-	stmt.Bind("@lang", _lang.c_str());
-
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		// Get the tag from the database and add to tree
-		Tag* tag = new Tag(&stmt);
-		TreeBuilderGeneric* builder = new TreeBuilderGeneric(tag);
-		added = (InsertItem(builder, false) != NULL);
 	}
 	stmt.Finalize();
 
