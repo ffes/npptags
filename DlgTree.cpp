@@ -33,6 +33,7 @@
 #include "WaitCursor.h"
 #include "Tag.h"
 #include "TreeBuilder.h"
+#include "TreeBuilderCpp.h"
 #include "TreeBuilderRst.h"
 using namespace std;
 
@@ -146,144 +147,6 @@ static HTREEITEM InsertTextItem(LPCWSTR txt)
 	return TreeView_InsertItem(g_hTree, &item);
 }
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//
-
-static bool AddMembers(HTREEITEM hParent, Tag* pTag)
-{
-	g_DB->Open();
-	SqliteStatement stmt(g_DB);
-	stmt.Prepare("SELECT * FROM Tags WHERE MemberOf = @memberof AND Language = @lang ORDER BY Tag, Signature");
-	stmt.Bind("@memberof", pTag->getTag().c_str());
-	stmt.Bind("@lang", pTag->getLanguage().c_str());
-
-	Tag tag;
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		// Get the tag from the database and add to tree
-		tag.SetFromDB(&stmt);
-		InsertTagItem(hParent, &tag, false);
-		added = true;
-	}
-	stmt.Finalize();
-	g_DB->Close();
-
-	return added;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-static void InsertCppItems(HTREEITEM hParent, LPCSTR type, bool members)
-{
-	SqliteStatement stmt(g_DB);
-	string sql = "SELECT * FROM Tags WHERE Type = @type AND Language = @lang ";
-	if (!members)
-		sql += "AND MemberOf IS NULL ";
-	sql += "ORDER BY Tag, Signature";
-	stmt.Prepare(sql.c_str());
-	stmt.Bind("@type", type);
-	stmt.Bind("@lang", "C/C++");
-
-	Tag tag;
-	HTREEITEM hGroup = NULL;
-	while (stmt.GetNextRecord())
-	{
-		// Get the information from the database
-		tag.SetFromDB(&stmt);
-
-		// Add the group header, JIT
-		if (hGroup == NULL)
-		{
-			string str = type;
-			wstring wstr(str.begin(), str.end());
-			hGroup = InsertTextItem(hParent, (LPWSTR) wstr.c_str());
-		}
-
-		// And can add the tag
-		InsertTagItem(hGroup, &tag, members);
-	}
-	stmt.Finalize();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-static void BuildCppTree(HTREEITEM hParent)
-{
-	InsertCppItems(hParent, "class", true);
-	InsertCppItems(hParent, "function", false);
-	InsertCppItems(hParent, "struct", true);
-	InsertCppItems(hParent, "union", true);
-	InsertCppItems(hParent, "enum", true);
-	InsertCppItems(hParent, "variable", false);
-	InsertCppItems(hParent, "macro", false);
-	InsertCppItems(hParent, "typedef", false);
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-static void BuildCSharpTree(HTREEITEM hParent)
-{
-	// First find the namespace
-	SqliteStatement namespace_stmt(g_DB, "SELECT DISTINCT Tag FROM Tags WHERE Type = 'namespace' AND Language = 'C#' ORDER BY Tag");
-	HTREEITEM hNamespaceGroup = NULL;
-	while (namespace_stmt.GetNextRecord())
-	{
-		wstring namespace_name = namespace_stmt.GetWTextColumn("Tag");
-		hNamespaceGroup = InsertTextItem(hParent, (LPWSTR) namespace_name.c_str());
-
-		// Find the classes of the namespace
-		SqliteStatement class_stmt(g_DB, "SELECT * FROM Tags WHERE Type = 'class' AND Language = 'C#' AND MemberOf = @member");
-		class_stmt.Bind("@member", namespace_name.c_str());
-
-		Tag tag;
-		HTREEITEM hGroup = NULL;
-		while (class_stmt.GetNextRecord())
-		{
-			// Get the information from the database
-			tag.SetFromDB(&class_stmt);
-			hGroup = InsertTagItem(hNamespaceGroup, &tag, true);
-		}
-		class_stmt.Finalize();
-	}
-	namespace_stmt.Finalize();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-static void BuildJavaTree(HTREEITEM hParent)
-{
-	// First find the namespace
-	SqliteStatement interface_stmt(g_DB, "SELECT DISTINCT Tag FROM Tags WHERE Type = 'interface' AND Language = 'Java' ORDER BY Tag");
-	HTREEITEM hInterfaceGroup = NULL;
-	while (interface_stmt.GetNextRecord())
-	{
-		wstring interface_name = interface_stmt.GetWTextColumn("Tag");
-		hInterfaceGroup = InsertTextItem(hParent, (LPWSTR) interface_name.c_str());
-
-		// Find the classes of the namespace
-		SqliteStatement class_stmt(g_DB, "SELECT * FROM Tags WHERE Type = 'class' AND Language = 'Java' AND MemberOf = @member");
-		class_stmt.Bind("@member", interface_name.c_str());
-
-		Tag tag;
-		HTREEITEM hGroup = NULL;
-		while (class_stmt.GetNextRecord())
-		{
-			// Get the information from the database
-			tag.SetFromDB(&class_stmt);
-			hGroup = InsertTagItem(hInterfaceGroup, &tag, true);
-		}
-		class_stmt.Finalize();
-	}
-	interface_stmt.Finalize();
-}
-*/
-
 /////////////////////////////////////////////////////////////////////////////
 //
 
@@ -315,7 +178,9 @@ void UpdateTagsTree()
 			string lang = stmt.GetTextColumn("Language");
 
 			TreeBuilder* builder = NULL;
-			if (lang == "reStructuredText")
+			if (lang == "C/C++")
+				builder = (TreeBuilder*) new TreeBuilderCpp();
+			else  if (lang == "reStructuredText")
 				builder = (TreeBuilder*) new TreeBuilderRst();
 			else
 				builder = (TreeBuilderGeneric*) new TreeBuilderGeneric(lang.c_str());

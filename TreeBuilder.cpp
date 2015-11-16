@@ -102,6 +102,20 @@ TreeBuilder::~TreeBuilder()
 /////////////////////////////////////////////////////////////////////////////
 //
 
+bool TreeBuilder::TypeHasMembers(LPCWSTR type)
+{
+	// In most languages classes have members
+	if (wcsicmp(type, L"class") == 0)
+	{
+		// But CSS classes don't
+		return _lang != "CSS";
+	}
+	return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
 bool TreeBuilder::AddTypeMembers()
 {
 	// Get the text from the current item
@@ -120,8 +134,8 @@ bool TreeBuilder::AddTypeMembers()
 	stmt.Bind("@type", item.pszText);
 	stmt.Bind("@lang", _lang.c_str());
 
-	// In most languages classes have members
-	bool members = (wcsicmp(item.pszText, L"class") == 0);
+	// See if this type has members
+	bool members = TypeHasMembers(item.pszText);
 
 	bool added = false;
 	while (stmt.GetNextRecord())

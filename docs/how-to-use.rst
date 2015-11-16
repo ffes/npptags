@@ -29,31 +29,25 @@ Tree
 ----
 
 Since ctags supports so many programming languages, it is impossible for
-me to add support for all these languages to the tree instantly.
+me to add proper support for all these languages to the tree instantly.
 
-Based upon a combination of the documentation of ctags and personal
-testing, these languages should work reasonably well:
+There is a generic treebuilder that tries builds a basic tree for every
+language. For some languages there is a specific treebuilder that tries
+to build a tree as good as it can, although they are not perfect at this
+moment.
 
--  Classic ASP
+These languages have a specific treebuilder:
 
 -  C / C++
+-  RestucturedText
 
--  C#, without namespaces
-
--  Java, without packages
-
--  JavaScript
-
--  PHP
-
--  Python
-
-If your programming language isn't in the list and/or your type of tags
-don't show (properly) in the tree, :ref:`contact me <contact>` because it is probably
-not too difficult to add/improve support for other languages and/or
-types.
+If your programming language isn't in the list and/or the tags for your
+programming language don't show (properly) in the tree, :ref:`contact me <contact>`
+because it is probably not too difficult to add or improve support for other
+languages and/or types.
 
 Note that this it only affects the tree, ``Jump to Tag`` shouldn't have
-any problem.
+any problem. If ``Jump to Tag`` does **not** work as expected,
+:ref:`contact me <contact>` as well.
 
 .. _contact me: #contact
