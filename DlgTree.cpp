@@ -34,6 +34,7 @@
 #include "Tag.h"
 #include "TreeBuilder.h"
 #include "TreeBuilderCpp.h"
+#include "TreeBuilderCSharp.h"
 #include "TreeBuilderRst.h"
 using namespace std;
 
@@ -180,6 +181,8 @@ void UpdateTagsTree()
 			TreeBuilder* builder = NULL;
 			if (lang == "C/C++")
 				builder = (TreeBuilder*) new TreeBuilderCpp();
+			else  if (lang == "C#")
+				builder = (TreeBuilder*) new TreeBuilderCSharp();
 			else  if (lang == "reStructuredText")
 				builder = (TreeBuilder*) new TreeBuilderRst();
 			else

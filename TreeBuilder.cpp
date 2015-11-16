@@ -116,7 +116,7 @@ bool TreeBuilder::TypeHasMembers(LPCWSTR type)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-bool TreeBuilder::AddTypeMembers()
+std::wstring TreeBuilder::GetItemText()
 {
 	// Get the text from the current item
 	TV_ITEM item;
@@ -129,13 +129,23 @@ bool TreeBuilder::AddTypeMembers()
 	item.cchTextMax = _MAX_PATH;
 	TreeView_GetItem(g_hTree, &item);
 
+	return item.pszText;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+bool TreeBuilder::AddTypeMembers()
+{
+	wstring type = GetItemText();
+
 	SqliteStatement stmt(g_DB);
 	stmt.Prepare("SELECT * FROM Tags WHERE Type = @type AND Language = @lang ORDER BY Tag, Signature");
-	stmt.Bind("@type", item.pszText);
+	stmt.Bind("@type", type.c_str());
 	stmt.Bind("@lang", _lang.c_str());
 
 	// See if this type has members
-	bool members = TypeHasMembers(item.pszText);
+	bool members = TypeHasMembers(type.c_str());
 
 	bool added = false;
 	while (stmt.GetNextRecord())
@@ -166,7 +176,32 @@ bool TreeBuilder::AddMembers()
 		// Get the tag from the database and add to tree
 		Tag* tag = new Tag(&stmt);
 		TreeBuilder* builder = New(tag);
-		added = (InsertItem(builder, false) != NULL);
+		if (InsertItem(builder, false) != NULL)
+			added = true;
+	}
+
+	// If nothing is added, try again with the namespace in front of it
+	if (!added)
+	{
+		string memberof = _tag->getMemberOf();
+		if (memberof.length() > 0)
+		{
+			memberof += ".";			// This separator probably needs to be a variable;
+			memberof += _tag->getTag();
+
+			stmt.Reset();
+			stmt.Bind("@memberof", memberof.c_str());
+			stmt.Bind("@lang", _lang.c_str());
+
+			while (stmt.GetNextRecord())
+			{
+				// Get the tag from the database and add to tree
+				Tag* tag = new Tag(&stmt);
+				TreeBuilder* builder = New(tag);
+				if (InsertItem(builder, false) != NULL)
+					added = true;
+			}
+		}
 	}
 	stmt.Finalize();
 

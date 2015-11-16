@@ -113,6 +113,7 @@
     <ClCompile Include="TagsDatabase.cpp" />
     <ClCompile Include="TreeBuilder.cpp" />
     <ClCompile Include="TreeBuilderCpp.cpp" />
+    <ClCompile Include="TreeBuilderCSharp.cpp" />
     <ClCompile Include="TreeBuilderRst.cpp" />
     <ClCompile Include="Version.cpp" />
     <ClCompile Include="WaitCursor.cpp" />
@@ -132,6 +133,7 @@
     <ClInclude Include="TagsDatabase.h" />
     <ClInclude Include="TreeBuilder.h" />
     <ClInclude Include="TreeBuilderCpp.h" />
+    <ClInclude Include="TreeBuilderCSharp.h" />
     <ClInclude Include="TreeBuilderRst.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="WaitCursor.h" />
