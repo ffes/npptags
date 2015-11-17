@@ -1,0 +1,191 @@
+/////////////////////////////////////////////////////////////////////////////
+//                                                                         //
+//  NppTags - CTags plugin for Notepad++                                   //
+//  Copyright (C) 2013-2015 Frank Fesevur                                  //
+//                                                                         //
+//  This program is free software; you can redistribute it and/or modify   //
+//  it under the terms of the GNU General Public License as published by   //
+//  the Free Software Foundation; either version 2 of the License, or      //
+//  (at your option) any later version.                                    //
+//                                                                         //
+//  This program is distributed in the hope that it will be useful,        //
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of         //
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           //
+//  GNU General Public License for more details.                           //
+//                                                                         //
+//  You should have received a copy of the GNU General Public License      //
+//  along with this program; if not, write to the Free Software            //
+//  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              //
+//                                                                         //
+/////////////////////////////////////////////////////////////////////////////
+
+#include <windows.h>
+#include <commctrl.h>
+#include <assert.h>
+
+#include "TagsDatabase.h"
+#include "TreeBuilder.h"
+#include "TreeBuilderSql.h"
+#include "NppTags.h"
+#include "DlgTree.h"
+#include "Tag.h"
+#include "WaitCursor.h"
+using namespace std;
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+TreeBuilderSql::TreeBuilderSql() : TreeBuilder("SQL")
+{
+	_table = false;
+	_tableHasIndexes = false;
+}
+
+TreeBuilderSql::TreeBuilderSql(Tag* tag) : TreeBuilder(tag)
+{
+	_table = false;
+	_tableHasIndexes = false;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+bool TreeBuilderSql::Expand()
+{
+	bool opened = false;
+	if (g_DB->GetDB() == NULL)
+	{
+		g_DB->Open();
+		opened = true;
+	}
+
+	WaitCursor wait;
+	bool added = false;
+	if (_depth == 1)
+		added = AddTypes();
+	else
+	{
+		if (_table)
+		{
+			if (_depth == 2)
+				added = AddTables();
+			else
+			{
+				if (_tableHasIndexes)
+					added = AddTableMembers();
+				else
+					added = AddMembers();
+			}
+		}
+		else
+			added = AddTypeMembers();
+	}
+
+	if (opened)
+		g_DB->Close();
+
+	return added;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// This first method is not used in this class
+
+TreeBuilder* TreeBuilderSql::New()
+{
+	return new TreeBuilderSql(NULL);
+}
+
+TreeBuilder* TreeBuilderSql::New(Tag* tag)
+{
+	return new TreeBuilderSql(tag);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+bool TreeBuilderSql::AddTypes()
+{
+	SqliteStatement stmt(g_DB, "SELECT DISTINCT Type FROM Tags WHERE Language = @lang AND Type NOT IN ('field', 'index')");
+	stmt.Bind("@lang", _lang.c_str());
+
+	bool added = false;
+	while (stmt.GetNextRecord())
+	{
+		wstring type = stmt.GetWTextColumn("Type");
+		TreeBuilderSql* builder = (TreeBuilderSql*) New();
+		builder->_table = (type == L"table");
+		if (InsertItem(builder, type.c_str(), true) != NULL)
+			added = true;
+	}
+	stmt.Finalize();
+
+	return added;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+bool TreeBuilderSql::AddTables()
+{
+	SqliteStatement stmt(g_DB, "SELECT * FROM Tags WHERE Language = @lang AND Type = 'table' ORDER BY Tag");
+	stmt.Bind("@lang", _lang.c_str());
+
+	bool added = false;
+	while (stmt.GetNextRecord())
+	{
+		// Put the data in an object
+		Tag* tag = new Tag(&stmt);
+		TreeBuilderSql* builder = (TreeBuilderSql*) New(tag);
+		builder->_table = true;
+
+		// Are there any indexes for this table?
+		SqliteStatement sub_stmt(g_DB, "SELECT COUNT(*) FROM Tags WHERE Type = 'index' AND Language = @lang AND MemberOf = @member");
+		sub_stmt.Bind("@member", tag->getTag().c_str());
+		sub_stmt.Bind("@lang", _lang.c_str());
+
+		builder->_tableHasIndexes = false;
+		if (sub_stmt.GetNextRecord())
+		{
+			int count = sub_stmt.GetIntColumn(0);
+			builder->_tableHasIndexes = (count > 0);
+		}
+		sub_stmt.Finalize();
+
+		// Now add the item
+		if (InsertItem(builder) != NULL)
+			added = true;
+	}
+	stmt.Finalize();
+
+	return added;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+bool TreeBuilderSql::AddTableMembers()
+{
+	SqliteStatement stmt(g_DB, "SELECT DISTINCT Type FROM Tags WHERE Language = @lang AND MemberOf = @memberof ORDER BY Type");
+	stmt.Bind("@lang", _lang.c_str());
+	stmt.Bind("@memberof", _tag->getTag().c_str());
+
+	bool added = false;
+	while (stmt.GetNextRecord())
+	{
+		wstring type = stmt.GetWTextColumn("Type");
+		if (InsertItem(New(), type.c_str()) != NULL)
+			added = true;
+	}
+	stmt.Finalize();
+
+	return added;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Non of non-table types has members
+
+bool TreeBuilderSql::TypeHasMembers(LPCWSTR type)
+{
+	UNREFERENCED_PARAMETER(type);
+	return false;
+}

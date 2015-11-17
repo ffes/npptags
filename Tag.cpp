@@ -36,6 +36,7 @@
 #define MEMBER_OF_CHAPTER		7
 #define MEMBER_OF_SECTION		8
 #define MEMBER_OF_SUBSECTION	9
+#define MEMBER_OF_TABLE			10
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -50,7 +51,8 @@ static std::pair<std::string, int> memberOfPairs[] =
 	std::make_pair("namespace",		MEMBER_OF_NAMESPACE),
 	std::make_pair("chapter",		MEMBER_OF_CHAPTER),
 	std::make_pair("section",		MEMBER_OF_SECTION),
-	std::make_pair("subsection",	MEMBER_OF_SUBSECTION)
+	std::make_pair("subsection",	MEMBER_OF_SUBSECTION),
+	std::make_pair("table",			MEMBER_OF_TABLE)
 };
 
 /////////////////////////////////////////////////////////////////////////////

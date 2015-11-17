@@ -115,6 +115,7 @@
     <ClCompile Include="TreeBuilderCpp.cpp" />
     <ClCompile Include="TreeBuilderCSharp.cpp" />
     <ClCompile Include="TreeBuilderRst.cpp" />
+    <ClCompile Include="TreeBuilderSql.cpp" />
     <ClCompile Include="Version.cpp" />
     <ClCompile Include="WaitCursor.cpp" />
   </ItemGroup>
@@ -135,6 +136,7 @@
     <ClInclude Include="TreeBuilderCpp.h" />
     <ClInclude Include="TreeBuilderCSharp.h" />
     <ClInclude Include="TreeBuilderRst.h" />
+    <ClInclude Include="TreeBuilderSql.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="WaitCursor.h" />
   </ItemGroup>

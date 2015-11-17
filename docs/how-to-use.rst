@@ -41,6 +41,7 @@ These languages have a specific treebuilder:
 -  C / C++
 -  C#
 -  RestucturedText
+-  SQL
 
 If your programming language isn't in the list and/or the tags for your
 programming language don't show (properly) in the tree, :ref:`contact me <contact>`

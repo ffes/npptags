@@ -36,6 +36,7 @@
 #include "TreeBuilderCpp.h"
 #include "TreeBuilderCSharp.h"
 #include "TreeBuilderRst.h"
+#include "TreeBuilderSql.h"
 using namespace std;
 
 #ifdef _MSC_VER
@@ -185,6 +186,8 @@ void UpdateTagsTree()
 				builder = (TreeBuilder*) new TreeBuilderCSharp();
 			else  if (lang == "reStructuredText")
 				builder = (TreeBuilder*) new TreeBuilderRst();
+			else  if (lang == "SQL")
+				builder = (TreeBuilder*) new TreeBuilderSql();
 			else
 				builder = (TreeBuilderGeneric*) new TreeBuilderGeneric(lang.c_str());
 

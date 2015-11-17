@@ -66,6 +66,9 @@
     <ClCompile Include="TreeBuilderCSharp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TreeBuilderSql.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DlgAbout.h">
@@ -120,6 +123,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TreeBuilderCSharp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeBuilderSql.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

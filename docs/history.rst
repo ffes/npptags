@@ -7,7 +7,7 @@ Version `0.3.0`_, Yet To Be Released
 
 -  Rewrite of the way the language trees are built.
 
--  Add a ``reStructuredText`` tree.
+-  Add a ``reStructuredText`` and ``SQL`` tree.
 
 -  Add an :ref:`option <options>` to specify the path to ``ctags.exe``
 
