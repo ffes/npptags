@@ -69,6 +69,8 @@ TreeBuilder::TreeBuilder(LPCSTR lang)
 	_tag = NULL;
 	_lang = lang;
 	_depth = 1;
+	_checkWithNamespace = false;
+
 	AddToBuilders(this);
 
 	TVINSERTSTRUCT item;
@@ -89,6 +91,7 @@ TreeBuilder::TreeBuilder(Tag* tag)
 	_hItem = NULL;
 	_tag = tag;
 	_depth = 0;
+	_checkWithNamespace = false;
 
 	AddToBuilders(this);
 }
@@ -181,7 +184,7 @@ bool TreeBuilder::AddMembers()
 	}
 
 	// If nothing is added, try again with the namespace in front of it
-	if (!added)
+	if (!added && _checkWithNamespace)
 	{
 		string memberof = _tag->getMemberOf();
 		if (memberof.length() > 0)

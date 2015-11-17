@@ -36,10 +36,12 @@ using namespace std;
 
 TreeBuilderCSharp::TreeBuilderCSharp() : TreeBuilder("C#")
 {
+	_checkWithNamespace = true;
 }
 
 TreeBuilderCSharp::TreeBuilderCSharp(Tag* tag) : TreeBuilder(tag)
 {
+	_checkWithNamespace = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////

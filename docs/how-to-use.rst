@@ -39,6 +39,7 @@ moment.
 These languages have a specific treebuilder:
 
 -  C / C++
+-  C#
 -  RestucturedText
 
 If your programming language isn't in the list and/or the tags for your

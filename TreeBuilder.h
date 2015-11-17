@@ -56,6 +56,7 @@ protected:
 	Tag* _tag;
 	std::string _lang;
 	int _depth;
+	bool _checkWithNamespace;
 
 	std::wstring GetItemText();
 	HTREEITEM InsertItem(TreeBuilder* builder, LPCWSTR txt, bool members = true);
