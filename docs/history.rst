@@ -24,7 +24,7 @@ Version `0.3.0`_, Yet To Be Released
 
 -  Updated to recent `Universal Ctags`_ build.
 
--  Upgrade to SQLite version 3.8.7
+-  Upgrade to SQLite version 3.9.2
 
 .. _Read the Docs: http://npptags.readthedocs.org/
 .. _Universal Ctags: https://ctags.io/
