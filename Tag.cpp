@@ -24,6 +24,8 @@
 
 #include "Tag.h"
 
+// Since these numbers are stored in the database,
+// be careful when changing them
 #define NOT_MEMBER_OF			0
 #define MEMBER_OF_CLASS			1
 #define MEMBER_OF_STRUCT		2
@@ -34,6 +36,22 @@
 #define MEMBER_OF_CHAPTER		7
 #define MEMBER_OF_SECTION		8
 #define MEMBER_OF_SUBSECTION	9
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+static std::pair<std::string, int> memberOfPairs[] =
+{
+	std::make_pair("class",			MEMBER_OF_CLASS),
+	std::make_pair("struct",		MEMBER_OF_STRUCT),
+	std::make_pair("union",			MEMBER_OF_UNION),
+	std::make_pair("enum",			MEMBER_OF_ENUM),
+	std::make_pair("interface",		MEMBER_OF_INTERFACE),
+	std::make_pair("namespace",		MEMBER_OF_NAMESPACE),
+	std::make_pair("chapter",		MEMBER_OF_CHAPTER),
+	std::make_pair("section",		MEMBER_OF_SECTION),
+	std::make_pair("subsection",	MEMBER_OF_SUBSECTION)
+};
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -92,6 +110,9 @@ Tag& Tag::operator=(const tagEntry tag)
 	_type = tag.kind;
 	_thisFileOnly = (bool) (tag.fileScope != 0);
 
+	// Create a map of all the type we want to check if the tags is a member of
+	std::map<std::string, int> memberOfMap(memberOfPairs, memberOfPairs + sizeof memberOfPairs / sizeof memberOfPairs[0]);
+
 	// Go through the fields
 	for (int i = 0; i < tag.fields.count; i++)
 	{
@@ -106,67 +127,12 @@ Tag& Tag::operator=(const tagEntry tag)
 			continue;
 		}
 
-		// Is it member of a class?
-		if (strcmp(tag.fields.list[i].key, "class") == 0)
+		// Is it a member of a known type?
+		std::map<std::string, int>::iterator it = memberOfMap.find(tag.fields.list[i].key);
+		if (it != memberOfMap.end())
 		{
 			_memberOf = tag.fields.list[i].value;
-			_memberOfType = MEMBER_OF_CLASS;
-			continue;
-		}
-
-		// Is it member of a struct?
-		if (strcmp(tag.fields.list[i].key, "struct") == 0)
-		{
-			_memberOf = tag.fields.list[i].value;
-			_memberOfType = MEMBER_OF_STRUCT;
-			continue;
-		}
-
-		// Is it member of a union?
-		if (strcmp(tag.fields.list[i].key, "union") == 0)
-		{
-			_memberOf = tag.fields.list[i].value;
-			_memberOfType = MEMBER_OF_UNION;
-			continue;
-		}
-
-		// Is it member of a enumeration?
-		if (strcmp(tag.fields.list[i].key, "enum") == 0)
-		{
-			_memberOf = tag.fields.list[i].value;
-			_memberOfType = MEMBER_OF_ENUM;
-			continue;
-		}
-
-		// Is it member of a enumeration?
-		if (strcmp(tag.fields.list[i].key, "interface") == 0)
-		{
-			_memberOf = tag.fields.list[i].value;
-			_memberOfType = MEMBER_OF_INTERFACE;
-			continue;
-		}
-
-		// Is it member of a namespace?
-		if (strcmp(tag.fields.list[i].key, "namespace") == 0)
-		{
-			_memberOf = tag.fields.list[i].value;
-			_memberOfType = MEMBER_OF_NAMESPACE;
-			continue;
-		}
-
-		// Is it member of a chapter?
-		if (strcmp(tag.fields.list[i].key, "chapter") == 0)
-		{
-			_memberOf = tag.fields.list[i].value;
-			_memberOfType = MEMBER_OF_CHAPTER;
-			continue;
-		}
-
-		// Is it member of a section?
-		if (strcmp(tag.fields.list[i].key, "section") == 0)
-		{
-			_memberOf = tag.fields.list[i].value;
-			_memberOfType = MEMBER_OF_SECTION;
+			_memberOfType = memberOfMap[tag.fields.list[i].key];
 			continue;
 		}
 
@@ -265,24 +231,8 @@ std::string Tag::getDetails()
 
 	if (!_memberOf.empty())
 	{
-		switch(_memberOfType)
-		{
-			case MEMBER_OF_CLASS:
-				ret += "class:";
-				break;
-			case MEMBER_OF_STRUCT:
-				ret += "struct:";
-				break;
-			case MEMBER_OF_UNION:
-				ret += "union:";
-				break;
-			case MEMBER_OF_ENUM:
-				ret += "enum:";
-				break;
-			case MEMBER_OF_INTERFACE:
-				ret += "interface:";
-				break;
-		}
+		ret += memberOfPairs[_memberOfType - 1].first;
+		ret += ":";
 		ret += _memberOf;
 		sep = " ";
 	}
