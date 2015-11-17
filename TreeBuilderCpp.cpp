@@ -80,7 +80,7 @@ bool TreeBuilderCpp::Expand()
 
 TreeBuilder* TreeBuilderCpp::New()
 {
-	return new TreeBuilderCpp();
+	return new TreeBuilderCpp(NULL);
 }
 
 TreeBuilder* TreeBuilderCpp::New(Tag* tag)
@@ -117,8 +117,7 @@ bool TreeBuilderCpp::AddTypes()
 			int count = stmt.GetIntColumn(0);
 			if (count > 0)
 			{
-				TreeBuilderCpp* builder = new TreeBuilderCpp(NULL);
-				if (InsertItem(builder, types[i], true) != NULL)
+				if (InsertItem(New(), types[i], true) != NULL)
 					added = true;
 			}
 		}

@@ -77,7 +77,7 @@ bool TreeBuilderRst::Expand()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// These functions are not used in this class
+// This first method is not used in this class
 
 TreeBuilder* TreeBuilderRst::New()
 {
@@ -87,9 +87,7 @@ TreeBuilder* TreeBuilderRst::New()
 
 TreeBuilder* TreeBuilderRst::New(Tag* tag)
 {
-	UNREFERENCED_PARAMETER(tag);
-	assert(false);
-	return NULL;
+	return new TreeBuilderRst(tag);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -129,8 +127,8 @@ bool TreeBuilderRst::AddItems(LPCSTR type, LPCSTR subtype)
 		sub_stmt.Finalize();
 
 		// Now add the item
-		TreeBuilderRst* builder = new TreeBuilderRst(tag);
-		added = (InsertItem(builder, members) != NULL);
+		if (InsertItem(New(tag), members) != NULL)
+			added = true;
 	}
 	stmt.Finalize();
 

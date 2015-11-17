@@ -297,7 +297,7 @@ bool TreeBuilderGeneric::Expand()
 
 TreeBuilder* TreeBuilderGeneric::New()
 {
-	return new TreeBuilderGeneric();
+	return new TreeBuilderGeneric((Tag*) NULL);
 }
 
 TreeBuilder* TreeBuilderGeneric::New(Tag* tag)
@@ -317,9 +317,9 @@ bool TreeBuilderGeneric::AddTypes()
 	bool added = false;
 	while (stmt.GetNextRecord())
 	{
-		TreeBuilderGeneric* builder = new TreeBuilderGeneric();
 		wstring type = stmt.GetWTextColumn("Type");
-		added = (InsertItem(builder, type.c_str()) != NULL);
+		if (InsertItem(New(), type.c_str()) != NULL)
+			added = true;
 	}
 	stmt.Finalize();
 
