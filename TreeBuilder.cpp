@@ -55,15 +55,6 @@ void CleanBuilders()
 /////////////////////////////////////////////////////////////////////////////
 //
 
-TreeBuilder::TreeBuilder()
-{
-	_hItem = NULL;
-	_tag = NULL;
-	_depth = 0;
-
-	AddToBuilders(this);
-}
-
 TreeBuilder::TreeBuilder(LPCSTR lang)
 {
 	_tag = NULL;
@@ -252,10 +243,6 @@ HTREEITEM TreeBuilder::InsertItem(TreeBuilder* builder, bool members)
 
 /////////////////////////////////////////////////////////////////////////////
 //
-
-TreeBuilderGeneric::TreeBuilderGeneric() : TreeBuilder()
-{
-}
 
 TreeBuilderGeneric::TreeBuilderGeneric(LPCSTR lang) : TreeBuilder(lang)
 {

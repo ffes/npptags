@@ -41,7 +41,6 @@ public:
 	HTREEITEM GetHItem()	{ return _hItem; };
 
 protected:
-	TreeBuilder();
 	TreeBuilder(Tag* tag);
 
 	// These are called by AddTypeMembers() and AddMembers()
@@ -74,7 +73,6 @@ public:
 	virtual bool Expand();
 
 private:
-	TreeBuilderGeneric();
 	TreeBuilderGeneric(Tag* tag);
 
 	virtual TreeBuilder* New();
