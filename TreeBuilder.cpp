@@ -137,7 +137,7 @@ bool TreeBuilder::AddTextsFromStmt(SqliteStatement* stmt, bool members)
 	while (stmt->GetNextRecord())
 	{
 		wstring txt = stmt->GetWTextColumn(0);
-		if (InsertItem(New(), txt.c_str()) != NULL)
+		if (InsertItem(New(), txt.c_str(), members) != NULL)
 			added = true;
 	}
 	return added;
