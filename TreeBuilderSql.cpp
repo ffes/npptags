@@ -65,16 +65,28 @@ bool TreeBuilderSql::Expand()
 		added = AddTypes();
 	else
 	{
+		// Within a table?
 		if (_table)
 		{
+			// level 2 = the names of the tables
 			if (_depth == 2)
 				added = AddTables();
 			else
 			{
-				if (_tableHasIndexes)
-					added = AddTableMembers();
+				// 
+				if (_depth == 3)
+				{
+					// Has the table indexes, add an extra level with "field" and "index"
+					if (_tableHasIndexes)
+						added = AddTableSubTypes();
+					else
+					{
+						// Just add the members of this table
+						added = AddMembers();
+					}
+				}
 				else
-					added = AddMembers();
+					added = AddTableMembers();
 			}
 		}
 		else
@@ -101,11 +113,12 @@ TreeBuilder* TreeBuilderSql::New(Tag* tag)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Add the various types to the tree. "field" and "index" belong to a table
+// so they are excluded here and added as member of a table later
 
 bool TreeBuilderSql::AddTypes()
 {
-	SqliteStatement stmt(g_DB, "SELECT DISTINCT Type FROM Tags WHERE Language = @lang AND Type NOT IN ('field', 'index')");
+	SqliteStatement stmt(g_DB, "SELECT DISTINCT Type FROM Tags WHERE Language = @lang AND Type NOT IN ('field', 'index') ORDER BY Type");
 	stmt.Bind("@lang", _lang.c_str());
 
 	bool added = false;
@@ -123,7 +136,7 @@ bool TreeBuilderSql::AddTypes()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Add all the tables to the tree
 
 bool TreeBuilderSql::AddTables()
 {
@@ -139,6 +152,7 @@ bool TreeBuilderSql::AddTables()
 		builder->_table = true;
 
 		// Are there any indexes for this table?
+		// If so, we need to add an extra level later
 		SqliteStatement sub_stmt(g_DB, "SELECT COUNT(*) FROM Tags WHERE Type = 'index' AND Language = @lang AND MemberOf = @member");
 		sub_stmt.Bind("@member", tag->getTag().c_str());
 		sub_stmt.Bind("@lang", _lang.c_str());
@@ -161,9 +175,10 @@ bool TreeBuilderSql::AddTables()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// Add the types (normally "field" and "index") that need to be added
+// below this table.
 
-bool TreeBuilderSql::AddTableMembers()
+bool TreeBuilderSql::AddTableSubTypes()
 {
 	SqliteStatement stmt(g_DB, "SELECT DISTINCT Type FROM Tags WHERE Language = @lang AND MemberOf = @memberof ORDER BY Type");
 	stmt.Bind("@lang", _lang.c_str());
@@ -173,7 +188,37 @@ bool TreeBuilderSql::AddTableMembers()
 	while (stmt.GetNextRecord())
 	{
 		wstring type = stmt.GetWTextColumn("Type");
-		if (InsertItem(New(), type.c_str()) != NULL)
+		Tag* tag = new Tag(*_tag);
+		TreeBuilderSql* builder = (TreeBuilderSql*) New(tag);
+		builder->_table = true;
+		if (InsertItem(builder, type.c_str()) != NULL)
+			added = true;
+	}
+	stmt.Finalize();
+
+	return added;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Add the fields or indexes to the table
+
+bool TreeBuilderSql::AddTableMembers()
+{
+	wstring type = GetItemText();
+
+	SqliteStatement stmt(g_DB);
+	stmt.Prepare("SELECT * FROM Tags WHERE Language = @lang AND MemberOf = @memberof AND Type = @type ORDER BY Tag");
+	stmt.Bind("@lang", _lang.c_str());
+	stmt.Bind("@memberof", _tag->getTag().c_str());
+	stmt.Bind("@type", type.c_str());
+
+	bool added = false;
+	while (stmt.GetNextRecord())
+	{
+		// Get the tag from the database and add to tree
+		Tag* tag = new Tag(&stmt);
+		TreeBuilder* builder = New(tag);
+		if (InsertItem(builder, false) != NULL)
 			added = true;
 	}
 	stmt.Finalize();

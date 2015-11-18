@@ -43,6 +43,7 @@ private:
 
 	bool AddTypes();
 	bool AddTables();
+	bool AddTableSubTypes();
 	bool AddTableMembers();
 
 	bool _table;
