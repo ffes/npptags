@@ -97,16 +97,7 @@ bool TreeBuilderJava::AddPackages()
 	SqliteStatement stmt(g_DB, "SELECT DISTINCT Tag FROM Tags WHERE Language = @lang AND Type = 'package' ORDER BY Tag");
 	stmt.Bind("@lang", _lang.c_str());
 
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		// Get the name of the package
-		wstring package = stmt.GetWTextColumn("Tag");
-
-		// And add the item to the tree
-		if (InsertItem(New(), package.c_str()) != NULL)
-			added = true;
-	}
+	bool added = AddTextsFromStmt(&stmt);
 	stmt.Finalize();
 
 	return added;
@@ -134,13 +125,7 @@ bool TreeBuilderJava::AddClasses()
 	stmt.Bind("@lang", _lang.c_str());
 	stmt.Bind("@tag", package.c_str());
 
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		Tag* tag = new Tag(&stmt);
-		if (InsertItem(New(tag)) != NULL)
-			added = true;
-	}
+	bool added = AddTagsFromStmt(&stmt);
 	stmt.Finalize();
 
 	return added;
@@ -156,13 +141,7 @@ bool TreeBuilderJava::AddClassMembers()
 	stmt.Bind("@memberof", _tag->getTag().c_str());
 	stmt.Bind("@file", _tag->getFile().c_str());
 
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		Tag* tag = new Tag(&stmt);
-		if (InsertItem(New(tag), false) != NULL)
-			added = true;
-	}
+	bool added = AddTagsFromStmt(&stmt, false);
 	stmt.Finalize();
 
 	return added;

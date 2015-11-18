@@ -60,6 +60,8 @@ protected:
 	std::wstring GetItemText();
 	HTREEITEM InsertItem(TreeBuilder* builder, LPCWSTR txt, bool members = true);
 	HTREEITEM InsertItem(TreeBuilder* builder, bool members = true);
+	bool AddTextsFromStmt(SqliteStatement* stmt, bool members = true);
+	bool AddTagsFromStmt(SqliteStatement* stmt, bool members = true);
 };
 
 /////////////////////////////////////////////////////////////////////////////

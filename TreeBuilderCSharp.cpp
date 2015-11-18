@@ -120,14 +120,7 @@ bool TreeBuilderCSharp::AddClasses()
 	stmt.Bind("@lang", _lang.c_str());
 	stmt.Bind("@member", ns.c_str());
 
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		// Get the tag from the database and add to tree
-		Tag* tag = new Tag(&stmt);
-		if (InsertItem(New(tag), true) != NULL)
-			added = true;
-	}
+	bool added = AddTagsFromStmt(&stmt);
 	stmt.Finalize();
 
 	return added;

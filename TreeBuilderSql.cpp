@@ -73,7 +73,7 @@ bool TreeBuilderSql::Expand()
 				added = AddTables();
 			else
 			{
-				// 
+				//
 				if (_depth == 3)
 				{
 					// Has the table indexes, add an extra level with "field" and "index"
@@ -212,15 +212,7 @@ bool TreeBuilderSql::AddTableMembers()
 	stmt.Bind("@memberof", _tag->getTag().c_str());
 	stmt.Bind("@type", type.c_str());
 
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		// Get the tag from the database and add to tree
-		Tag* tag = new Tag(&stmt);
-		TreeBuilder* builder = New(tag);
-		if (InsertItem(builder, false) != NULL)
-			added = true;
-	}
+	bool added = AddTagsFromStmt(&stmt, false);
 	stmt.Finalize();
 
 	return added;

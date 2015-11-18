@@ -127,6 +127,39 @@ std::wstring TreeBuilder::GetItemText()
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// Add text items to the tree with the tags found in the statement.
+// The text to be used as the text for item must be the first column
+// in the statement.
+
+bool TreeBuilder::AddTextsFromStmt(SqliteStatement* stmt, bool members)
+{
+	bool added = false;
+	while (stmt->GetNextRecord())
+	{
+		wstring txt = stmt->GetWTextColumn(0);
+		if (InsertItem(New(), txt.c_str()) != NULL)
+			added = true;
+	}
+	return added;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Add items to the tree with the tags found in the statement
+
+bool TreeBuilder::AddTagsFromStmt(SqliteStatement* stmt, bool members)
+{
+	bool added = false;
+	while (stmt->GetNextRecord())
+	{
+		// Get the tag from the database and add to tree
+		Tag* tag = new Tag(stmt);
+		if (InsertItem(New(tag), members) != NULL)
+			added = true;
+	}
+	return added;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 //
 
 bool TreeBuilder::AddTypeMembers()
@@ -138,17 +171,7 @@ bool TreeBuilder::AddTypeMembers()
 	stmt.Bind("@type", type.c_str());
 	stmt.Bind("@lang", _lang.c_str());
 
-	// See if this type has members
-	bool members = TypeHasMembers(type.c_str());
-
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		// Get the tag from the database and add to tree
-		Tag* tag = new Tag(&stmt);
-		TreeBuilder* builder = New(tag);
-		added = (InsertItem(builder, members) != NULL);
-	}
+	bool added = AddTagsFromStmt(&stmt, TypeHasMembers(type.c_str()));
 	stmt.Finalize();
 
 	return added;
@@ -164,15 +187,7 @@ bool TreeBuilder::AddMembers()
 	stmt.Bind("@memberof", _tag->getTag().c_str());
 	stmt.Bind("@lang", _lang.c_str());
 
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		// Get the tag from the database and add to tree
-		Tag* tag = new Tag(&stmt);
-		TreeBuilder* builder = New(tag);
-		if (InsertItem(builder, false) != NULL)
-			added = true;
-	}
+	bool added = AddTagsFromStmt(&stmt, false);
 
 	// If nothing is added, try again with the namespace in front of it
 	if (!added && _checkWithNamespace)
@@ -187,14 +202,7 @@ bool TreeBuilder::AddMembers()
 			stmt.Bind("@memberof", memberof.c_str());
 			stmt.Bind("@lang", _lang.c_str());
 
-			while (stmt.GetNextRecord())
-			{
-				// Get the tag from the database and add to tree
-				Tag* tag = new Tag(&stmt);
-				TreeBuilder* builder = New(tag);
-				if (InsertItem(builder, false) != NULL)
-					added = true;
-			}
+			added = AddTagsFromStmt(&stmt, false);
 		}
 	}
 	stmt.Finalize();
@@ -301,13 +309,7 @@ bool TreeBuilderGeneric::AddTypes()
 	stmt.Prepare("SELECT DISTINCT Type FROM Tags WHERE Language = @lang ORDER BY Type");
 	stmt.Bind("@lang", _lang.c_str());
 
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		wstring type = stmt.GetWTextColumn("Type");
-		if (InsertItem(New(), type.c_str()) != NULL)
-			added = true;
-	}
+	bool added = AddTextsFromStmt(&stmt);
 	stmt.Finalize();
 
 	return added;
