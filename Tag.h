@@ -30,6 +30,7 @@ class Tag
 {
 public:
 	Tag();
+	Tag(const Tag& copy);
 	Tag(SqliteStatement* stmt);
 
 	Tag& operator=(const tagEntry);

@@ -63,6 +63,25 @@ Tag::Tag()
 	empty();
 }
 
+Tag::Tag(const Tag& copy)
+{
+	_idx = copy._idx;
+	_tag = copy._tag;
+	_file = copy._file;
+	_line = copy._line;
+	_pattern = copy._pattern;
+	_type = copy._type;
+	_language = copy._language;
+	_memberOf = copy._memberOf;
+	_memberOfType = copy._memberOfType;
+	_inherits = copy._inherits;
+	_signature = copy._signature;
+	_access = copy._access;
+	_implementation = copy._implementation;
+	_thisFileOnly = copy._thisFileOnly;
+	_unrecognized = copy._unrecognized;
+}
+
 Tag::Tag(SqliteStatement* stmt)
 {
 	SetFromDB(stmt);
