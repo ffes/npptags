@@ -35,6 +35,7 @@
 #include "TreeBuilder.h"
 #include "TreeBuilderCpp.h"
 #include "TreeBuilderCSharp.h"
+#include "TreeBuilderJava.h"
 #include "TreeBuilderRst.h"
 #include "TreeBuilderSql.h"
 using namespace std;
@@ -184,6 +185,8 @@ void UpdateTagsTree()
 				builder = (TreeBuilder*) new TreeBuilderCpp();
 			else  if (lang == "C#")
 				builder = (TreeBuilder*) new TreeBuilderCSharp();
+			else  if (lang == "Java")
+				builder = (TreeBuilder*) new TreeBuilderJava();
 			else  if (lang == "reStructuredText")
 				builder = (TreeBuilder*) new TreeBuilderRst();
 			else  if (lang == "SQL")

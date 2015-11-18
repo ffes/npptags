@@ -6,7 +6,7 @@ NppTags is a [Universal CTags](https://ctags.io) plug-in for [Notepad++](https:/
 Version 0.3.0 (Yet To Be Released)
 
 * Rewrite of the way the language trees are built.
-* Add a reStructuredText and SQL tree.
+* Add a Java, reStructuredText and SQL tree.
 * Add an option to specify the path to ctags.exe
 * Converted DocBook documentation to reStructedText and publish it at [Read the Docs](http://npptags.readthedocs.org/).
 * `Jump Back` to bring you back to the position where when you jumped to a tag.

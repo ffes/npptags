@@ -40,6 +40,7 @@ These languages have a specific treebuilder:
 
 -  C / C++
 -  C#
+-  Java
 -  RestucturedText
 -  SQL
 
