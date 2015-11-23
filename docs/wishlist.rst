@@ -1,14 +1,14 @@
 Wish list
 =========
 
+-  Add an Options dialog (required for v1.0)
+
+-  Show the tags per file. This should be configurable per language, and
+   maybe even per language, per database.
+
+-  Building better trees for many languages.
+
 -  Internally always use WCHARS for filenames
-
--  Add an Options dialog
-
--  Show the tags per file. This should even configurable per language
-
--  Building better trees for many languages, like C# namespaces, Java
-   packages, JavaScript nested classes.
 
 -  Add an option to set a path to a secondary tags database. If the tag
    is not found in the default tags database, the secondary one should

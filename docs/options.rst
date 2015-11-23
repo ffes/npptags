@@ -6,7 +6,7 @@ Options
 At the moment there is no user interface to set options. But there
 is an ini-file  that you can edit manually to do some settings.
 This ini-file is normally found in your "Application Data" directory
-and is named ``NppTags.ini``. On my Windows 7 machine this directory
+and is named ``NppTags.ini``. On my Windows 10 machine this directory
 is ``C:\Users\Frank\AppData\Roaming\Notepad++\plugins\config``.
 
 These are the default settings:
@@ -18,7 +18,8 @@ These are the default settings:
     Depth=3
     JumpBackStack=4
 
-When ``Show`` is set to ``0`` the tree will not be shown.
+When ``Show`` is set to ``0`` the tree will not be shown. The plug-in will
+remember if the tree is shown.
 
 ``Depth`` is the number of directories the plug-in will go up to search
 for the tags database.
@@ -49,7 +50,7 @@ generated tags file after it is converted to the database.
 When ``OverwriteTags`` is set to ``0`` and a tags file is found the
 plug-in will not overwrite and regenerate this existing tags file before
 generating the database. When set to ``0``, this implies that ``DelTags`` is
-set to ``0`` as well. Can be useful when regenerating the tree but you
+set to ``0`` as well. Can be useful when regenerating the database but you
 don't want to execute ctags every time.
 
 When ``CtagsVerbose`` is set to ``1`` the ``--verbose`` flag is added
