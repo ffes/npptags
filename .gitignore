@@ -1,11 +1,14 @@
 _*
+*.d
 *.LNK
 *.lnk
 *.suo
 *.ncb
 *.user
+*.o
 *.opensdf
 *.sdf
 [Rr]elease/
 [Dd]ebug/
+NppTags.dll
 tags.*
