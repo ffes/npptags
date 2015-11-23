@@ -1,6 +1,4 @@
 /*
-*   $Id: readtags.c 592 2007-07-31 03:30:41Z dhiebert $
-*
 *   Copyright (c) 1996-2003, Darren Hiebert
 *
 *   This source code is released into the public domain.
@@ -60,7 +58,7 @@ struct sTagFile {
 			char *name;
 				/* length of name for partial matches */
 			size_t nameLength;
-				/* peforming partial match */
+				/* performing partial match */
 			short partial;
 				/* ignoring case */
 			short ignorecase;
@@ -88,8 +86,8 @@ struct sTagFile {
 /*
 *   DATA DEFINITIONS
 */
-const char *const EmptyString = "";
-const char *const PseudoTagPrefix = "!_";
+static const char *const EmptyString = "";
+static const char *const PseudoTagPrefix = "!_";
 
 /*
 *   FUNCTION DEFINITIONS
@@ -289,6 +287,26 @@ static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 	}
 }
 
+static int isOdd (unsigned int i)
+{
+	return  (i % 2);
+}
+
+static unsigned int countContinuousBackslashesBackward(const char *from,
+						     const char *till)
+{
+	unsigned int counter = 0;
+
+	for (; from > till; from--)
+	{
+		if (*from == '\\')
+			counter++;
+		else
+			break;
+	}
+	return counter;
+}
+
 static void parseTagLine (tagFile *file, tagEntry *const entry)
 {
 	int i;
@@ -321,7 +339,10 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 				do
 				{
 					p = strchr (p + 1, delimiter);
-				} while (p != NULL  &&  *(p - 1) == '\\');
+				} while (p != NULL
+					 &&  isOdd (countContinuousBackslashesBackward (p - 1,
+											entry->address.pattern)));
+
 				if (p == NULL)
 				{
 					/* invalid pattern */
@@ -865,37 +886,48 @@ static void listTags (void)
 	}
 }
 
-const char *const Usage =
+static const char *const Usage =
 	"Find tag file entries matching specified names.\n\n"
-	"Usage: %s [-ilp] [-s[0|1]] [-t file] [name(s)]\n\n"
+	"Usage: \n"
+	"    %s -h\n"
+	"    %s [-ilp] [-s[0|1]] [-t file] [-] [name(s)]\n\n"
 	"Options:\n"
 	"    -e           Include extension fields in output.\n"
+	"    -h           Print this help message.\n"
 	"    -i           Perform case-insensitive matching.\n"
 	"    -l           List all tags.\n"
 	"    -p           Perform partial matching.\n"
 	"    -s[0|1|2]    Override sort detection of tag file.\n"
 	"    -t file      Use specified tag file (default: \"tags\").\n"
+	"    -            Treat arguments after this as NAME even if they start with -.\n"
 	"Note that options are acted upon as encountered, so order is significant.\n";
+
+static void printUsage(FILE* stream, int exitCode)
+{
+	fprintf (stream, Usage, ProgramName, ProgramName);
+	exit (exitCode);
+}
 
 extern int main (int argc, char **argv)
 {
 	int options = 0;
 	int actionSupplied = 0;
 	int i;
+	int ignore_prefix = 0;
+
 	ProgramName = argv [0];
 	if (argc == 1)
-	{
-		fprintf (stderr, Usage, ProgramName);
-		exit (1);
-	}
+		printUsage(stderr, 1);
 	for (i = 1  ;  i < argc  ;  ++i)
 	{
 		const char *const arg = argv [i];
-		if (arg [0] != '-')
+		if (ignore_prefix || arg [0] != '-')
 		{
 			findTag (arg, options);
 			actionSupplied = 1;
 		}
+		else if (arg [0] == '-' && arg [1] == '\0')
+			ignore_prefix = 1;
 		else
 		{
 			size_t j;
@@ -903,11 +935,12 @@ extern int main (int argc, char **argv)
 			{
 				switch (arg [j])
 				{
+					case 'h': printUsage (stdout, 0); break;
 					case 'e': extensionFields = 1;         break;
 					case 'i': options |= TAG_IGNORECASE;   break;
 					case 'p': options |= TAG_PARTIALMATCH; break;
 					case 'l': listTags (); actionSupplied = 1; break;
-			
+
 					case 't':
 						if (arg [j+1] != '\0')
 						{
@@ -917,10 +950,7 @@ extern int main (int argc, char **argv)
 						else if (i + 1 < argc)
 							TagFileName = argv [++i];
 						else
-						{
-							fprintf (stderr, Usage, ProgramName);
-							exit (1);
-						}
+							printUsage(stderr, 1);
 						break;
 					case 's':
 						SortOverride = 1;
@@ -930,10 +960,7 @@ extern int main (int argc, char **argv)
 						else if (strchr ("012", arg[j]) != NULL)
 							SortMethod = (sortType) (arg[j] - '0');
 						else
-						{
-							fprintf (stderr, Usage, ProgramName);
-							exit (1);
-						}
+							printUsage(stderr, 1);
 						break;
 					default:
 						fprintf (stderr, "%s: unknown option: %c\n",
