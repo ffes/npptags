@@ -171,10 +171,7 @@ bool TreeBuilder::AddTypeMembers()
 	stmt.Bind("@type", type.c_str());
 	stmt.Bind("@lang", _lang.c_str());
 
-	bool added = AddTagsFromStmt(&stmt, TypeHasMembers(type.c_str()));
-	stmt.Finalize();
-
-	return added;
+	return AddTagsFromStmt(&stmt, TypeHasMembers(type.c_str()));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -305,12 +302,8 @@ TreeBuilder* TreeBuilderGeneric::New(Tag* tag)
 
 bool TreeBuilderGeneric::AddTypes()
 {
-	SqliteStatement stmt(g_DB);
-	stmt.Prepare("SELECT DISTINCT Type FROM Tags WHERE Language = @lang ORDER BY Type");
+	SqliteStatement stmt(g_DB, "SELECT DISTINCT Type FROM Tags WHERE Language = @lang ORDER BY Type");
 	stmt.Bind("@lang", _lang.c_str());
 
-	bool added = AddTextsFromStmt(&stmt);
-	stmt.Finalize();
-
-	return added;
+	return AddTextsFromStmt(&stmt);
 }

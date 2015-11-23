@@ -212,10 +212,7 @@ bool TreeBuilderSql::AddTableMembers()
 	stmt.Bind("@memberof", _tag->getTag().c_str());
 	stmt.Bind("@type", type.c_str());
 
-	bool added = AddTagsFromStmt(&stmt, false);
-	stmt.Finalize();
-
-	return added;
+	return AddTagsFromStmt(&stmt, false);
 }
 
 /////////////////////////////////////////////////////////////////////////////

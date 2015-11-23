@@ -97,10 +97,7 @@ bool TreeBuilderJava::AddPackages()
 	SqliteStatement stmt(g_DB, "SELECT DISTINCT Tag FROM Tags WHERE Language = @lang AND Type = 'package' ORDER BY Tag");
 	stmt.Bind("@lang", _lang.c_str());
 
-	bool added = AddTextsFromStmt(&stmt);
-	stmt.Finalize();
-
-	return added;
+	return AddTextsFromStmt(&stmt);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -125,10 +122,7 @@ bool TreeBuilderJava::AddClasses()
 	stmt.Bind("@lang", _lang.c_str());
 	stmt.Bind("@tag", package.c_str());
 
-	bool added = AddTagsFromStmt(&stmt);
-	stmt.Finalize();
-
-	return added;
+	return AddTagsFromStmt(&stmt);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -141,8 +135,5 @@ bool TreeBuilderJava::AddClassMembers()
 	stmt.Bind("@memberof", _tag->getTag().c_str());
 	stmt.Bind("@file", _tag->getFile().c_str());
 
-	bool added = AddTagsFromStmt(&stmt, false);
-	stmt.Finalize();
-
-	return added;
+	return AddTagsFromStmt(&stmt, false);
 }

@@ -98,16 +98,7 @@ bool TreeBuilderCSharp::AddNamespaces()
 	SqliteStatement stmt(g_DB, "SELECT DISTINCT Tag FROM Tags WHERE Type = 'namespace' AND Language = @lang ORDER BY Tag");
 	stmt.Bind("@lang", _lang.c_str());
 
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		wstring ns = stmt.GetWTextColumn("Tag");
-		if (InsertItem(New(), ns.c_str(), true) != NULL)
-			added = true;
-	}
-	stmt.Finalize();
-
-	return added;
+	return AddTextsFromStmt(&stmt);;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -120,8 +111,5 @@ bool TreeBuilderCSharp::AddClasses()
 	stmt.Bind("@lang", _lang.c_str());
 	stmt.Bind("@member", ns.c_str());
 
-	bool added = AddTagsFromStmt(&stmt);
-	stmt.Finalize();
-
-	return added;
+	return AddTagsFromStmt(&stmt);
 }
