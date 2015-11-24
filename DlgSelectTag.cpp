@@ -146,22 +146,12 @@ static void FillList(HWND hList)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+// This function is not actually used. Keep it here so when it *is* needed
+// it gets called already.
 
 static void CleanItems(HWND hDlg)
 {
-/*
-	// Clean up the ItemData
-	int count = (int) SendDlgItemMessage(hDlg, IDC_NEW_DOC_LANG, CB_GETCOUNT, (WPARAM) 0, (LPARAM) 0);
-	for (int item = 0; item < count; item++)
-	{
-		int* langid = (int*) SendDlgItemMessage(hDlg, IDC_NEW_DOC_LANG, CB_GETITEMDATA, (WPARAM) item, (LPARAM) 0);
-		delete langid;
-	}
-
-	// Now delete the items from the combobox
-	SendDlgItemMessage(hDlg, IDC_NEW_DOC_LANG, CB_RESETCONTENT, (WPARAM) 0, (LPARAM) 0);
-*/
+	UNREFERENCED_PARAMETER(hDlg);
 }
 
 /////////////////////////////////////////////////////////////////////////////

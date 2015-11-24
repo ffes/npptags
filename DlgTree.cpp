@@ -282,7 +282,7 @@ static void ShowTagsProperties()
 
 	tvi.hItem = (HTREEITEM) TreeView_GetSelection(g_hTree);
 	tvi.mask = TVIF_PARAM;
-	int err = TreeView_GetItem(g_hTree, &tvi);
+	TreeView_GetItem(g_hTree, &tvi);
 
 	if (tvi.lParam != NULL)
 	{
@@ -433,6 +433,7 @@ static BOOL OnItemExpanding(NMTREEVIEW* pNMTreeView)
 
 static BOOL OnSelChanged(NMTREEVIEW* pNMTreeView)
 {
+	UNREFERENCED_PARAMETER(pNMTreeView);
 	return TRUE;
 }
 
@@ -441,6 +442,9 @@ static BOOL OnSelChanged(NMTREEVIEW* pNMTreeView)
 
 static void OnCommand(HWND hWnd, int ResID, int msg)
 {
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(msg);
+
 	switch (ResID)
 	{
 		case IDC_JUMP_TO_TAG:
