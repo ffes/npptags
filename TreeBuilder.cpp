@@ -60,7 +60,6 @@ TreeBuilder::TreeBuilder(LPCSTR lang)
 	_tag = NULL;
 	_lang = lang;
 	_depth = 1;
-	_checkWithNamespace = false;
 
 	AddToBuilders(this);
 
@@ -82,7 +81,6 @@ TreeBuilder::TreeBuilder(Tag* tag)
 	_hItem = NULL;
 	_tag = tag;
 	_depth = 0;
-	_checkWithNamespace = false;
 
 	AddToBuilders(this);
 }
@@ -184,27 +182,7 @@ bool TreeBuilder::AddMembers()
 	stmt.Bind("@memberof", _tag->getTag().c_str());
 	stmt.Bind("@lang", _lang.c_str());
 
-	bool added = AddTagsFromStmt(&stmt, false);
-
-	// If nothing is added, try again with the namespace in front of it
-	if (!added && _checkWithNamespace)
-	{
-		string memberof = _tag->getMemberOf();
-		if (memberof.length() > 0)
-		{
-			memberof += ".";			// This separator probably needs to be a variable;
-			memberof += _tag->getTag();
-
-			stmt.Reset();
-			stmt.Bind("@memberof", memberof.c_str());
-			stmt.Bind("@lang", _lang.c_str());
-
-			added = AddTagsFromStmt(&stmt, false);
-		}
-	}
-	stmt.Finalize();
-
-	return added;
+	return AddTagsFromStmt(&stmt, false);
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -42,4 +42,5 @@ private:
 
 	bool AddNamespaces();
 	bool AddClasses();
+	virtual bool AddMembers();
 };

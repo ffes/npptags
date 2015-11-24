@@ -36,12 +36,10 @@ using namespace std;
 
 TreeBuilderCSharp::TreeBuilderCSharp() : TreeBuilder("C#")
 {
-	_checkWithNamespace = true;
 }
 
 TreeBuilderCSharp::TreeBuilderCSharp(Tag* tag) : TreeBuilder(tag)
 {
-	_checkWithNamespace = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -112,4 +110,21 @@ bool TreeBuilderCSharp::AddClasses()
 	stmt.Bind("@member", ns.c_str());
 
 	return AddTagsFromStmt(&stmt);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+
+bool TreeBuilderCSharp::AddMembers()
+{
+	// We need to add the namespace in front of the tag
+	string memberof = _tag->getMemberOf();
+	memberof += ".";
+	memberof += _tag->getTag();
+
+	SqliteStatement stmt(g_DB, "SELECT * FROM Tags WHERE MemberOf = @memberof AND Language = @lang ORDER BY Tag, Signature");
+	stmt.Bind("@memberof", memberof.c_str());
+	stmt.Bind("@lang", _lang.c_str());
+
+	return AddTagsFromStmt(&stmt, false);
 }
