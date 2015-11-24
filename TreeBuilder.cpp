@@ -163,13 +163,19 @@ bool TreeBuilder::AddTagsFromStmt(SqliteStatement* stmt, bool members)
 bool TreeBuilder::AddTypeMembers()
 {
 	wstring type = GetItemText();
+	bool members = TypeHasMembers(type.c_str());
 
-	SqliteStatement stmt(g_DB);
-	stmt.Prepare("SELECT * FROM Tags WHERE Type = @type AND Language = @lang ORDER BY Tag, Signature");
+	// If the type doesn't have members, exclude them from the query
+	string sql = "SELECT * FROM Tags WHERE Type = @type AND Language = @lang ";
+	if (!members)
+		sql += "AND MemberOf IS NULL ";
+	sql += "ORDER BY Tag, Signature";
+
+	SqliteStatement stmt(g_DB, sql.c_str());
 	stmt.Bind("@type", type.c_str());
 	stmt.Bind("@lang", _lang.c_str());
 
-	return AddTagsFromStmt(&stmt, TypeHasMembers(type.c_str()));
+	return AddTagsFromStmt(&stmt, members);
 }
 
 /////////////////////////////////////////////////////////////////////////////
