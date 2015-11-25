@@ -1,5 +1,7 @@
-Installation Note
-=================
+.. _install:
+
+How to install
+==============
 
 To manually install the plug-in, copy ``NppTags.dll`` to the ``plugins``
 directory. There you need to create a directory ``NppTags`` and copy

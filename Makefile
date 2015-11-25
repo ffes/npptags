@@ -21,7 +21,7 @@ all: clean now
 # The general compiler flags
 CFLAGS = -DUNICODE -mtune=i686
 CXXFLAGS = $(CFLAGS) -Wno-write-strings
-LIBS = -static -lgdi32 -lcomctl32
+LIBS = -static -lgdi32 -lcomctl32 -lcomdlg32
 LDFLAGS = -Wl,--out-implib,$(TARGET) -shared
 
 # Default target is RELEASE
@@ -55,6 +55,7 @@ endif
 # All the source files
 PROGRAM_SRCS_CPP = \
 	DlgAbout.cpp \
+	DlgOptions.cpp \
 	DlgSelectTag.cpp \
 	DlgTree.cpp \
 	NppOptions.cpp \

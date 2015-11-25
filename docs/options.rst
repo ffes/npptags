@@ -3,11 +3,30 @@
 Options
 =======
 
-At the moment there is no user interface to set options. But there
-is an ini-file  that you can edit manually to do some settings.
-This ini-file is normally found in your "Application Data" directory
-and is named ``NppTags.ini``. On my Windows 10 machine this directory
-is ``C:\Users\Frank\AppData\Roaming\Notepad++\plugins\config``.
+The Options dialog lets you control some of the behavior of the plug-in.
+It can be found in ``Plugins``, ``NppTags``, ``Options...``.
+
+Here you have these options:
+
+
+``Maximum depth`` is the number of directories the plug-in will go up to
+search for the tags database.
+
+``Jump Back Stack`` is the size of the stack of locations used by
+:ref:`Jump Back <usage>`.
+
+``Path to ctags.exe`` specifies the location of ``ctags.exe``. When left
+empty, the plug-in will search for ctags.exe as described in the
+:ref:`installation instructions <install>`.
+
+
+NppTags.ini
+-----------
+
+The options are stored in an ini-file that is normally found in your
+"Application Data" directory and is named ``NppTags.ini``. On my
+Windows 10 machine this directory is
+``C:\Users\Frank\AppData\Roaming\Notepad++\plugins\config``.
 
 These are the default settings:
 
@@ -18,15 +37,9 @@ These are the default settings:
     Depth=3
     JumpBackStack=4
 
-When ``Show`` is set to ``0`` the tree will not be shown. The plug-in will
-remember if the tree is shown.
+When ``Show`` is set to ``0`` the tree will not be shown.
 
-``Depth`` is the number of directories the plug-in will go up to search
-for the tags database.
-
-``JumpBackStack`` is the size of the stack of locations used by the ``JumpBack``
-
-``CtagsPath`` can be used to override the default location of ``ctags.exe``.
+The other options correspond to the various items in the dialog.
 
 
 Debug section in NppTags.ini

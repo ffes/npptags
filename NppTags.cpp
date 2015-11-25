@@ -34,6 +34,7 @@ using namespace std;
 #include "Version.h"
 #include "DlgAbout.h"
 #include "DlgTree.h"
+#include "DlgOptions.h"
 #include "DlgSelectTag.h"
 #include "Options.h"
 #include "Tag.h"
@@ -44,7 +45,7 @@ using namespace std;
 #endif
 
 static const TCHAR PLUGIN_NAME[] = L"NppTags";
-static const int nbFunc = 7;
+static const int nbFunc = 9;
 static int s_iShowTagsIndex, s_iRefreshTagsIndex, s_iJumpToTagIndex, s_iJumpBackIndex;
 static HBITMAP s_hbmpShowTags, s_hbmpRefreshTags, s_hbmpJumpToTag, s_hbmpJumpBack;
 static std::vector<Tag> s_JumpBackStack;
@@ -159,7 +160,7 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification* notifyCode)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Here you can process the Npp Messages 
+// Here you can process the Npp Messages
 // I will make the messages accessible little by little, according to the
 // need of plugin development.
 // Please let me know if you need to access to some messages :
@@ -436,6 +437,20 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
 			s_iRefreshTagsIndex = index;
+			index++;
+
+			// Seperator
+			g_funcItem[index]._pFunc = NULL;
+			wcscpy(g_funcItem[index]._itemName, L"-SEPARATOR-");
+			g_funcItem[index]._init2Check = false;
+			g_funcItem[index]._pShKey = NULL;
+			index++;
+
+			// Show Options Dialog
+			g_funcItem[index]._pFunc = ShowOptionsDlg;
+			wcscpy(g_funcItem[index]._itemName, L"Options...");
+			g_funcItem[index]._init2Check = false;
+			g_funcItem[index]._pShKey = NULL;
 			index++;
 
 			// Seperator

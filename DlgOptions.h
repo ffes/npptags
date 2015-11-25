@@ -21,47 +21,4 @@
 
 #pragma once
 
-#include "NppOptions.h"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-class Options : public NppOptions
-{
-public:
-	Options();
-	~Options();
-
-	// General options
-	bool GetShowTreeDlg()				{ return _showTreeDlg; };
-	int  GetMaxDepth()					{ return _maxDepth; };
-	int  GetJumpBackStack()				{ return _jumpBackStack; };
-	WCHAR* GetPrevVersion() 			{ return _prevVersion; };
-	WCHAR* GetCtagsPath() 				{ return _ctagsPath; };
-
-	void SetShowTreeDlg(bool b)			{ _showTreeDlg = b; };
-	void SetMaxDepth(int i)				{ _maxDepth = i; };
-	void SetJumpBackStack(int i)		{ _jumpBackStack = i; };
-	void SetCtagsPath(WCHAR* s) 		{ wcsncpy(_ctagsPath, s, MAX_PATH); };
-
-	// Debug options
-	bool GetDeleteTagsFile()			{ return _deleteTagsFile; };
-	bool GetOverwriteExistingTagsFile()	{ return _overwriteExistingTagsFile; };
-	bool GetCtagsVerbose()				{ return _ctagsVerbose; };
-
-	void Read();
-	void Write();
-
-private:
-	// General options
-	bool _showTreeDlg;
-	int _maxDepth;
-	int _jumpBackStack;
-	WCHAR _ctagsPath[MAX_PATH];
-	WCHAR _prevVersion[MAX_PATH];
-
-	// Debug options
-	bool _deleteTagsFile;
-	bool _overwriteExistingTagsFile;
-	bool _ctagsVerbose;
-};
+extern void ShowOptionsDlg();

@@ -1,7 +1,7 @@
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
-#ifndef IDC_STATIC 
+#ifndef IDC_STATIC
 #define IDC_STATIC -1
 #endif
 
@@ -26,6 +26,13 @@
 // Select tag dialog
 #define IDD_SELECT_TAG				3100
 #define IDC_TAG_LIST				3101
+
+// Options dialog
+#define IDD_OPTIONS					3200
+#define IDC_DEPTH					3201
+#define IDC_JUMP_BACK				3202
+#define IDC_CTAGS_PATH				3203
+#define IDC_BROWSE					3204
 
 // Context Menu for tree
 #define IDCM_TAGS_TREE				4000

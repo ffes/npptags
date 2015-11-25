@@ -1,3 +1,5 @@
+.. _usage:
+
 How to use this plug-in
 =======================
 

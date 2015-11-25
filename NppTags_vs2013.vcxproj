@@ -101,6 +101,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DlgAbout.cpp" />
+    <ClCompile Include="DlgOptions.cpp" />
     <ClCompile Include="DlgSelectTag.cpp" />
     <ClCompile Include="DlgTree.cpp" />
     <ClCompile Include="NppOptions.cpp" />
@@ -122,6 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DlgAbout.h" />
+    <ClInclude Include="DlgOptions.h" />
     <ClInclude Include="DlgSelectTag.h" />
     <ClInclude Include="DlgTree.h" />
     <ClInclude Include="NppOptions.h" />
