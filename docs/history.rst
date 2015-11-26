@@ -15,18 +15,18 @@ Version `0.3.0`_, Yet To Be Released
 
 -  Converted DocBook documentation to reStructedText and publish it at `Read the Docs`_.
 
--  ``Jump Back`` to bring you back to the position where you were when you
+-  Add ``Jump Back`` to bring you back to the position where you were when you
    jumped to a tag.
 
--  Better support for sources stored in various sub-directories.
+-  Better support for :ref:`sources stored in sub-directories <usage_dir_tree>`.
 
--  Very simple Tags Properties MessageBox
+-  Very simple Tags Properties MessageBox.
 
 -  Add debug option to store the output of ``ctags --verbose``.
 
 -  Updated to recent `Universal Ctags`_ build.
 
--  Upgrade to SQLite version 3.9.2
+-  Upgrade to SQLite version 3.9.2.
 
 .. _Read the Docs: http://npptags.readthedocs.org/
 .. _Universal Ctags: https://ctags.io/

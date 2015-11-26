@@ -28,3 +28,6 @@ Wish list
 
 -  Option to use line numbers instead of search patterns. Note that
    adding ``-n`` to a ``.ctags`` file already gives you this result.
+
+-  Make the plug-in multi-threading, especially when generating the tags
+   file and converting that to the database.

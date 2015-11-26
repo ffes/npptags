@@ -14,6 +14,7 @@ Welcome to NppTags documentation!
     faq.rst
     wishlist.rst
     known-issues.rst
+    compile.rst
     contact.rst
     license.rst
     history.rst

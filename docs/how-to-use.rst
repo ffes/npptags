@@ -15,7 +15,7 @@ This tags database is used by the plug-in.
 Basic use
 ---------
 
-This plug-in has two different ways to use:
+This plug-in has different ways to use:
 
 -  ``Jump to Tag`` tries to find the tag (function, variable, etc) under
    the cursor. If you want to jump to this tag simply press the assigned
@@ -26,6 +26,30 @@ This plug-in has two different ways to use:
 -  The tree shows all (recognized) tags in a tree. You can double-click
    on a tag in the tree and you will be taken to it.
 
+-  ``Jump Back`` (default ``Ctrl+Alt+Q``) will bring you back to the position
+   where you were when you jumped to a tag.
+
+
+.. _usage_dir_tree:
+
+Source files in a directory tree
+--------------------------------
+
+Make sure you generate the database from the root directory of your project,
+that means with a file in that directory active. When you have generated the
+database and you open a file in a sub-directory NppTags will first look in
+the current directory for the tags database. If it cannot find one, it will
+go up a :ref:`number of times <options>` to see if a database can be found there.
+
+Do not try to generate a tags database from the root directory (like ``c:\``)
+of your harddisk. Because of the ``ctags -R`` flag it will search your
+entire disk for source files, which probably not what you want.
+
+When you need to regenerate your existing database you can just click the
+button on the toolbar. The plug-in will know where the database is located.
+
+
+.. _usage_tree:
 
 Tree
 ----
