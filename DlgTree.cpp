@@ -284,7 +284,7 @@ static void ShowTagsProperties()
 	tvi.mask = TVIF_PARAM;
 	TreeView_GetItem(g_hTree, &tvi);
 
-	if (tvi.lParam != NULL)
+	if (tvi.lParam != 0)
 	{
 		TreeBuilder* builder = (TreeBuilder*) tvi.lParam;
 		Tag* tag = builder->GetTag();
@@ -380,7 +380,7 @@ static BOOL OnDblClk_Tree()
 	TreeView_GetItem(g_hTree, &tvi);
 
 	// No object found, nothing to do
-	if (tvi.lParam == NULL)
+	if (tvi.lParam == 0)
 		return TRUE;
 
 	// Is there a tag in the TreeBuilder object?
@@ -410,7 +410,7 @@ static BOOL OnItemExpanding(NMTREEVIEW* pNMTreeView)
 
 	// Is this a tag
 	bool added = false;
-	if (tvi.lParam != NULL)
+	if (tvi.lParam != 0)
 	{
 		// Get the object from the treeitem and expand it
 		TreeBuilder* builder = (TreeBuilder*) tvi.lParam;
