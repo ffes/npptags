@@ -46,6 +46,9 @@ private:
 	bool AddTableSubTypes();
 	bool AddTableMembers();
 
+	void AddTablesCallback(TreeBuilder* builder);
+	void AddTablesSubTypesCallback(TreeBuilder* builder);
+
 	bool _table;
 	bool _tableHasIndexes;
 };

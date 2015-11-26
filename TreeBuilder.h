@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <functional>
+
 extern void CleanBuilders();
 
 class Tag;
@@ -59,8 +61,8 @@ protected:
 	std::wstring GetItemText();
 	HTREEITEM InsertItem(TreeBuilder* builder, LPCWSTR txt, bool members = true);
 	HTREEITEM InsertItem(TreeBuilder* builder, bool members = true);
-	bool AddTextsFromStmt(SqliteStatement* stmt, bool members = true);
-	bool AddTagsFromStmt(SqliteStatement* stmt, bool members = true);
+	bool AddTextsFromStmt(SqliteStatement* stmt, bool members = true, std::function<void(TreeBuilder*)> callback = nullptr);
+	bool AddTagsFromStmt(SqliteStatement* stmt, bool members = true, std::function<void(TreeBuilder*)> callback = nullptr);
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -20,7 +20,7 @@ all: clean now
 
 # The general compiler flags
 CFLAGS = -DUNICODE -mtune=i686
-CXXFLAGS = $(CFLAGS) -Wno-write-strings
+CXXFLAGS = $(CFLAGS) -Wno-write-strings --std=c++11
 LIBS = -static -lgdi32 -lcomctl32 -lcomdlg32
 LDFLAGS = -Wl,--out-implib,$(TARGET) -shared
 

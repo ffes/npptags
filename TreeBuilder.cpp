@@ -128,14 +128,20 @@ std::wstring TreeBuilder::GetItemText()
 // Add text items to the tree with the tags found in the statement.
 // The text to be used as the text for item must be the first column
 // in the statement.
+// Use the callback function to take full control over the classes added to
+// tree.
 
-bool TreeBuilder::AddTextsFromStmt(SqliteStatement* stmt, bool members)
+bool TreeBuilder::AddTextsFromStmt(SqliteStatement* stmt, bool members, std::function<void(TreeBuilder*)> callback)
 {
 	bool added = false;
 	while (stmt->GetNextRecord())
 	{
 		wstring txt = stmt->GetWTextColumn(0);
-		if (InsertItem(New(), txt.c_str(), members) != NULL)
+
+		TreeBuilder* builder = New();
+		if (callback != nullptr)
+			callback(builder);
+		if (InsertItem(builder, txt.c_str(), members) != NULL)
 			added = true;
 	}
 	return added;
@@ -144,14 +150,17 @@ bool TreeBuilder::AddTextsFromStmt(SqliteStatement* stmt, bool members)
 /////////////////////////////////////////////////////////////////////////////
 // Add items to the tree with the tags found in the statement
 
-bool TreeBuilder::AddTagsFromStmt(SqliteStatement* stmt, bool members)
+bool TreeBuilder::AddTagsFromStmt(SqliteStatement* stmt, bool members, std::function<void(TreeBuilder*)> callback)
 {
 	bool added = false;
 	while (stmt->GetNextRecord())
 	{
 		// Get the tag from the database and add to tree
 		Tag* tag = new Tag(stmt);
-		if (InsertItem(New(tag), members) != NULL)
+		TreeBuilder* builder = New(tag);
+		if (callback != nullptr)
+			callback(builder);
+		if (InsertItem(builder, members) != NULL)
 			added = true;
 	}
 	return added;

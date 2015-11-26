@@ -136,42 +136,51 @@ bool TreeBuilderSql::AddTypes()
 }
 
 /////////////////////////////////////////////////////////////////////////////
+//
+
+void TreeBuilderSql::AddTablesCallback(TreeBuilder* builder)
+{
+	TreeBuilderSql* buildersql = (TreeBuilderSql*) builder;
+	buildersql->_table = true;
+
+	// Are there any indexes for this table?
+	// If so, we need to add an extra level later
+	SqliteStatement stmt(g_DB, "SELECT COUNT(*) FROM Tags WHERE Type = 'index' AND Language = @lang AND MemberOf = @member");
+	stmt.Bind("@member", buildersql->_tag->getTag().c_str());
+	stmt.Bind("@lang", _lang.c_str());
+
+	buildersql->_tableHasIndexes = false;
+	if (stmt.GetNextRecord())
+	{
+		int count = stmt.GetIntColumn(0);
+		buildersql->_tableHasIndexes = (count > 0);
+	}
+	stmt.Finalize();
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // Add all the tables to the tree
 
 bool TreeBuilderSql::AddTables()
 {
+	using namespace std::placeholders;
+
 	SqliteStatement stmt(g_DB, "SELECT * FROM Tags WHERE Language = @lang AND Type = 'table' ORDER BY Tag");
 	stmt.Bind("@lang", _lang.c_str());
 
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		// Put the data in an object
-		Tag* tag = new Tag(&stmt);
-		TreeBuilderSql* builder = (TreeBuilderSql*) New(tag);
-		builder->_table = true;
+	return AddTagsFromStmt(&stmt, true, std::bind(&TreeBuilderSql::AddTablesCallback, this, _1));
+}
 
-		// Are there any indexes for this table?
-		// If so, we need to add an extra level later
-		SqliteStatement sub_stmt(g_DB, "SELECT COUNT(*) FROM Tags WHERE Type = 'index' AND Language = @lang AND MemberOf = @member");
-		sub_stmt.Bind("@member", tag->getTag().c_str());
-		sub_stmt.Bind("@lang", _lang.c_str());
+/////////////////////////////////////////////////////////////////////////////
+//
 
-		builder->_tableHasIndexes = false;
-		if (sub_stmt.GetNextRecord())
-		{
-			int count = sub_stmt.GetIntColumn(0);
-			builder->_tableHasIndexes = (count > 0);
-		}
-		sub_stmt.Finalize();
+void TreeBuilderSql::AddTablesSubTypesCallback(TreeBuilder* builder)
+{
+	TreeBuilderSql* buildersql = (TreeBuilderSql*) builder;
 
-		// Now add the item
-		if (InsertItem(builder) != NULL)
-			added = true;
-	}
-	stmt.Finalize();
-
-	return added;
+	Tag* tag = new Tag(*_tag);
+	buildersql->_tag = tag;
+	buildersql->_table = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -180,23 +189,13 @@ bool TreeBuilderSql::AddTables()
 
 bool TreeBuilderSql::AddTableSubTypes()
 {
+	using namespace std::placeholders;
+
 	SqliteStatement stmt(g_DB, "SELECT DISTINCT Type FROM Tags WHERE Language = @lang AND MemberOf = @memberof ORDER BY Type");
 	stmt.Bind("@lang", _lang.c_str());
 	stmt.Bind("@memberof", _tag->getTag().c_str());
 
-	bool added = false;
-	while (stmt.GetNextRecord())
-	{
-		wstring type = stmt.GetWTextColumn("Type");
-		Tag* tag = new Tag(*_tag);
-		TreeBuilderSql* builder = (TreeBuilderSql*) New(tag);
-		builder->_table = true;
-		if (InsertItem(builder, type.c_str()) != NULL)
-			added = true;
-	}
-	stmt.Finalize();
-
-	return added;
+	return AddTextsFromStmt(&stmt, true, std::bind(&TreeBuilderSql::AddTablesSubTypesCallback, this, _1));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -216,7 +215,7 @@ bool TreeBuilderSql::AddTableMembers()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Non of non-table types has members
+// Non of non-table types have members
 
 bool TreeBuilderSql::TypeHasMembers(LPCWSTR type)
 {
