@@ -156,6 +156,12 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification* notifyCode)
 			g_DB->UpdateFilename();
 			break;
 		}
+
+		case NPPN_WORDSTYLESUPDATED:
+		{
+			MatchTreeViewColorsWithTheme();
+			break;
+		}
 	}
 }
 

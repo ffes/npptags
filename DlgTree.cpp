@@ -304,6 +304,18 @@ static void ShowTagsProperties()
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// Make sure the colors of the tree match the Notepad++ theme
+
+void MatchTreeViewColorsWithTheme()
+{
+	int fore = SendMsg(SCI_STYLEGETFORE, (WPARAM) STYLE_DEFAULT);
+	int back = SendMsg(SCI_STYLEGETBACK, (WPARAM) STYLE_DEFAULT);
+
+	TreeView_SetTextColor(g_hTree, fore);
+	TreeView_SetBkColor(g_hTree, back);
+}
+
+/////////////////////////////////////////////////////////////////////////////
 //
 
 #define SPACER 4
@@ -554,6 +566,9 @@ void TagsTree()
 
 		if (!s_bTreeInitialized)
 		{
+			// Match the colors with the n++ theme
+			MatchTreeViewColorsWithTheme();
+
 			// Load the icon
 			s_hTabIcon = (HICON) LoadImage(g_hInst, MAKEINTRESOURCE(IDI_TAGS), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_COLOR | LR_LOADTRANSPARENT);
 

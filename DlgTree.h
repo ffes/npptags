@@ -26,3 +26,4 @@ extern HWND g_hTree;
 extern void TagsTree();
 extern void CreateTreeDlg();
 extern void UpdateTagsTree();
+extern void MatchTreeViewColorsWithTheme();

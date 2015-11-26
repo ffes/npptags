@@ -5,6 +5,8 @@ Version History
 Version `0.3.0`_, Yet To Be Released
 ------------------------------------
 
+-  The color of the tree match the selected Notepad++ theme.
+
 -  Add an :ref:`Options dialog <options>`.
 
 -  Rewrite of the way the language trees are built.
