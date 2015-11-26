@@ -354,6 +354,20 @@ void JumpToTag(Tag* pTag, bool storeCurPos)
 		if (pos >= 0)
 			SendMsg(SCI_GOTOPOS, pos);
 	}
+
+	// What is line we are currently on
+	int currPos = SendMsg(SCI_GETCURRENTPOS);
+	int line = SendMsg(SCI_LINEFROMPOSITION, currPos);
+
+	// Make sure the line is not folded
+	SendMsg(SCI_ENSUREVISIBLE, line);
+
+	// Try to move the current line to 1/4th from the top
+	int nrLines = SendMsg(SCI_LINESONSCREEN);
+	line = SendMsg(SCI_VISIBLEFROMDOCLINE, line) - int(nrLines / 4);
+	if (line < 0)
+		line = 0;
+	SendMsg(SCI_SETFIRSTVISIBLELINE, line);
 }
 
 /////////////////////////////////////////////////////////////////////////////
