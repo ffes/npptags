@@ -2,8 +2,8 @@ Version History
 ===============
 
 
-Version `0.3.0`_, Yet To Be Released
-------------------------------------
+Version `0.9.0`_, 2 December 2015
+---------------------------------
 
 -  The color of the tree match the selected Notepad++ theme.
 
@@ -32,7 +32,7 @@ Version `0.3.0`_, Yet To Be Released
 
 .. _Read the Docs: http://npptags.readthedocs.org/
 .. _Universal Ctags: https://ctags.io/
-.. _0.3.0: https://github.com/ffes/npptags/releases/tag/v0.3.0
+.. _0.9.0: https://github.com/ffes/npptags/releases/tag/v0.9.0
 
 
 Version `0.2.0`_, 23 October 2013

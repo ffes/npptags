@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //                                                                         //
 //  NppTags - CTags plugin for Notepad++                                   //
-//  Copyright (C) 2013 Frank Fesevur                                       //
+//  Copyright (C) 2013-2015 Frank Fesevur                                  //
 //                                                                         //
 //  This program is free software; you can redistribute it and/or modify   //
 //  it under the terms of the GNU General Public License as published by   //
@@ -41,10 +41,11 @@ struct VersionInfo
 	WCHAR*	text;
 };
 
-#define MAX_VERSION_INFO 3
+#define MAX_VERSION_INFO 4
 
 static VersionInfo s_info[MAX_VERSION_INFO] =
 {
+	{	{0,9,0,0},	{2015,12, 2},	L"- Add an Options dialog\n- Rewrite of the way the language trees are built.\n- Add a Java, reStructuredText and SQL tree.\n- Add an option to specify the path to ctags.exe\n- Converted DocBook documentation to reStructedText and publish it at Read the Docs.\n- Jump Back to bring you back to the position where you were when you jumped to a tag.\n- Better support for sources stored in various sub-directories.\n- Very simple Tags Properties MessageBox\n- Add debug option to store the output of ctags --verbose.\n- Updated to recent Universal Ctags build.\n- Upgrade to SQLite version 3.9.2" },
 	{	{0,2,0,0},	{2013, 7,14},	L"- After generating the tags file, it is now converted to a SQLite database. This makes it much easier and faster to build a proper tree.\n- Tree filled with common types of tags for various languages." },
 	{	{0,1,1,0},	{2013, 7, 5},	L"- Tree now filled with functions.\n- Added three toolbar buttons." },
 	{	{0,1,0,0},	{2013, 6,30},	L"- Internal proof of concept." }
