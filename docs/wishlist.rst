@@ -1,8 +1,6 @@
 Wish list
 =========
 
--  Add an Options dialog (required for v1.0)
-
 -  Show the tags per file. This should be configurable per language, and
    maybe even per language, per database.
 
