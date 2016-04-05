@@ -11,4 +11,5 @@ _*
 [Rr]elease/
 [Dd]ebug/
 NppTags.dll
+version_git.h
 tags.*

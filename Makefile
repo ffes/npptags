@@ -1,7 +1,8 @@
 #############################################################################
-#
-#  Makefile for building NppTags.dll with MinGW-w64
-#
+#                                                                           #
+#             Makefile for building NppTags.dll with MinGW-w64              #
+#                                                                           #
+#############################################################################
 
 .SUFFIXES: .dll .o .c .cpp .rc .h
 
@@ -96,14 +97,17 @@ PROGRAM_OBJS_RC=$(PROGRAM_RC:.rc=.o)
 PROGRAM_DEP_CPP=$(PROGRAM_SRCS_CPP:.cpp=.d)
 PROGRAM_DEP_C=$(PROGRAM_SRCS_C:.c=.d)
 
-$(PROGRAM).dll: $(PROGRAM_OBJS_CPP) $(PROGRAM_OBJS_C) $(PROGRAM_OBJS_RC)
+$(PROGRAM).dll: version_git.h $(PROGRAM_OBJS_CPP) $(PROGRAM_OBJS_C) $(PROGRAM_OBJS_RC)
 	$(V_CXX) $(CXX) -o $@ $(PROGRAM_OBJS_CPP) $(PROGRAM_OBJS_C) $(PROGRAM_OBJS_RC) $(LDFLAGS) $(LDOPT) $(LIBS)
 
 clean:
 	@echo Cleaning
-	$(SILENT) rm -f $(PROGRAM_OBJS_CPP) $(PROGRAM_OBJS_C) $(PROGRAM_OBJS_RC)
+	$(SILENT) rm -f $(PROGRAM_OBJS_CPP) $(PROGRAM_OBJS_C) $(PROGRAM_OBJS_RC) version_git.h
 	$(SILENT) rm -f $(PROGRAM_DEP_CPP) $(PROGRAM_DEP_C) $(PROGRAM).dll
 	$(SILENT) rm -f tags tags.out tags.sqlite
+
+version_git.h:
+	$(SILENT) ./version_git.sh
 
 # The dependencies
 $(PROGRAM)_res.o: $(PROGRAM)_res.rc Version.h
