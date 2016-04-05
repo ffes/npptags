@@ -6,6 +6,7 @@ _*
 *.ncb
 *.user
 *.o
+*.opendb
 *.opensdf
 *.sdf
 [Rr]elease/
