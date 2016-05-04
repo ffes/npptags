@@ -29,7 +29,9 @@
 #include "NppTags.h"
 #include "Tag.h"
 #include "WaitCursor.h"
+
 using namespace std;
+using namespace std::placeholders;
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -162,12 +164,10 @@ void TreeBuilderSql::AddTablesCallback(TreeBuilder* builder)
 
 bool TreeBuilderSql::AddTables()
 {
-	using namespace std::placeholders;
-
 	SqliteStatement stmt(g_DB, "SELECT * FROM Tags WHERE Language = @lang AND Type = 'table' ORDER BY Tag");
 	stmt.Bind("@lang", _lang.c_str());
 
-	return AddTagsFromStmt(&stmt, true, std::bind(&TreeBuilderSql::AddTablesCallback, this, _1));
+	return AddTagsFromStmt(&stmt, true, bind(&TreeBuilderSql::AddTablesCallback, this, _1));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -188,13 +188,11 @@ void TreeBuilderSql::AddTablesSubTypesCallback(TreeBuilder* builder)
 
 bool TreeBuilderSql::AddTableSubTypes()
 {
-	using namespace std::placeholders;
-
 	SqliteStatement stmt(g_DB, "SELECT DISTINCT Type FROM Tags WHERE Language = @lang AND MemberOf = @memberof ORDER BY Type");
 	stmt.Bind("@lang", _lang.c_str());
 	stmt.Bind("@memberof", _tag->getTag().c_str());
 
-	return AddTextsFromStmt(&stmt, true, std::bind(&TreeBuilderSql::AddTablesSubTypesCallback, this, _1));
+	return AddTextsFromStmt(&stmt, true, bind(&TreeBuilderSql::AddTablesSubTypesCallback, this, _1));
 }
 
 /////////////////////////////////////////////////////////////////////////////

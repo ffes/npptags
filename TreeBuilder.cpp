@@ -34,7 +34,7 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static std::vector<TreeBuilder*> s_Builders;
+static vector<TreeBuilder*> s_Builders;
 
 static void AddToBuilders(TreeBuilder* builder)
 {
@@ -46,7 +46,7 @@ void CleanBuilders()
 	if (s_Builders.size() == 0)
 		return;
 
-	for (std::vector<TreeBuilder*>::iterator it = s_Builders.begin(); it != s_Builders.end(); it++)
+	for (vector<TreeBuilder*>::iterator it = s_Builders.begin(); it != s_Builders.end(); it++)
 		delete *it;
 
 	s_Builders.clear();
