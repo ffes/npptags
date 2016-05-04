@@ -26,10 +26,8 @@
 #include "TreeBuilder.h"
 #include "TreeBuilderCpp.h"
 #include "NppTags.h"
-#include "DlgTree.h"
 #include "Tag.h"
 #include "WaitCursor.h"
-using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 //
