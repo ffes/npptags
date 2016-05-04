@@ -30,7 +30,7 @@ Version `0.9.0`_, 2 December 2015
 
 -  Upgrade to SQLite version 3.9.2.
 
-.. _Read the Docs: http://npptags.readthedocs.org/
+.. _Read the Docs: http://npptags.readthedocs.io/
 .. _Universal Ctags: https://ctags.io/
 .. _0.9.0: https://github.com/ffes/npptags/releases/tag/v0.9.0
 
