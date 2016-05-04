@@ -9,6 +9,7 @@ _*
 *.opendb
 *.opensdf
 *.sdf
+*.VC.db
 [Rr]elease/
 [Dd]ebug/
 NppTags.dll
