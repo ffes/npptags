@@ -13,6 +13,15 @@ General
 -  Switching between files leaves the tree untouched when there is no
    tags database found for the new source file.
 
+-  Find out how to use the full search pattern to jump to the line, while
+   searching. So including the ``^`` and ``$`` to ensure the entire line
+   is searched for.
+
+-  Recent versions of Universal Ctags have changed ho to behave on long
+   JavaScript and CSS files. This is most visible on minimized files.
+   The current check in NppTags to prevent items from minimized files
+   to show up on the tree need to be updated.
+
 
 TreeBuilder specific
 --------------------

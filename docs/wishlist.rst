@@ -29,3 +29,6 @@ Wish list
 
 -  Make the plug-in multi-threading, especially when generating the tags
    file and converting that to the database.
+
+-  When ``Jump to Tag`` is used and there is no database, ask to generate it
+   and then jump to the tag.
