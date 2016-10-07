@@ -41,9 +41,9 @@ database and you open a file in a sub-directory NppTags will first look in
 the current directory for the tags database. If it cannot find one, it will
 go up a :ref:`number of times <options>` to see if a database can be found there.
 
-Do not try to generate a tags database from the root directory (like ``c:\``)
+Do not try to generate a tags database from the root directory (like ``C:\``)
 of your harddisk. Because of the ``ctags -R`` flag it will search your
-entire disk for source files, which probably not what you want.
+entire disk for source files, which is probably not what you want.
 
 When you need to regenerate your existing database you can just click the
 button on the toolbar. The plug-in will know where the database is located.
@@ -67,7 +67,7 @@ These languages have a specific treebuilder:
 -  C / C++
 -  C#
 -  Java
--  RestucturedText
+-  reStructuredText
 -  SQL
 
 If your programming language isn't in the list and/or the tags for your
