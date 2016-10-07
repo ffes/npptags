@@ -2,6 +2,12 @@ Version History
 ===============
 
 
+Version 1.0.0, Yet to be released
+---------------------------------
+
+-  Include latest git commit SHA in About dialog.
+
+
 Version `0.9.0`_, 2 December 2015
 ---------------------------------
 
