@@ -19,9 +19,6 @@
 //                                                                         //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __DLGSELECTTAG_H__
-#define __DLGSELECTTAG_H__
+#pragma once
 
 extern void JumpToTag();
-
-#endif // __DLGSELECTTAG_H__

@@ -19,12 +19,9 @@
 //                                                                         //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __DLGABOUT_H__
-#define __DLGABOUT_H__
+#pragma once
 
 class Version;
 
 extern void ShowAboutDlg();
 extern void ShowAboutDlgVersion(Version prevVer);
-
-#endif // __DLGABOUT_H__
