@@ -129,16 +129,16 @@ bool TreeBuilderCpp::AddTypes()
 
 bool TreeBuilderCpp::TypeHasMembers(LPCWSTR type)
 {
-	if (wcsicmp(type, L"class") == 0)
+	if (_wcsicmp(type, L"class") == 0)
 		return true;
 
-	if (wcsicmp(type, L"struct") == 0)
+	if (_wcsicmp(type, L"struct") == 0)
 		return true;
 
-	if (wcsicmp(type, L"union") == 0)
+	if (_wcsicmp(type, L"union") == 0)
 		return true;
 
-	if (wcsicmp(type, L"enum") == 0)
+	if (_wcsicmp(type, L"enum") == 0)
 		return true;
 
 	return false;

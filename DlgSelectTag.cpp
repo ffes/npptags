@@ -104,7 +104,7 @@ static void FillList(HWND hList)
 					str = s_foundTags[i].getFile();
 
 					// Is it the current file, preselect the tag
-					if (stricmp(curPath, str.c_str()) == 0 && selItem < 0)
+					if (_stricmp(curPath, str.c_str()) == 0 && selItem < 0)
 						selItem = i;
 					break;
 

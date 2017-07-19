@@ -97,7 +97,7 @@ TreeBuilder::~TreeBuilder()
 bool TreeBuilder::TypeHasMembers(LPCWSTR type)
 {
 	// In most languages classes have members
-	if (wcsicmp(type, L"class") == 0)
+	if (_wcsicmp(type, L"class") == 0)
 	{
 		// But CSS classes don't
 		return _lang != "CSS";

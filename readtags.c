@@ -382,7 +382,7 @@ static char *duplicate (const char *str)
 	char *result = NULL;
 	if (str != NULL)
 	{
-		result = strdup (str);
+		result = _strdup (str);
 		if (result == NULL)
 			perror (NULL);
 	}

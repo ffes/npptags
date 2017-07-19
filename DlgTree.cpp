@@ -309,8 +309,8 @@ static void ShowTagsProperties()
 
 void MatchTreeViewColorsWithTheme()
 {
-	int fore = SendMsg(SCI_STYLEGETFORE, (WPARAM) STYLE_DEFAULT);
-	int back = SendMsg(SCI_STYLEGETBACK, (WPARAM) STYLE_DEFAULT);
+	LRESULT fore = SendMsg(SCI_STYLEGETFORE, (WPARAM) STYLE_DEFAULT);
+	LRESULT back = SendMsg(SCI_STYLEGETBACK, (WPARAM) STYLE_DEFAULT);
 
 	TreeView_SetTextColor(g_hTree, fore);
 	TreeView_SetBkColor(g_hTree, back);
@@ -486,7 +486,7 @@ static void OnCommand(HWND hWnd, int ResID, int msg)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static BOOL CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message)
 	{

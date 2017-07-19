@@ -206,7 +206,7 @@ bool Tag::isMemberOf(LPCSTR szMemberOf)
 
 bool Tag::isType(LPCSTR szType)
 {
-	return(stricmp(_type.c_str(), szType) == 0);
+	return(_stricmp(_type.c_str(), szType) == 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////
