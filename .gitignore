@@ -1,15 +1,7 @@
-_*
+.vs/
 *.d
-*.LNK
-*.lnk
-*.suo
-*.ncb
-*.user
 *.o
-*.opendb
-*.opensdf
-*.sdf
-*.VC.db
+*.user
 [Rr]elease/
 [Dd]ebug/
 NppTags.dll
