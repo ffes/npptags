@@ -53,7 +53,7 @@ struct sTagFile {
 		/* defines tag search state */
 	struct {
 				/* file position of last match for tag */
-			off_t pos; 
+			off_t pos;
 				/* name of tag last searched for */
 			char *name;
 				/* length of name for partial matches */
@@ -93,6 +93,59 @@ static const char *const PseudoTagPrefix = "!_";
 *   FUNCTION DEFINITIONS
 */
 
+/* Converts a hexadecimal digit to its value */
+static int xdigitValue (char digit)
+{
+	if (digit >= '0' && digit <= '9')
+		return digit - '0';
+	else if (digit >= 'a' && digit <= 'f')
+		return 10 + digit - 'a';
+	else if (digit >= 'A' && digit <= 'F')
+		return 10 + digit - 'A';
+	else
+		return 0;
+}
+
+/*
+ * Reads the first character from the string, possibly un-escaping it, and
+ * advances *s to the start of the next character.
+ */
+static int readTagCharacter (const char **s)
+{
+	int c = **s;
+
+	(*s)++;
+
+	if (c == '\\')
+	{
+		switch (**s)
+		{
+			case 't': c = '\t'; (*s)++; break;
+			case 'r': c = '\r'; (*s)++; break;
+			case 'n': c = '\n'; (*s)++; break;
+			case '\\': c = '\\'; (*s)++; break;
+			/* Universal-CTags extensions */
+			case 'a': c = '\a'; (*s)++; break;
+			case 'b': c = '\b'; (*s)++; break;
+			case 'v': c = '\v'; (*s)++; break;
+			case 'f': c = '\f'; (*s)++; break;
+			case 'x':
+				if (isxdigit ((*s)[1]) && isxdigit ((*s)[2]))
+				{
+					int val = (xdigitValue ((*s)[1]) << 4) | xdigitValue ((*s)[2]);
+					if (val < 0x80)
+					{
+						(*s) += 3;
+						c = val;
+					}
+				}
+				break;
+		}
+	}
+
+	return c;
+}
+
 /*
  * Compare two strings, ignoring case.
  * Return 0 for match, < 0 for smaller, > 0 for bigger
@@ -100,23 +153,59 @@ static const char *const PseudoTagPrefix = "!_";
  * This makes a difference when one of the chars lies between upper and lower
  * ie. one of the chars [ \ ] ^ _ ` for ascii. (The '_' in particular !)
  */
-static int struppercmp (const char *s1, const char *s2)
+static int taguppercmp (const char *s1, const char *s2)
 {
 	int result;
+	int c1, c2;
 	do
 	{
-		result = toupper ((int) *s1) - toupper ((int) *s2);
-	} while (result == 0  &&  *s1++ != '\0'  &&  *s2++ != '\0');
+		c1 = *s1++;
+		c2 = readTagCharacter (&s2);
+
+		result = toupper (c1) - toupper (c2);
+	} while (result == 0  &&  c1 != '\0'  &&  c2 != '\0');
 	return result;
 }
 
-static int strnuppercmp (const char *s1, const char *s2, size_t n)
+static int tagnuppercmp (const char *s1, const char *s2, size_t n)
 {
 	int result;
+	int c1, c2;
 	do
 	{
-		result = toupper ((int) *s1) - toupper ((int) *s2);
-	} while (result == 0  &&  --n > 0  &&  *s1++ != '\0'  &&  *s2++ != '\0');
+		c1 = *s1++;
+		c2 = readTagCharacter (&s2);
+
+		result = toupper (c1) - toupper (c2);
+	} while (result == 0  &&  --n > 0  &&  c1 != '\0'  &&  c2 != '\0');
+	return result;
+}
+
+static int tagcmp (const char *s1, const char *s2)
+{
+	int result;
+	int c1, c2;
+	do
+	{
+		c1 = *s1++;
+		c2 = readTagCharacter (&s2);
+
+		result = c1 - c2;
+	} while (result == 0  &&  c1 != '\0'  &&  c2 != '\0');
+	return result;
+}
+
+static int tagncmp (const char *s1, const char *s2, size_t n)
+{
+	int result;
+	int c1, c2;
+	do
+	{
+		c1 = *s1++;
+		c2 = readTagCharacter (&s2);
+
+		result = c1 - c2;
+	} while (result == 0  &&  --n > 0  &&  c1 != '\0'  &&  c2 != '\0');
 	return result;
 }
 
@@ -311,17 +400,34 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 {
 	int i;
 	char *p = file->line.buffer;
+	size_t p_len = strlen (p);
 	char *tab = strchr (p, TAB);
 
-	entry->fields.list = NULL;
-	entry->fields.count = 0;
-	entry->kind = NULL;
-	entry->fileScope = 0;
+	memset(entry, 0, sizeof(*entry));
 
 	entry->name = p;
 	if (tab != NULL)
 	{
 		*tab = '\0';
+	}
+	while (*p != '\0')
+	{
+		const char *next = p;
+		int ch = readTagCharacter (&next);
+		size_t skip = next - p;
+
+		*p = (char) ch;
+		p++;
+		p_len -= skip;
+		if (skip > 1)
+		{
+			memmove (p, next, p_len);
+			tab -= skip - 1;
+		}
+	}
+
+	if (tab != NULL)
+	{
 		p = tab + 1;
 		entry->file = p;
 		tab = strchr (p, TAB);
@@ -362,10 +468,14 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 			{
 				/* invalid pattern */
 			}
-			fieldsPresent = (strncmp (p, ";\"", 2) == 0);
-			*p = '\0';
-			if (fieldsPresent)
-				parseExtensionFields (file, entry, p + 2);
+
+			if (p)
+			{
+				fieldsPresent = (strncmp (p, ";\"", 2) == 0);
+				*p = '\0';
+				if (fieldsPresent)
+					parseExtensionFields (file, entry, p + 2);
+			}
 		}
 	}
 	if (entry->fields.count > 0)
@@ -468,7 +578,7 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 		result->fields.max = 20;
 		result->fields.list = (tagExtensionField*) calloc (
 			result->fields.max, sizeof (tagExtensionField));
-		result->fp = fopen (filePath, "r");
+		result->fp = fopen (filePath, "rb");
 		if (result->fp == NULL)
 		{
 			free (result);
@@ -561,18 +671,18 @@ static int nameComparison (tagFile *const file)
 	if (file->search.ignorecase)
 	{
 		if (file->search.partial)
-			result = strnuppercmp (file->search.name, file->name.buffer,
+			result = tagnuppercmp (file->search.name, file->name.buffer,
 					file->search.nameLength);
 		else
-			result = struppercmp (file->search.name, file->name.buffer);
+			result = taguppercmp (file->search.name, file->name.buffer);
 	}
 	else
 	{
 		if (file->search.partial)
-			result = strncmp (file->search.name, file->name.buffer,
+			result = tagncmp (file->search.name, file->name.buffer,
 					file->search.nameLength);
 		else
-			result = strcmp (file->search.name, file->name.buffer);
+			result = tagcmp (file->search.name, file->name.buffer);
 	}
 	return result;
 }
@@ -800,187 +910,3 @@ extern tagResult tagsClose (tagFile *const file)
 	}
 	return result;
 }
-
-/*
-*  TEST FRAMEWORK
-*/
-
-#ifdef READTAGS_MAIN
-
-static const char *TagFileName = "tags";
-static const char *ProgramName;
-static int extensionFields;
-static int SortOverride;
-static sortType SortMethod;
-
-static void printTag (const tagEntry *entry)
-{
-	int i;
-	int first = 1;
-	const char* separator = ";\"";
-	const char* const empty = "";
-/* "sep" returns a value only the first time it is evaluated */
-#define sep (first ? (first = 0, separator) : empty)
-	printf ("%s\t%s\t%s",
-		entry->name, entry->file, entry->address.pattern);
-	if (extensionFields)
-	{
-		if (entry->kind != NULL  &&  entry->kind [0] != '\0')
-			printf ("%s\tkind:%s", sep, entry->kind);
-		if (entry->fileScope)
-			printf ("%s\tfile:", sep);
-#if 0
-		if (entry->address.lineNumber > 0)
-			printf ("%s\tline:%lu", sep, entry->address.lineNumber);
-#endif
-		for (i = 0  ;  i < entry->fields.count  ;  ++i)
-			printf ("%s\t%s:%s", sep, entry->fields.list [i].key,
-				entry->fields.list [i].value);
-	}
-	putchar ('\n');
-#undef sep
-}
-
-static void findTag (const char *const name, const int options)
-{
-	tagFileInfo info;
-	tagEntry entry;
-	tagFile *const file = tagsOpen (TagFileName, &info);
-	if (file == NULL)
-	{
-		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
-				ProgramName, strerror (info.status.error_number), name);
-		exit (1);
-	}
-	else
-	{
-		if (SortOverride)
-			tagsSetSortType (file, SortMethod);
-		if (tagsFind (file, &entry, name, options) == TagSuccess)
-		{
-			do
-			{
-				printTag (&entry);
-			} while (tagsFindNext (file, &entry) == TagSuccess);
-		}
-		tagsClose (file);
-	}
-}
-
-static void listTags (void)
-{
-	tagFileInfo info;
-	tagEntry entry;
-	tagFile *const file = tagsOpen (TagFileName, &info);
-	if (file == NULL)
-	{
-		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
-				ProgramName, strerror (info.status.error_number), TagFileName);
-		exit (1);
-	}
-	else
-	{
-		while (tagsNext (file, &entry) == TagSuccess)
-			printTag (&entry);
-		tagsClose (file);
-	}
-}
-
-static const char *const Usage =
-	"Find tag file entries matching specified names.\n\n"
-	"Usage: \n"
-	"    %s -h\n"
-	"    %s [-ilp] [-s[0|1]] [-t file] [-] [name(s)]\n\n"
-	"Options:\n"
-	"    -e           Include extension fields in output.\n"
-	"    -h           Print this help message.\n"
-	"    -i           Perform case-insensitive matching.\n"
-	"    -l           List all tags.\n"
-	"    -p           Perform partial matching.\n"
-	"    -s[0|1|2]    Override sort detection of tag file.\n"
-	"    -t file      Use specified tag file (default: \"tags\").\n"
-	"    -            Treat arguments after this as NAME even if they start with -.\n"
-	"Note that options are acted upon as encountered, so order is significant.\n";
-
-static void printUsage(FILE* stream, int exitCode)
-{
-	fprintf (stream, Usage, ProgramName, ProgramName);
-	exit (exitCode);
-}
-
-extern int main (int argc, char **argv)
-{
-	int options = 0;
-	int actionSupplied = 0;
-	int i;
-	int ignore_prefix = 0;
-
-	ProgramName = argv [0];
-	if (argc == 1)
-		printUsage(stderr, 1);
-	for (i = 1  ;  i < argc  ;  ++i)
-	{
-		const char *const arg = argv [i];
-		if (ignore_prefix || arg [0] != '-')
-		{
-			findTag (arg, options);
-			actionSupplied = 1;
-		}
-		else if (arg [0] == '-' && arg [1] == '\0')
-			ignore_prefix = 1;
-		else
-		{
-			size_t j;
-			for (j = 1  ;  arg [j] != '\0'  ;  ++j)
-			{
-				switch (arg [j])
-				{
-					case 'h': printUsage (stdout, 0); break;
-					case 'e': extensionFields = 1;         break;
-					case 'i': options |= TAG_IGNORECASE;   break;
-					case 'p': options |= TAG_PARTIALMATCH; break;
-					case 'l': listTags (); actionSupplied = 1; break;
-
-					case 't':
-						if (arg [j+1] != '\0')
-						{
-							TagFileName = arg + j + 1;
-							j += strlen (TagFileName);
-						}
-						else if (i + 1 < argc)
-							TagFileName = argv [++i];
-						else
-							printUsage(stderr, 1);
-						break;
-					case 's':
-						SortOverride = 1;
-						++j;
-						if (arg [j] == '\0')
-							SortMethod = TAG_SORTED;
-						else if (strchr ("012", arg[j]) != NULL)
-							SortMethod = (sortType) (arg[j] - '0');
-						else
-							printUsage(stderr, 1);
-						break;
-					default:
-						fprintf (stderr, "%s: unknown option: %c\n",
-									ProgramName, arg[j]);
-						exit (1);
-						break;
-				}
-			}
-		}
-	}
-	if (! actionSupplied)
-	{
-		fprintf (stderr,
-			"%s: no action specified: specify tag name(s) or -l option\n",
-			ProgramName);
-		exit (1);
-	}
-	return 0;
-}
-
-#endif
-
-/* vi:set tabstop=4 shiftwidth=4: */
