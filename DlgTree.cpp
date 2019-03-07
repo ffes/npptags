@@ -66,10 +66,14 @@ static bool TagLangEqualsNppLang(string lang)
 	{
 		std::make_pair(L_ADA,			"Ada"),
 		std::make_pair(L_ASM,			"Asm"),
+		//L_ASN1
 		std::make_pair(L_ASP,			"Asp"),
-		//L_AU3,
+		//L_AU3
+		//L_AVS
+		//L_BAANC
 		std::make_pair(L_BASH,			"Sh"),
 		std::make_pair(L_BATCH,			"DosBatch"),
+		//L_BLITZBASIC
 		std::make_pair(L_C,				"C/C++"),
 		std::make_pair(L_CAML,			"OCaml"),
 		//L_CMAKE
@@ -77,14 +81,20 @@ static bool TagLangEqualsNppLang(string lang)
 		std::make_pair(L_COFFEESCRIPT,	"CoffeeScript"),
 		std::make_pair(L_CPP,			"C/C++"),
 		std::make_pair(L_CS,			"C#"),
+		//L_CSOUND
 		std::make_pair(L_CSS,			"CSS"),
 		std::make_pair(L_D,				"D"),
 		//L_DIFF
+		//L_ERLANG
+		//L_ESCRIPT
 		std::make_pair(L_FLASH,			"Flex"),
+		//L_FORTH
 		std::make_pair(L_FORTRAN,		"Fortran"),
 		std::make_pair(L_FORTRAN_77,	"Fortran"),
+		//L_FREEBASIC
 		//L_HASKELL
 		std::make_pair(L_HTML,			"HTML"),
+		//L_IHEX
 		//L_INI
 		//L_INNO
 		std::make_pair(L_JAVA,			"Java"),
@@ -93,27 +103,42 @@ static bool TagLangEqualsNppLang(string lang)
 		std::make_pair(L_JSON,			"JSON"),
 		//L_JSP
 		//L_KIX
+		//L_LATEX
 		std::make_pair(L_LISP,			"Lisp"),
 		std::make_pair(L_LUA,			"Lua"),
 		std::make_pair(L_MAKEFILE,		"Make"),
 		std::make_pair(L_MATLAB,		"MatLab"),
+		//L_MMIXAL
 		std::make_pair(L_OBJC,			"ObjectiveC"),
+		//L_NIMROD
+		//L_NNCRONTAB
 		//L_NSIS
+		//L_OSCRIPT
 		std::make_pair(L_PASCAL,		"Pascal"),
 		std::make_pair(L_PERL,			"Perl"),
 		std::make_pair(L_PHP,			"PHP"),
 		//L_POWERSHELL
 		//L_PS
+		//L_PUREBASIC
 		std::make_pair(L_PYTHON,		"Python"),
 		std::make_pair(L_R,				"R"),
 		std::make_pair(L_RC,			"WindRes"),
+		//L_REBOL
+		//L_REGISTRY
 		std::make_pair(L_RUBY,			"Ruby"),
+		//L_RUST
 		std::make_pair(L_SCHEME,		"Scheme"),
 		//L_SMALLTALK
+		//L_SPICE
 		std::make_pair(L_SQL,			"SQL"),
+		//L_SREC
+		//L_SWIFT
 		std::make_pair(L_TCL,			"Tcl"),
+		//L_TEHEX
 		std::make_pair(L_TEX,			"Tex"),
+		//L_TXT2TAGS
 		std::make_pair(L_VB,			"Basic"),
+		//L_VISUALPROLOG
 		std::make_pair(L_VERILOG,		"Verilog"),
 		std::make_pair(L_VHDL,			"VHDL")
 		//L_YAML
