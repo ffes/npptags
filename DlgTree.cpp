@@ -188,7 +188,7 @@ void UpdateTagsTree()
 				builder = (TreeBuilder*) new TreeBuilderCSharp();
 			else  if (lang == "Java")
 				builder = (TreeBuilder*) new TreeBuilderJava();
-			else  if (lang == "reStructuredText")
+			else  if (lang == "ReStructuredText")
 				builder = (TreeBuilder*) new TreeBuilderRst();
 			else  if (lang == "SQL")
 				builder = (TreeBuilder*) new TreeBuilderSql();

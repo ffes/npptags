@@ -35,7 +35,7 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////
 //
 
-TreeBuilderRst::TreeBuilderRst() : TreeBuilder("reStructuredText")
+TreeBuilderRst::TreeBuilderRst() : TreeBuilder("ReStructuredText")
 {
 }
 
