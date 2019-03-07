@@ -309,8 +309,8 @@ static void ShowTagsProperties()
 
 void MatchTreeViewColorsWithTheme()
 {
-	int fore = SendMsg(SCI_STYLEGETFORE, (WPARAM) STYLE_DEFAULT);
-	int back = SendMsg(SCI_STYLEGETBACK, (WPARAM) STYLE_DEFAULT);
+	int fore = (int) SendMsg(SCI_STYLEGETFORE, (WPARAM) STYLE_DEFAULT);
+	int back = (int) SendMsg(SCI_STYLEGETBACK, (WPARAM) STYLE_DEFAULT);
 
 	TreeView_SetTextColor(g_hTree, fore);
 	TreeView_SetBkColor(g_hTree, back);
