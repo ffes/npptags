@@ -301,22 +301,23 @@ bool TagsDatabase::GenerateTagsFile()
 	}
 
 	// Is there a path to a specific ctags.exe?
-	WCHAR szExePath[_MAX_PATH];
-	wcsncpy(szExePath, g_Options->GetCtagsPath(), _MAX_PATH);
+	wstring exePath = g_Options->GetCtagsPath();
 
 	// If not, try the default location
-	if (wcslen(szExePath) == 0)
+	if (exePath.length() == 0)
 	{
-		SendMessage(g_nppData._nppHandle, NPPM_GETNPPDIRECTORY, MAX_PATH, (LPARAM) &szExePath);
-		wcsncat(szExePath, L"\\plugins\\", _MAX_PATH);
-		wcsncat(szExePath, getName(), _MAX_PATH);
-		wcsncat(szExePath, L"\\ctags", _MAX_PATH);
+		WCHAR szTmp[MAX_PATH];
+		SendMessage(g_nppData._nppHandle, NPPM_GETPLUGINHOMEPATH, MAX_PATH, (LPARAM) szTmp);
+		exePath = szTmp;
+		exePath += L"\\";
+		exePath += getName();
+		exePath += L"\\ctags";
 	}
 
 	// Construct the command line
 	wstring cmd;
 	cmd += char(34);
-	cmd += szExePath;
+	cmd += exePath;
 	cmd += char(34);
 
 	// Add the options. Add (short) --verbose flag?
@@ -370,7 +371,7 @@ bool TagsDatabase::ImportTags()
 		BeginTransaction();
 		while (tagsNext(file, &entry) == TagSuccess)
 		{
-			// Put it in the array		
+			// Put it in the array
 			tag = entry;
 
 			// Is there anything to search for?
