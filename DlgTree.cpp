@@ -634,5 +634,5 @@ void TagsTree()
 void CreateTreeDlg()
 {
 	// Create the window
-	s_hDlg = CreateDialog(g_hInst, MAKEINTRESOURCE(IDD_TAGS_TREE), g_nppData._nppHandle, DlgProc);
+	s_hDlg = CreateDialog(g_hInst, MAKEINTRESOURCE(IDD_TAGS_TREE), g_nppData._nppHandle, (DLGPROC) DlgProc);
 }
