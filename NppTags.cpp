@@ -343,8 +343,8 @@ void JumpToTag(Tag* pTag, bool storeCurPos)
 	{
 		// Now search for the pattern of the tag
 		int length = SendMsg(SCI_GETLENGTH);
-		string str = pTag->getPattern();
-		char* searchPattern = (char*) str.c_str();
+		string pat = pTag->getPattern();
+		char* searchPattern = (char*) pat.c_str();
 		Sci_TextToFind search;
 		search.lpstrText = searchPattern;
 		search.chrg.cpMin = 0;
