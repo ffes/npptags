@@ -44,7 +44,7 @@ using namespace std;
 #endif
 
 static const TCHAR PLUGIN_NAME[] = L"NppTags";
-static const int nbFunc = 9;
+static const int nbFunc = 10;
 static int s_iShowTagsIndex, s_iRefreshTagsIndex, s_iJumpToTagIndex, s_iJumpBackIndex;
 static HBITMAP s_hbmpShowTags, s_hbmpRefreshTags, s_hbmpJumpToTag, s_hbmpJumpBack;
 static std::vector<Tag> s_JumpBackStack;
@@ -390,6 +390,14 @@ static void GenerateTagsDB()
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// Open the on-line manual
+
+static void OpenOnlineManual()
+{
+	ShellExecute(NULL, L"open", L"https://npptags.readthedocs.io", NULL, NULL, SW_SHOWNORMAL);
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // The entry point of the DLL
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
@@ -467,6 +475,13 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 			// Seperator
 			g_funcItem[index]._pFunc = NULL;
 			wcscpy(g_funcItem[index]._itemName, L"-SEPARATOR-");
+			g_funcItem[index]._init2Check = false;
+			g_funcItem[index]._pShKey = NULL;
+			index++;
+
+			// Open Online Manual
+			g_funcItem[index]._pFunc = OpenOnlineManual;
+			wcscpy(g_funcItem[index]._itemName, L"Open Online Manual");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
 			index++;
