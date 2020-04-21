@@ -21,7 +21,5 @@
 
 #pragma once
 
-class Version;
-
 extern void ShowAboutDlg();
-extern void ShowAboutDlgVersion(Version prevVer);
+

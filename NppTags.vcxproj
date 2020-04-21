@@ -213,7 +213,6 @@
     <ClCompile Include="TreeBuilderJava.cpp" />
     <ClCompile Include="TreeBuilderRst.cpp" />
     <ClCompile Include="TreeBuilderSql.cpp" />
-    <ClCompile Include="Version.cpp" />
     <ClCompile Include="WaitCursor.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -236,7 +235,6 @@
     <ClInclude Include="TreeBuilderJava.h" />
     <ClInclude Include="TreeBuilderRst.h" />
     <ClInclude Include="TreeBuilderSql.h" />
-    <ClInclude Include="Version.h" />
     <ClInclude Include="WaitCursor.h" />
   </ItemGroup>
   <ItemGroup>

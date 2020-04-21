@@ -22,7 +22,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include "Options.h"
-#include "Version.h"
+#include "version_git.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Strings used in the ini file

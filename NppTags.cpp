@@ -31,7 +31,6 @@ using namespace std;
 #include "NPP/PluginInterface.h"
 #include "Resource.h"
 #include "NppTags.h"
-#include "Version.h"
 #include "DlgAbout.h"
 #include "DlgTree.h"
 #include "DlgOptions.h"
@@ -124,14 +123,6 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification* notifyCode)
 			{
 				g_DB->UpdateFilename();
 				TagsTree();
-			}
-
-			// Check if we are running a newer version
-			Version curVer, prevVer(g_Options->GetPrevVersion());
-			if (curVer > prevVer)
-			{
-				ShowAboutDlgVersion(prevVer);
-				g_Options->Write();
 			}
 			break;
 		}

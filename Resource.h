@@ -8,7 +8,6 @@
 // About dialog
 #define IDD_ABOUTBOX				250
 #define IDC_SYSLINK					251
-#define IDC_CHANGELOG				252
 
 // Toolbar Bitmaps
 #define IDB_SHOW_TAGS				260

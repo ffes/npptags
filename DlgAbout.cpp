@@ -29,59 +29,7 @@ using namespace std;
 #include "NPP/PluginInterface.h"
 #include "NppTags.h"
 #include "Resource.h"
-#include "Version.h"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-struct VersionInfo
-{
-	BYTE	version[VERSION_DIGITS];
-	int		date[3];
-	WCHAR*	text;
-};
-
-#define MAX_VERSION_INFO 4
-
-static VersionInfo s_info[MAX_VERSION_INFO] =
-{
-	{	{0,9,0,0},	{2015,12, 2},	L"- Add an Options dialog\n- Rewrite of the way the language trees are built.\n- Add a Java, reStructuredText and SQL tree.\n- Add an option to specify the path to ctags.exe\n- Converted DocBook documentation to reStructedText and publish it at Read the Docs.\n- Jump Back to bring you back to the position where you were when you jumped to a tag.\n- Better support for sources stored in various sub-directories.\n- Very simple Tags Properties MessageBox\n- Add debug option to store the output of ctags --verbose.\n- Updated to recent Universal Ctags build.\n- Upgrade to SQLite version 3.9.2" },
-	{	{0,2,0,0},	{2013, 7,14},	L"- After generating the tags file, it is now converted to a SQLite database. This makes it much easier and faster to build a proper tree.\n- Tree filled with common types of tags for various languages." },
-	{	{0,1,1,0},	{2013, 7, 5},	L"- Tree now filled with functions.\n- Added three toolbar buttons." },
-	{	{0,1,0,0},	{2013, 6,30},	L"- Internal proof of concept." }
-};
-
-static int s_showTill = MAX_VERSION_INFO;
-
-/////////////////////////////////////////////////////////////////////////////
-// VERY simple LF -> CRLF conversion
-
-static wstring ConvertNewLines(LPCWSTR from)
-{
-	wstring to;
-
-	// Is there a string anyway?
-	if (from != NULL)
-	{
-		// Iterate through the text we were given
-		size_t len = wcslen(from);
-		for (size_t i = 0; i < len; i++)
-		{
-			// The "\r" is simply skipped
-			if (from[i] == '\r')
-				continue;
-
-			// For every "\n", we add an extra "\r"
-			if (from[i] == '\n')
-				to += '\r';
-
-			// The character itself (all but "\r")
-			to += from[i];
-		}
-	}
-
-	return to;
-}
+#include "version_git.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -89,39 +37,6 @@ static wstring ConvertNewLines(LPCWSTR from)
 static BOOL OnInitDialog(HWND hDlg)
 {
 	CenterWindow(hDlg);
-
-	// Show the relevant part of the changelog
-	wstring txt;
-	WCHAR szTmp[_MAX_PATH];
-	for (int i = 0; i < s_showTill; i++)
-	{
-		if (!txt.empty())
-			txt += L"\n\n";
-
-		// Add the version number
-		txt += L"Version ";
-		snwprintf(szTmp, _MAX_PATH, L"%d.%d.%d", s_info[i].version[0], s_info[i].version[1], s_info[i].version[2]);
-		txt += szTmp;
-
-		// Add the release date
-		struct tm released;
-		ZeroMemory(&released, sizeof(tm));
-		released.tm_year = s_info[i].date[0] - 1900;
-		released.tm_mon = s_info[i].date[1] - 1;
-		released.tm_mday = s_info[i].date[2];
-
-		txt += L", released on ";
-		wcsftime(szTmp,_MAX_PATH, L"%d-%b-%Y", &released);
-		txt += szTmp;
-		txt += L"\n";
-
-		// Add the changelog
-		txt += s_info[i].text;
-	}
-	txt = ConvertNewLines(txt.c_str());
-	SetDlgItemText(hDlg, IDC_CHANGELOG, txt.c_str());
-
-	// Let windows set focus
 	return TRUE;
 }
 
@@ -173,25 +88,5 @@ static BOOL CALLBACK DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 
 void ShowAboutDlg()
 {
-	s_showTill = MAX_VERSION_INFO;
-	DialogBox(g_hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), g_nppData._nppHandle, (DLGPROC) DlgProc);
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// Show the About Dialog, with version information until 'prevVer'
-
-void ShowAboutDlgVersion(Version prevVer)
-{
-	s_showTill = MAX_VERSION_INFO;
-	for (int i = 0; i < MAX_VERSION_INFO; i++)
-	{
-		Version ver(s_info[i].version);
-		if (ver == prevVer)
-		{
-			s_showTill = i;
-			break;
-		}
-	}
-
 	DialogBox(g_hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), g_nppData._nppHandle, (DLGPROC) DlgProc);
 }
