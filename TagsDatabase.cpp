@@ -52,7 +52,7 @@ static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 {
 	TCHAR szPath[_MAX_PATH];
 	DWORD dwFlags = STARTF_USESHOWWINDOW;
-	HANDLE hStdOut = NULL;
+	HANDLE hStdOut = NULL, hStdErr = NULL;
 
 	// Open the file to redirect stdout to
 	if (g_Options->GetCtagsVerbose())
@@ -63,14 +63,23 @@ static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 		sa.lpSecurityDescriptor = NULL;
 		sa.bInheritHandle = TRUE;
 
-		// Construct the filename
+		// Construct the filename for stdout
 		wcsncpy(szPath, szDir, _MAX_PATH);
-		wcsncat(szPath, L"\\tags.out", _MAX_PATH);
+		wcsncat(szPath, L"\\tags.stdout", _MAX_PATH);
 
 		// Create the file
 		hStdOut = CreateFile(szPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
 								&sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
+		// Construct the filename for stderr
+		wcsncpy(szPath, szDir, _MAX_PATH);
+		wcsncat(szPath, L"\\tags.stderr", _MAX_PATH);
+
+		// Create the file
+		hStdErr = CreateFile(szPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+								&sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+		// Let CreateProcess() know it should capture the output
 		dwFlags |= STARTF_USESTDHANDLES;
 	}
 
@@ -80,6 +89,7 @@ static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 	si.dwFlags = dwFlags;
 	si.wShowWindow = SW_HIDE;
 	si.hStdOutput = hStdOut;
+	si.hStdError = hStdErr;
 
 	PROCESS_INFORMATION pi;
 	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
@@ -105,6 +115,9 @@ static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 
 	if (hStdOut != NULL)
 		CloseHandle(hStdOut);
+
+	if (hStdErr != NULL)
+		CloseHandle(hStdErr);
 
 	return dwReturn;
 }

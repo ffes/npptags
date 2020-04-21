@@ -36,8 +36,10 @@ These are the default settings:
     Show=1
     Depth=3
     JumpBackStack=4
+    CtagsPath=
 
-When ``Show`` is set to ``0`` the tree will not be shown.
+``Show`` is controlled by the ``Show Tags Tree`` button on the toolbar
+and stores if the tree is shown.
 
 The other options correspond to the various items in the dialog.
 
@@ -66,5 +68,5 @@ generating the database. When set to ``0``, this implies that ``DelTags`` is
 set to ``0`` as well. Can be useful when regenerating the database but you
 don't want to execute ctags every time.
 
-When ``CtagsVerbose`` is set to ``1`` the ``--verbose`` flag is added
-when ctags is executed. The output is written to ``tags.out``.
+When ``CtagsVerbose`` is set to ``1`` the ``--verbose`` flag is added when
+ctags is executed. The output is written to ``tags.stdout`` and ``tags.stderr``.
