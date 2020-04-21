@@ -67,6 +67,7 @@ void Options::Write()
 	WriteBool(s_szOptions, s_szShow, _showTreeDlg);
 	WriteInt(s_szOptions, s_szDepth, _maxDepth);
 	WriteInt(s_szOptions, s_szJumpBackStack, _jumpBackStack);
+	WriteString(s_szOptions, s_szCtagsPath, _ctagsPath);
 	WriteString(s_szOptions, s_szVersion, VERSION_NUMBER_WSTR);
 }
 
