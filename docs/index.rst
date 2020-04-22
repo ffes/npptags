@@ -17,7 +17,7 @@ Welcome to NppTags documentation!
     compile.rst
     contact.rst
     license.rst
-    history.rst
+    changelog.rst
     gpl-2.rst
 
 
