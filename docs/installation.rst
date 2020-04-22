@@ -3,6 +3,18 @@
 How to install
 ==============
 
-To manually install the plug-in, copy ``NppTags.dll`` to the ``plugins``
-directory. There you need to create a directory ``NppTags`` and copy
-``ctags.exe`` to that directory. Then (re)start Notepad++.
+To manually install the plug-in, in the ``plugins`` directory in the Notepad++
+installation directory, create a folder named ``NppTags`` and place ``NppTags.dll``
+and ``ctags.exe`` in that directory. Then (re)start Notepad++.
+
+Provided ctags executable
+-------------------------
+
+In the zip is a precompiled version of ``ctags.exe``. This always a recent
+version of the `executables`_ provided by the Universal Ctags project when
+the plugin was released.
+
+You can always try to replace the provided version of ``ctags.exe`` with a
+more recent version.
+
+.. _executables: https://github.com/universal-ctags/ctags-win32/releases
