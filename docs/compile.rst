@@ -1,7 +1,7 @@
 How to compile
 ==============
 
-To compile NppTags you can use `Visual Studio`_. Project files for VS 2013 are
+To compile NppTags you can use `Visual Studio`_. Project files for VS 2019 are
 provided and actively used. To compile with other versions of Visual Studio
 you can convert the existing project files.
 
