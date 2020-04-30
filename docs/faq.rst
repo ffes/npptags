@@ -14,8 +14,11 @@ Tag`` should have no problems, but the tree could not show any or all tags.
 **Q:** I want to ignore some files when ctags generates the tags file.
 Can I add extra command line options?
 
-**A:** If you want to add extra command line options to ctags, use a
-``.ctags`` or ``ctags.cnf`` file. It can be placed in the current
+**A:** If you want to add extra command line options to ctags,
+create a file ``.ctags.d/exclude.ctags``. Add lines with the
+``--exclude=`` command line options you need.
+
+It can be placed in the current
 directory for local settings or in your user directory for global
 settings. See the `Files section`_ in the documentation of ctags for
 more details.
@@ -38,4 +41,4 @@ patterns is planned.
 
 
 .. _Universal Ctags: https://ctags.io/
-.. _Files section: http://ctags.sourceforge.net/ctags.html#FILES
+.. _Files section: https://docs.ctags.io/en/latest/man/ctags.1.html#files
