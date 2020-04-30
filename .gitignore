@@ -4,6 +4,7 @@
 *.user
 [Rr]elease/
 [Dd]ebug/
+x64/
 NppTags.dll
 version_git.h
-tags.*
+docs/_build/
