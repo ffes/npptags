@@ -33,9 +33,6 @@ Wish list
 -  When ``Jump to Tag`` is used and there is no database, ask to generate it
    and then jump to the tag.
 
--  Investigate the new JSON output of Universal Ctags instead of the traditional
-   ``tags`` output. Not sure if there is a real advantage for the plug-in.
-
 -  Expand the tree item of a generic language if there is only one type.
 
 -  Allow ``Enter``-key to be used to go to tag from the tree.
