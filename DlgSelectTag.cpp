@@ -32,13 +32,15 @@ using namespace std;
 
 static vector<Tag> s_foundTags;
 
-// The names of the columns
-#define COL_TAG     0
-#define COL_FILE    1
-#define COL_TYPE    2
-#define COL_DETAILS 3
-#define COL_LANG    4
-#define NR_COLS     5
+// The columns in the dialog
+enum TagColumns {
+	COL_TAG = 0,
+	COL_FILE = 1,
+	COL_TYPE = 2,
+	COL_DETAILS = 3,
+	COL_LANG = 4,
+	NR_COLS = 5
+};
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -54,7 +56,7 @@ static void CreateColumns(HWND hList)
 		col.mask = LVCF_TEXT | LVCF_SUBITEM;
 		col.pszText = szCols[i];
 		ListView_InsertColumn(hList, i, &col);
-    }
+	}
 
 	// Make the list Full Row Select
 	ListView_SetExtendedListViewStyle(hList, LVS_EX_FULLROWSELECT);
