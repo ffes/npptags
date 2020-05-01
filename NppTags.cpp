@@ -44,8 +44,8 @@ using namespace std;
 #endif
 
 static const TCHAR PLUGIN_NAME[] = L"NppTags";
-static const int nbFunc = 10;
-static int s_iShowTagsIndex, s_iRefreshTagsIndex, s_iJumpToTagIndex, s_iJumpBackIndex;
+static constexpr int nbFunc = 11;
+static int s_iRefreshTagsIndex, s_iJumpToTagIndex, s_iJumpBackIndex;
 static HBITMAP s_hbmpShowTags, s_hbmpRefreshTags, s_hbmpJumpToTag, s_hbmpJumpBack;
 static std::vector<Tag> s_JumpBackStack;
 
@@ -54,6 +54,7 @@ NppData g_nppData;
 FuncItem g_funcItem[nbFunc];
 Options *g_Options = NULL;
 TagsDatabase* g_DB = NULL;
+int g_iShowTagsIndex;
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -135,7 +136,7 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification* notifyCode)
 		case NPPN_TBMODIFICATION:
 		{
 			// Add the button to the toolbar
-			AddToolbarButton(notifyCode, s_iShowTagsIndex, s_hbmpShowTags);
+			AddToolbarButton(notifyCode, g_iShowTagsIndex, s_hbmpShowTags);
 			AddToolbarButton(notifyCode, s_iJumpToTagIndex, s_hbmpJumpToTag);
 			AddToolbarButton(notifyCode, s_iJumpBackIndex, s_hbmpJumpBack);
 			AddToolbarButton(notifyCode, s_iRefreshTagsIndex, s_hbmpRefreshTags);
@@ -382,11 +383,19 @@ static void JumpBack()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Simple placeholders
+// Generate the tags database
 
 static void GenerateTagsDB()
 {
 	g_DB->Generate();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Set the focus on the tags tree
+
+static void FocusOnTagsTree()
+{
+	SetFocus(g_hTree);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -412,21 +421,8 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 
 			// The menu entries
 			int index = 0;
-			g_funcItem[index]._pFunc = TagsTree;
-			wcscpy(g_funcItem[index]._itemName, L"Show Tags Tree");
-			g_funcItem[index]._init2Check = false;
-			g_funcItem[index]._pShKey = NULL;
-			s_iShowTagsIndex = index;
-			index++;
 
-			// Seperator
-			g_funcItem[index]._pFunc = NULL;
-			wcscpy(g_funcItem[index]._itemName, L"-SEPARATOR-");
-			g_funcItem[index]._init2Check = false;
-			g_funcItem[index]._pShKey = NULL;
-			index++;
-
-			// The basic jump-to-tag handling
+			// Jump to Tag
 			g_funcItem[index]._pFunc = JumpToTag;
 			wcscpy(g_funcItem[index]._itemName, L"Jump to Tag");
 			g_funcItem[index]._init2Check = false;
@@ -438,7 +434,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 			s_iJumpToTagIndex = index;
 			index++;
 
-			// The basic jump-back handling
+			// Jump Back
 			g_funcItem[index]._pFunc = JumpBack;
 			wcscpy(g_funcItem[index]._itemName, L"Jump Back");
 			g_funcItem[index]._init2Check = false;
@@ -450,12 +446,38 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 			s_iJumpBackIndex = index;
 			index++;
 
-			// The basic jump-to-tag handling
+			// Generate the tags database
 			g_funcItem[index]._pFunc = GenerateTagsDB;
 			wcscpy(g_funcItem[index]._itemName, L"Generate tags database");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
 			s_iRefreshTagsIndex = index;
+			index++;
+
+			// Seperator
+			g_funcItem[index]._pFunc = NULL;
+			wcscpy(g_funcItem[index]._itemName, L"-SEPARATOR-");
+			g_funcItem[index]._init2Check = false;
+			g_funcItem[index]._pShKey = NULL;
+			index++;
+
+			// The Show / Hide Tree
+			g_funcItem[index]._pFunc = TagsTree;
+			wcscpy(g_funcItem[index]._itemName, L"Show Tags Tree");
+			g_funcItem[index]._init2Check = false;
+			g_funcItem[index]._pShKey = NULL;
+			g_iShowTagsIndex = index;
+			index++;
+
+			// Set focus on the tree
+			g_funcItem[index]._pFunc = FocusOnTagsTree;
+			wcscpy(g_funcItem[index]._itemName, L"Focus on Tags Tree");
+			g_funcItem[index]._init2Check = false;
+			g_funcItem[index]._pShKey = new ShortcutKey;
+			g_funcItem[index]._pShKey->_isAlt = true;
+			g_funcItem[index]._pShKey->_isCtrl = false;
+			g_funcItem[index]._pShKey->_isShift = true;
+			g_funcItem[index]._pShKey->_key = 'Q';
 			index++;
 
 			// Seperator
@@ -510,7 +532,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 
 		case DLL_PROCESS_DETACH:
 		{
-			// Clean up the shortcuts
+			// Clean up all the shortcuts
 			for (int i = 0; i < nbFunc; i++)
 			{
 				if (g_funcItem[i]._pShKey != NULL)

@@ -595,7 +595,7 @@ void TagsTree()
 	{
 		// Hide the window and uncheck the menu item
 		SendMessage(g_nppData._nppHandle, NPPM_DMMHIDE, 0, (LPARAM) s_hDlg);
-		SendMessage(g_nppData._nppHandle, NPPM_SETMENUITEMCHECK, (WPARAM) g_funcItem[0]._cmdID, (LPARAM) FALSE);
+		SendMessage(g_nppData._nppHandle, NPPM_SETMENUITEMCHECK, (WPARAM) g_funcItem[g_iShowTagsIndex]._cmdID, (LPARAM) FALSE);
 
 		// The window is not visible anymore
 		s_bTreeVisible = false;
@@ -634,7 +634,7 @@ void TagsTree()
 
 		// Show the window and check the menu item
 		SendMessage(g_nppData._nppHandle, NPPM_DMMSHOW, 0, (LPARAM) s_hDlg);
-		SendMessage(g_nppData._nppHandle, NPPM_SETMENUITEMCHECK, (WPARAM) g_funcItem[0]._cmdID, (LPARAM) TRUE);
+		SendMessage(g_nppData._nppHandle, NPPM_SETMENUITEMCHECK, (WPARAM) g_funcItem[g_iShowTagsIndex]._cmdID, (LPARAM) TRUE);
 
 		// Set the focus back on the main window
 		SetFocusOnEditor();

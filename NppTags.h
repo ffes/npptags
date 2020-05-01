@@ -49,6 +49,7 @@ extern NppData g_nppData;
 extern FuncItem g_funcItem[];
 extern Options *g_Options;
 extern TagsDatabase* g_DB;
+extern int g_iShowTagsIndex;
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
