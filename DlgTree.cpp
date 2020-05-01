@@ -476,6 +476,18 @@ static BOOL OnSelChanged(NMTREEVIEW* pNMTreeView)
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// Handle KeyDown events for the tree
+
+static BOOL OnKeyDown(const NMTVKEYDOWN* pNMKeyDown)
+{
+	// Enter is the same as a double-click
+	if (pNMKeyDown->wVKey == VK_RETURN)
+		OnDblClk_Tree();
+
+	return TRUE;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 //
 
 static void OnCommand(HWND hWnd, int ResID, int msg)
@@ -560,6 +572,10 @@ static BOOL CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 						case TVN_SELCHANGED:
 						{
 							return OnSelChanged((NMTREEVIEW*) lParam);
+						}
+						case TVN_KEYDOWN:
+						{
+							return OnKeyDown((NMTVKEYDOWN*) lParam);
 						}
 					}
 				}

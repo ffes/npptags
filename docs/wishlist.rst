@@ -35,6 +35,4 @@ Wish list
 
 -  Expand the tree item of a generic language if there is only one type.
 
--  Allow ``Enter``-key to be used to go to tag from the tree.
-
 -  Add a searchbox above the tree.
