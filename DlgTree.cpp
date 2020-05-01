@@ -332,10 +332,10 @@ static void ShowTagsProperties()
 /////////////////////////////////////////////////////////////////////////////
 // Make sure the colors of the tree match the Notepad++ theme
 
-void MatchTreeViewColorsWithTheme()
+void MatchTreeViewColorsWithTheme() noexcept
 {
-	int fore = (int) SendMsg(SCI_STYLEGETFORE, (WPARAM) STYLE_DEFAULT);
-	int back = (int) SendMsg(SCI_STYLEGETBACK, (WPARAM) STYLE_DEFAULT);
+	const COLORREF fore = (COLORREF) SendMessage(g_nppData._nppHandle, NPPM_GETEDITORDEFAULTFOREGROUNDCOLOR, 0, 0);
+	const COLORREF back = (COLORREF) SendMessage(g_nppData._nppHandle, NPPM_GETEDITORDEFAULTBACKGROUNDCOLOR, 0, 0);
 
 	TreeView_SetTextColor(g_hTree, fore);
 	TreeView_SetBkColor(g_hTree, back);
