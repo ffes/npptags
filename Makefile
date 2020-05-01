@@ -20,7 +20,7 @@ now: $(TARGET)
 all: clean now
 
 # The general compiler flags
-CFLAGS = -DUNICODE -mtune=i686
+CFLAGS = -DUNICODE
 CXXFLAGS = $(CFLAGS) -Wno-write-strings --std=c++11
 LIBS = -static -lgdi32 -lcomctl32 -lcomdlg32
 LDFLAGS = -Wl,--out-implib,$(TARGET) -shared
@@ -71,7 +71,6 @@ PROGRAM_SRCS_CPP = \
 	TreeBuilderRst.cpp \
 	TreeBuilderSql.cpp \
 	Options.cpp \
-	Version.cpp \
 	WaitCursor.cpp
 
 PROGRAM_SRCS_C = \
@@ -110,7 +109,7 @@ version_git.h:
 	$(SILENT) ./version_git.sh
 
 # The dependencies
-$(PROGRAM)_res.o: $(PROGRAM)_res.rc Version.h
+$(PROGRAM)_res.o: $(PROGRAM)_res.rc
 
 -include $(PROGRAM_DEP_CPP)
 -include $(PROGRAM_DEP_C)
