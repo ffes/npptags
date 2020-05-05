@@ -125,7 +125,7 @@ static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-TagsDatabase::TagsDatabase() : SqliteDatabase()
+TagsDatabase::TagsDatabase() noexcept : SqliteDatabase()
 {
 	SetValues();
 }
@@ -138,7 +138,7 @@ TagsDatabase::TagsDatabase(LPCWSTR file) : SqliteDatabase(file)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-void TagsDatabase::SetValues()
+void TagsDatabase::SetValues() noexcept
 {
 	_dbVersion = 1;
 }
@@ -151,7 +151,7 @@ void TagsDatabase::Open()
 	SqliteDatabase::Open();
 
 	// If it is the same version as we generate, we're done
-	int dbVersion = GetUserVersion();
+	const int dbVersion = GetUserVersion();
 	if (dbVersion == _dbVersion)
 		return;
 

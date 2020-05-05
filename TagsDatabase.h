@@ -26,10 +26,10 @@
 class TagsDatabase : public SqliteDatabase
 {
 public:
-	TagsDatabase();
+	TagsDatabase() noexcept;
 	TagsDatabase(LPCWSTR file);
 
-	virtual void Open();
+	void Open() override;
 	void InsertPragmas();
 
 	void Generate();
@@ -37,7 +37,7 @@ public:
 
 protected:
 	void Init();
-	void SetValues();
+	void SetValues() noexcept;
 
 	void SetTagsFile(const WCHAR* tagsPath);
 	bool GetTagsFilename(bool mustExist);
