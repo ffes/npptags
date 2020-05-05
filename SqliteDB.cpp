@@ -36,12 +36,6 @@
 #include "SqliteDB.h"
 using namespace std;
 
-#ifdef _MSC_VER
-#define snprintf _snprintf
-#define snwprintf swprintf
-#define wunlink _wunlink
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 //
 
