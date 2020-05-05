@@ -81,7 +81,7 @@ void NppOptions::WriteBool(const WCHAR* szAppName, const WCHAR* szKeyName, const
 void NppOptions::WriteInt(const WCHAR* szAppName, const WCHAR* szKeyName, const int val) noexcept
 {
 	WCHAR temp[256];
-	snwprintf(temp, 256, L"%d", val);
+	swprintf(temp, _countof(temp), L"%d", val);
 	WritePrivateProfileString(szAppName, szKeyName, temp, _IniPath.c_str());
 }
 

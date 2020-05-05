@@ -69,7 +69,7 @@ SqliteDatabase::~SqliteDatabase()
 
 void SqliteDatabase::SetFilename(LPCWSTR file)
 {
-	wcsncpy(_dbFile, file, MAX_PATH);
+	wcsncpy_s(_dbFile, file, MAX_PATH);
 }
 
 /////////////////////////////////////////////////////////////////////////////

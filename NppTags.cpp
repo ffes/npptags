@@ -227,7 +227,7 @@ void MsgBoxf(const char* szFmt, ...)
 	char szTmp[1024];
 	va_list argp;
 	va_start(argp, szFmt);
-	vsprintf(szTmp, szFmt, argp);
+	vsprintf_s(szTmp, szFmt, argp);
 	va_end(argp);
 	MsgBox(szTmp);
 }
@@ -424,7 +424,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 
 			// Jump to Tag
 			g_funcItem[index]._pFunc = JumpToTag;
-			wcscpy(g_funcItem[index]._itemName, L"Jump to Tag");
+			wcscpy_s(g_funcItem[index]._itemName, L"Jump to Tag");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = new ShortcutKey;
 			g_funcItem[index]._pShKey->_isAlt = true;
@@ -436,7 +436,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 
 			// Jump Back
 			g_funcItem[index]._pFunc = JumpBack;
-			wcscpy(g_funcItem[index]._itemName, L"Jump Back");
+			wcscpy_s(g_funcItem[index]._itemName, L"Jump Back");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = new ShortcutKey;
 			g_funcItem[index]._pShKey->_isAlt = true;
@@ -448,7 +448,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 
 			// Generate the tags database
 			g_funcItem[index]._pFunc = GenerateTagsDB;
-			wcscpy(g_funcItem[index]._itemName, L"Generate tags database");
+			wcscpy_s(g_funcItem[index]._itemName, L"Generate tags database");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
 			s_iRefreshTagsIndex = index;
@@ -456,14 +456,14 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 
 			// Seperator
 			g_funcItem[index]._pFunc = NULL;
-			wcscpy(g_funcItem[index]._itemName, L"-SEPARATOR-");
+			wcscpy_s(g_funcItem[index]._itemName, L"-SEPARATOR-");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
 			index++;
 
 			// The Show / Hide Tree
 			g_funcItem[index]._pFunc = TagsTree;
-			wcscpy(g_funcItem[index]._itemName, L"Show Tags Tree");
+			wcscpy_s(g_funcItem[index]._itemName, L"Show Tags Tree");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
 			g_iShowTagsIndex = index;
@@ -471,7 +471,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 
 			// Set focus on the tree
 			g_funcItem[index]._pFunc = FocusOnTagsTree;
-			wcscpy(g_funcItem[index]._itemName, L"Focus on Tags Tree");
+			wcscpy_s(g_funcItem[index]._itemName, L"Focus on Tags Tree");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = new ShortcutKey;
 			g_funcItem[index]._pShKey->_isAlt = true;
@@ -482,35 +482,35 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 
 			// Seperator
 			g_funcItem[index]._pFunc = NULL;
-			wcscpy(g_funcItem[index]._itemName, L"-SEPARATOR-");
+			wcscpy_s(g_funcItem[index]._itemName, L"-SEPARATOR-");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
 			index++;
 
 			// Show Options Dialog
 			g_funcItem[index]._pFunc = ShowOptionsDlg;
-			wcscpy(g_funcItem[index]._itemName, L"Options...");
+			wcscpy_s(g_funcItem[index]._itemName, L"Options...");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
 			index++;
 
 			// Seperator
 			g_funcItem[index]._pFunc = NULL;
-			wcscpy(g_funcItem[index]._itemName, L"-SEPARATOR-");
+			wcscpy_s(g_funcItem[index]._itemName, L"-SEPARATOR-");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
 			index++;
 
 			// Open Online Manual
 			g_funcItem[index]._pFunc = OpenOnlineManual;
-			wcscpy(g_funcItem[index]._itemName, L"Open Online Manual");
+			wcscpy_s(g_funcItem[index]._itemName, L"Open Online Manual");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
 			index++;
 
 			// Show About Dialog
 			g_funcItem[index]._pFunc = ShowAboutDlg;
-			wcscpy(g_funcItem[index]._itemName, L"About...");
+			wcscpy_s(g_funcItem[index]._itemName, L"About...");
 			g_funcItem[index]._init2Check = false;
 			g_funcItem[index]._pShKey = NULL;
 			index++;

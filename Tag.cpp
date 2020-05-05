@@ -208,7 +208,7 @@ bool Tag::isMemberOf(LPCSTR szMemberOf)
 
 bool Tag::isType(LPCSTR szType)
 {
-	return(stricmp(_type.c_str(), szType) == 0);
+	return(_stricmp(_type.c_str(), szType) == 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -221,7 +221,7 @@ std::string Tag::getBaseFile()
 	char szSpoolDir[_MAX_DIR];
 	char szSpoolFile[_MAX_FNAME];
 	char szSpoolExt[_MAX_EXT];
-	_splitpath(_file.c_str(), szSpoolDrive, szSpoolDir, szSpoolFile, szSpoolExt);
+	_splitpath_s(_file.c_str(), szSpoolDrive, szSpoolDir, szSpoolFile, szSpoolExt);
 
 	return szSpoolFile;
 }
@@ -236,7 +236,7 @@ std::string Tag::getFullBaseFile()
 	char szDir[_MAX_DIR];
 	char szFile[_MAX_FNAME];
 	char szExt[_MAX_EXT];
-	_splitpath(_file.c_str(), szDrive, szDir, szFile, szExt);
+	_splitpath_s(_file.c_str(), szDrive, szDir, szFile, szExt);
 
 	// Reconstruct the base filename
 	std::string ret = szDrive;
