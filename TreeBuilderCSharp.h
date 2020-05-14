@@ -32,15 +32,15 @@ class TreeBuilderCSharp : public TreeBuilder
 public:
 	TreeBuilderCSharp();
 
-	virtual bool Expand();
+	bool Expand() override;
 
 private:
 	TreeBuilderCSharp(Tag* tag);
 
-	virtual TreeBuilder* New();
-	virtual TreeBuilder* New(Tag* tag);
+	TreeBuilder* New() override;
+	TreeBuilder* New(Tag* tag) override;
 
 	bool AddNamespaces();
 	bool AddClasses();
-	virtual bool AddMembers();
+	bool AddMembers() override;
 };
