@@ -36,12 +36,6 @@
 #include "SqliteDB.h"
 using namespace std;
 
-#ifdef _MSC_VER
-#define snprintf _snprintf
-#define snwprintf swprintf
-#define wunlink _wunlink
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 //
 
@@ -69,7 +63,7 @@ SqliteDatabase::~SqliteDatabase()
 
 void SqliteDatabase::SetFilename(LPCWSTR file)
 {
-	wcsncpy(_dbFile, file, MAX_PATH);
+	wcsncpy_s(_dbFile, file, MAX_PATH);
 }
 
 /////////////////////////////////////////////////////////////////////////////

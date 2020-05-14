@@ -50,7 +50,6 @@ static bool FileExists(LPCSTR path)
 
 static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 {
-	TCHAR szPath[_MAX_PATH];
 	DWORD dwFlags = STARTF_USESHOWWINDOW;
 	HANDLE hStdOut = NULL, hStdErr = NULL;
 
@@ -64,19 +63,19 @@ static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 		sa.bInheritHandle = TRUE;
 
 		// Construct the filename for stdout
-		wcsncpy(szPath, szDir, _MAX_PATH);
-		wcsncat(szPath, L"\\tags.stdout", _MAX_PATH);
+		std::wstring path = szDir;
+		path += L"\\tags.stdout";
 
 		// Create the file
-		hStdOut = CreateFile(szPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		hStdOut = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
 								&sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 		// Construct the filename for stderr
-		wcsncpy(szPath, szDir, _MAX_PATH);
-		wcsncat(szPath, L"\\tags.stderr", _MAX_PATH);
+		path = szDir;
+		path += L"\\tags.stderr";
 
 		// Create the file
-		hStdErr = CreateFile(szPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		hStdErr = CreateFile(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
 								&sa, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 		// Let CreateProcess() know it should capture the output
@@ -94,11 +93,12 @@ static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 	PROCESS_INFORMATION pi;
 	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
 
-	// The command line can't be a LPCWSTR
-	wcsncpy(szPath, szCmdLine, _MAX_PATH);
-
 	// Show the wait cursor
 	WaitCursor wait;
+
+	// CreateProcess doesn't accept the command line can't be a LPCWSTR
+	WCHAR szPath[_MAX_PATH];
+	wcscpy_s(szPath, _countof(szPath), szCmdLine);
 
 	// Run the command
 	DWORD dwReturn = NOERROR;
@@ -125,7 +125,7 @@ static DWORD Run(LPCWSTR szCmdLine, LPCWSTR szDir, bool waitFinish)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-TagsDatabase::TagsDatabase() : SqliteDatabase()
+TagsDatabase::TagsDatabase() noexcept : SqliteDatabase()
 {
 	SetValues();
 }
@@ -138,7 +138,7 @@ TagsDatabase::TagsDatabase(LPCWSTR file) : SqliteDatabase(file)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-void TagsDatabase::SetValues()
+void TagsDatabase::SetValues() noexcept
 {
 	_dbVersion = 1;
 }
@@ -151,7 +151,7 @@ void TagsDatabase::Open()
 	SqliteDatabase::Open();
 
 	// If it is the same version as we generate, we're done
-	int dbVersion = GetUserVersion();
+	const int dbVersion = GetUserVersion();
 	if (dbVersion == _dbVersion)
 		return;
 

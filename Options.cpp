@@ -67,7 +67,7 @@ void Options::Write()
 	WriteBool(s_szOptions, s_szShow, _showTreeDlg);
 	WriteInt(s_szOptions, s_szDepth, _maxDepth);
 	WriteInt(s_szOptions, s_szJumpBackStack, _jumpBackStack);
-	WriteString(s_szOptions, s_szCtagsPath, _ctagsPath);
+	WriteString(s_szOptions, s_szCtagsPath, _ctagsPath.c_str());
 	WriteString(s_szOptions, s_szVersion, VERSION_NUMBER_WSTR);
 }
 
@@ -79,8 +79,8 @@ void Options::Read()
 	_showTreeDlg = GetBool(s_szOptions, s_szShow, true);
 	_maxDepth = GetInt(s_szOptions, s_szDepth, 3);
 	_jumpBackStack = GetInt(s_szOptions, s_szJumpBackStack, 4);
-	GetString(s_szOptions, s_szVersion, _prevVersion, MAX_PATH, L"");
-	GetString(s_szOptions, s_szCtagsPath, _ctagsPath, MAX_PATH, L"");
+	_prevVersion = GetString(s_szOptions, s_szVersion, L"");
+	_ctagsPath = GetString(s_szOptions, s_szCtagsPath, L"");
 
 	// Read Only Debug options
 	_overwriteExistingTagsFile = GetBool(s_szDebug, s_szOverwriteTags, true);

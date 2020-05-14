@@ -131,7 +131,7 @@ static BOOL OnInitDialog(HWND hDlg)
 	// Fill the items of the dialog
 	SetDlgItemInt(hDlg, IDC_DEPTH, g_Options->GetMaxDepth(), FALSE);
 	SetDlgItemInt(hDlg, IDC_JUMP_BACK, g_Options->GetJumpBackStack(), FALSE);
-	SetDlgItemText(hDlg, IDC_CTAGS_PATH, g_Options->GetCtagsPath());
+	SetDlgItemText(hDlg, IDC_CTAGS_PATH, g_Options->GetCtagsPath().c_str());
 
 	// Let windows set focus
 	return TRUE;

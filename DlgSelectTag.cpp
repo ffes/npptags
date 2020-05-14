@@ -103,23 +103,23 @@ static void FillList(HWND hList)
 			switch (col)
 			{
 				case COL_FILE:      // Filename
-					str = s_foundTags[i].getFile();
+					str = s_foundTags.at(i).getFile();
 
 					// Is it the current file, preselect the tag
-					if (stricmp(curPath, str.c_str()) == 0 && selItem < 0)
+					if (_stricmp(curPath, str.c_str()) == 0 && selItem < 0)
 						selItem = i;
 					break;
 
 				case COL_TYPE:
-					str = s_foundTags[i].getType();
+					str = s_foundTags.at(i).getType();
 					break;
 
 				case COL_DETAILS:
-					str = s_foundTags[i].getDetails();
+					str = s_foundTags.at(i).getDetails();
 					break;
 
 				case COL_LANG:
-					str = s_foundTags[i].getLanguage();
+					str = s_foundTags.at(i).getLanguage();
 					break;
 
 				default:

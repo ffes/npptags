@@ -36,13 +36,13 @@ public:
 	bool GetShowTreeDlg()				{ return _showTreeDlg; };
 	int  GetMaxDepth()					{ return _maxDepth; };
 	int  GetJumpBackStack()				{ return _jumpBackStack; };
-	WCHAR* GetPrevVersion() 			{ return _prevVersion; };
-	WCHAR* GetCtagsPath() 				{ return _ctagsPath; };
+	std::wstring GetPrevVersion() 		{ return _prevVersion; };
+	std::wstring GetCtagsPath() 		{ return _ctagsPath; };
 
 	void SetShowTreeDlg(bool b)			{ _showTreeDlg = b; };
 	void SetMaxDepth(int i)				{ _maxDepth = i; };
 	void SetJumpBackStack(int i)		{ _jumpBackStack = i; };
-	void SetCtagsPath(WCHAR* s) 		{ wcsncpy(_ctagsPath, s, MAX_PATH); };
+	void SetCtagsPath(WCHAR* s) 		{ _ctagsPath = s; };
 
 	// Debug options
 	bool GetDeleteTagsFile()			{ return _deleteTagsFile; };
@@ -57,8 +57,8 @@ private:
 	bool _showTreeDlg;
 	int _maxDepth;
 	int _jumpBackStack;
-	WCHAR _ctagsPath[MAX_PATH];
-	WCHAR _prevVersion[MAX_PATH];
+	std::wstring _ctagsPath;
+	std::wstring _prevVersion;
 
 	// Debug options
 	bool _deleteTagsFile;
