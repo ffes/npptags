@@ -105,7 +105,7 @@ bool TreeBuilderCSharp::AddNamespaces()
 bool TreeBuilderCSharp::AddClasses()
 {
 	wstring ns = GetItemText();
-	SqliteStatement stmt(g_DB, "SELECT * FROM Tags WHERE Type = 'class' AND Language = @lang AND MemberOf = @member ORDER BY Tag, Signature");
+	SqliteStatement stmt(g_DB, "SELECT * FROM Tags WHERE (Type = 'class' or Type = 'interface') AND Language = @lang AND MemberOf = @member ORDER BY Tag, Signature");
 	stmt.Bind("@lang", _lang.c_str());
 	stmt.Bind("@member", ns.c_str());
 
