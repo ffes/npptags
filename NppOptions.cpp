@@ -20,7 +20,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <windows.h>
-#include <stdio.h>
 #include "NppOptions.h"
 #include "NPP/PluginInterface.h"
 #include "NppTags.h"
