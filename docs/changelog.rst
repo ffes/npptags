@@ -20,8 +20,8 @@ Version 0.9.1, Yet to be released
 -  Include latest git commit SHA in About dialog.
 
 
-Version `0.9.0`_, 2 December 2015
----------------------------------
+Version `0.9.0`_, 2015-12-05
+----------------------------
 
 -  The color of the tree match the selected Notepad++ theme.
 
@@ -53,8 +53,8 @@ Version `0.9.0`_, 2 December 2015
 .. _0.9.0: https://github.com/ffes/npptags/releases/tag/v0.9.0
 
 
-Version `0.2.0`_, 23 October 2013
----------------------------------
+Version `0.2.0`_, 2013-11-23
+----------------------------
 
 -  After generating the tags file, it is now converted to a SQLite
    database. This makes it much easier and faster to build a proper
@@ -75,15 +75,15 @@ Version `0.2.0`_, 23 October 2013
 .. _0.2.0: https://github.com/ffes/npptags/releases/tag/v0.2.0
 
 
-Version 0.1.1, 5 July 2013
---------------------------
+Version 0.1.1, 2013-07-05
+-------------------------
 
 -  Tree now filled with functions.
 
 -  Added three toolbar buttons.
 
 
-Version 0.1.0, 30 June 2013
----------------------------
+Version 0.1.0, 2013-06-30
+-------------------------
 
 -  Internal proof of concept
