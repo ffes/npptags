@@ -13,6 +13,10 @@ Version 0.9.1, Yet to be released
 
 -  Remove the changelog from the About dialog. It is already in the documentation.
 
+-  Add menu entry to put the focus on the tree. This makes the plugin more keyboard friendly.
+
+-  Allow ``Enter``-key to be used to go to a tag from the tree.
+
 -  Include latest git commit SHA in About dialog.
 
 
