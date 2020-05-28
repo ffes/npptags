@@ -1,5 +1,5 @@
 --
--- Not used by the plugin.
+-- This file is not used by the plugin.
 -- Just here so the tables show up in the tree.
 --
 
