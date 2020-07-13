@@ -17,5 +17,11 @@ when the plugin was released.
 You can always try to replace the provided version of ``ctags.exe`` with a
 more recent version.
 
+Note that is you are upgrading from an older build of ctags you may have to put
+your local ``ctags.cnf`` or ``.ctags`` file to a file in the ``.ctags.d``
+directory. See the `Files section`_ in the documentation of ctags for
+more details.
+
 .. _Windows executables: https://github.com/universal-ctags/ctags-win32/releases
 .. _Universal Ctags: https://ctags.io/
+.. _Files section: https://docs.ctags.io/en/latest/man/ctags.1.html#files
