@@ -1,29 +1,18 @@
 // This file is part of Notepad++ project
-// Copyright (C)2020 Don HO <don.h@free.fr>
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either
-// version 2 of the License, or (at your option) any later version.
-//
-// Note that the GPL places important restrictions on "derived works", yet
-// it does not provide a detailed definition of that term.  To avoid
-// misunderstandings, we consider an application to constitute a
-// "derivative work" for the purpose of this license if it does any of the
-// following:
-// 1. Integrates source code from Notepad++.
-// 2. Integrates/includes/aggregates Notepad++ into a proprietary executable
-//	installer, such as those produced by InstallShield.
-// 3. Links to a library or executes a program that does any of the above.
+// Copyright (C)2021 Don HO <don.h@free.fr>
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// at your option any later version.
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -63,6 +52,7 @@ const int TAB_VERTICAL = 64;       //0000 0100 0000
 const int TAB_MULTILINE = 128;     //0000 1000 0000
 const int TAB_HIDE = 256;          //0001 0000 0000
 const int TAB_QUITONEMPTY = 512;   //0010 0000 0000
+const int TAB_ALTICONS = 1024;     //0100 0000 0000
 
 
 enum class EolType: std::uint8_t
@@ -91,6 +81,10 @@ enum ChangeDetect { cdDisabled = 0x0, cdEnabledOld = 0x01, cdEnabledNew = 0x02, 
 enum BackupFeature {bak_none = 0, bak_simple = 1, bak_verbose = 2};
 enum OpenSaveDirSetting {dir_followCurrent = 0, dir_last = 1, dir_userDef = 2};
 enum MultiInstSetting {monoInst = 0, multiInstOnSession = 1, multiInst = 2};
+enum writeTechnologyEngine {defaultTechnology = 0, directWriteTechnology = 1};
+enum urlMode {urlDisable = 0, urlNoUnderLineFg, urlUnderLineFg, urlNoUnderLineBg, urlUnderLineBg,
+              urlMin = urlDisable,
+              urlMax = urlUnderLineBg};
 
 const int LANG_INDEX_INSTR = 0;
 const int LANG_INDEX_INSTR2 = 1;
@@ -198,8 +192,11 @@ struct Session
 	size_t _activeView = 0;
 	size_t _activeMainIndex = 0;
 	size_t _activeSubIndex = 0;
+	bool _includeFileBrowser = false;
+	generic_string _fileBrowserSelectedItem;
 	std::vector<sessionFileInfo> _mainViewFiles;
 	std::vector<sessionFileInfo> _subViewFiles;
+	std::vector<generic_string> _fileBrowserRoots;
 };
 
 
@@ -226,6 +223,7 @@ struct CmdLineParams
 
 	LangType _langType = L_EXTERNAL;
 	generic_string _localizationPath;
+
 	generic_string _easterEggName;
 	unsigned char _quoteType = '\0';
 	int _ghostTypingSpeed = -1; // -1: initial value  1: slow  2: fast  3: speed of light
@@ -802,6 +800,9 @@ struct NppGUI final
 	int _tabSize = 4;
 	bool _tabReplacedBySpace = false;
 
+	bool _finderLinesAreCurrentlyWrapped = false;
+	bool _finderPurgeBeforeEverySearch = false;
+
 	int _fileAutoDetection = cdEnabledNew;
 
 	bool _checkHistoryFiles = false;
@@ -815,6 +816,7 @@ struct NppGUI final
 	bool _rememberLastSession = true; // remember next session boolean will be written in the settings
 	bool _isCmdlineNosessionActivated = false; // used for if -nosession is indicated on the launch time
 	bool _detectEncoding = true;
+	bool _setSaveDlgExtFiltToAllTypes = false;
 	bool _doTaskList = true;
 	bool _maitainIndent = true;
 	bool _enableSmartHilite = true;
@@ -835,14 +837,14 @@ struct NppGUI final
 	bool _backSlashIsEscapeCharacterForSql = true;
 	bool _stopFillingFindField = false;
 	bool _monospacedFontFindDlg = false;
+	bool _findDlgAlwaysVisible = false;
+	bool _confirmReplaceInAllOpenDocs = true;
+	bool _muteSounds = false;
+	writeTechnologyEngine _writeTechnologyEngine = defaultTechnology;
 	bool _isWordCharDefault = true;
 	std::string _customWordChars;
-
-	// 0 : do nothing
-	// 1 : don't draw underline
-	// 2 : draw underline
-	int _styleURL = 2;
-
+	urlMode _styleURL = urlUnderLineFg;
+	generic_string _uriSchemes = TEXT("svn:// cvs:// git:// imap:// irc:// irc6:// ircs:// ldap:// ldaps:// news: telnet:// gopher:// ssh:// sftp:// smb:// skype: snmp:// spotify: steam:// sms: slack:// chrome:// bitcoin:");
 	NewDocDefaultSettings _newDocDefaultSettings;
 
 
@@ -897,7 +899,6 @@ struct NppGUI final
 	size_t _snapshotBackupTiming = 7000;
 	generic_string _cloudPath; // this option will never be read/written from/to config.xml
 	unsigned char _availableClouds = '\0'; // this option will never be read/written from/to config.xml
-	bool _useNewStyleSaveDlg = true;
 
 	enum SearchEngineChoice{ se_custom = 0, se_duckDuckGo = 1, se_google = 2, se_bing = 3, se_yahoo = 4, se_stackoverflow = 5 };
 	SearchEngineChoice _searchEngineChoice = se_google;
@@ -912,6 +913,7 @@ struct NppGUI final
 struct ScintillaViewParams
 {
 	bool _lineNumberMarginShow = true;
+	bool _lineNumberMarginDynamicWidth = true;
 	bool _bookMarkMarginShow = true;
 	folderStyle  _folderStyle = FOLDER_STYLE_BOX; //"simple", "arrow", "circle", "box" and "none"
 	lineWrapMethod _lineWrapMethod = LINEWRAP_ALIGNED;
@@ -928,10 +930,18 @@ struct ScintillaViewParams
 	bool _whiteSpaceShow = false;
 	bool _eolShow = false;
 	int _borderWidth = 2;
-	bool _scrollBeyondLastLine = false;
+	bool _scrollBeyondLastLine = true;
+	bool _rightClickKeepsSelection = false;
 	bool _disableAdvancedScrolling = false;
 	bool _doSmoothFont = false;
 	bool _showBorderEdge = true;
+
+	unsigned char _paddingLeft = 0;  // 0-9 pixel
+	unsigned char _paddingRight = 0; // 0-9 pixel
+
+	// distractionFreeDivPart is used for divising the fullscreen pixel width.
+	// the result of division will be the left & right padding in Distraction Free mode
+	unsigned char _distractionFreeDivPart = 4;     // 3-255 parts
 };
 
 const int NB_LIST = 20;
@@ -1163,14 +1173,19 @@ struct FindHistory final
 
 	bool _isFifRecuisive = true;
 	bool _isFifInHiddenFolder = false;
+    bool _isFifProjectPanel_1 = false;
+    bool _isFifProjectPanel_2 = false;
+    bool _isFifProjectPanel_3 = false;
 
 	searchMode _searchMode = normal;
 	transparencyMode _transparencyMode = onLossingFocus;
 	int _transparency = 150;
 
-	bool _isDlgAlwaysVisible = false;
 	bool _isFilterFollowDoc = false;
 	bool _isFolderFollowDoc = false;
+
+	// Allow regExpr backward search: this option is not present in UI, only to modify in config.xml
+	bool _regexBackward4PowerUser = false;
 };
 
 
@@ -1497,6 +1512,9 @@ public:
 	}
 	const CmdLineParamsDTO & getCmdLineParams() const {return _cmdLineParams;};
 
+	const generic_string& getCmdLineString() const { return _cmdLineString; }
+	void setCmdLineString(const generic_string& str) { _cmdLineString = str; }
+
 	void setFileSaveDlgFilterIndex(int ln) {_fileSaveDlgFilterIndex = ln;};
 	int getFileSaveDlgFilterIndex() const {return _fileSaveDlgFilterIndex;};
 
@@ -1539,6 +1557,8 @@ public:
 	};
 
 	const std::vector<generic_string> getFileBrowserRoots() const { return _fileBrowserRoot; };
+	generic_string getFileBrowserSelectedItemPath() const { return _fileBrowserSelectedItemPath; };
+
 	void setWorkSpaceFilePath(int i, const TCHAR *wsFile);
 
 	void setWorkingDir(const TCHAR * newPath);
@@ -1569,6 +1589,7 @@ public:
 		generic_string _find;
 		generic_string _replace;
 		generic_string _findInFiles;
+		generic_string _findInProjects;
 		generic_string _mark;
 	};
 
@@ -1658,13 +1679,20 @@ public:
 		_currentDefaultFgColor = c;
 	}
 
-	bool useNewStyleSaveDlg() const {
-		return _nppGUI._useNewStyleSaveDlg;
+	void setCmdSettingsDir(const generic_string& settingsDir) {
+		_cmdSettingsDir = settingsDir;
+	};
+
+	void setTitleBarAdd(const generic_string& titleAdd)
+	{
+		_titleBarAdditional = titleAdd;
 	}
 
-	void setUseNewStyleSaveDlg(bool v) {
-		_nppGUI._useNewStyleSaveDlg = v;
+	const generic_string& getTitleBarAdd() const
+	{
+		return _titleBarAdditional;
 	}
+
 	DPIManager _dpiManager;
 
 	generic_string static getSpecialFolderLocation(int folderKind);
@@ -1693,7 +1721,6 @@ private:
 	std::vector<UdlXmlFileState> _pXmlUserLangsDoc;
 	TiXmlDocument *_pXmlToolIconsDoc = nullptr;
 	TiXmlDocument *_pXmlShortcutDoc = nullptr;
-	TiXmlDocument *_pXmlSessionDoc = nullptr;
 	TiXmlDocument *_pXmlBlacklistDoc = nullptr;
 
 	TiXmlDocumentA *_pXmlNativeLangDocA = nullptr;
@@ -1703,7 +1730,7 @@ private:
 
 	NppGUI _nppGUI;
 	ScintillaViewParams _svp;
-	Lang *_langList[NB_LANG];
+	Lang *_langList[NB_LANG] = {};
 	int _nbLang = 0;
 
 	// Recent File History
@@ -1725,6 +1752,7 @@ private:
 	int _nbExternalLang = 0;
 
 	CmdLineParamsDTO _cmdLineParams;
+	generic_string _cmdLineString;
 
 	int _fileSaveDlgFilterIndex = -1;
 
@@ -1743,10 +1771,15 @@ private:
 	bool _isLocal;
 	bool _isx64 = false; // by default 32-bit
 
+	generic_string _cmdSettingsDir;
+
+	generic_string _titleBarAdditional;
+
 public:
 	void setShortcutDirty() { _isAnyShortcutModified = true; };
 	void setAdminMode(bool isAdmin) { _isAdminMode = isAdmin; }
 	bool isAdmin() const { return _isAdminMode; }
+	bool regexBackward4PowerUser() const { return _findHistory._regexBackward4PowerUser; }
 
 private:
 	bool _isAnyShortcutModified = false;
@@ -1786,6 +1819,7 @@ private:
 	generic_string _workSpaceFilePathes[3];
 
 	std::vector<generic_string> _fileBrowserRoot;
+	generic_string _fileBrowserSelectedItemPath;
 
 	Accelerator *_pAccelerator;
 	ScintillaAccelerator * _pScintAccelerator;
@@ -1831,7 +1865,7 @@ private:
 	bool getUserCmdsFromXmlTree();
 	bool getPluginCmdsFromXmlTree();
 	bool getScintKeysFromXmlTree();
-	bool getSessionFromXmlTree(TiXmlDocument *pSessionDoc = NULL, Session *session = NULL);
+	bool getSessionFromXmlTree(TiXmlDocument *pSessionDoc, Session& session);
 	bool getBlackListFromXmlTree();
 
 	void feedGUIParameters(TiXmlNode *node);
@@ -1839,6 +1873,7 @@ private:
 	void feedFileListParameters(TiXmlNode *node);
 	void feedScintillaParam(TiXmlNode *node);
 	void feedDockingManager(TiXmlNode *node);
+	void duplicateDockingManager(TiXmlNode *dockMngNode, TiXmlElement* dockMngElmt2Clone);
 	void feedFindHistoryParameters(TiXmlNode *node);
 	void feedProjectPanelsParameters(TiXmlNode *node);
 	void feedFileBrowserParameters(TiXmlNode *node);
