@@ -2,8 +2,8 @@ Changelog
 =========
 
 
-Version 0.9.1, Yet to be released
----------------------------------
+Version `0.9.1`_, 2021-04-11
+----------------------------
 
 -  Provide a 64-bit version of the plugin.
 
@@ -18,6 +18,12 @@ Version 0.9.1, Yet to be released
 -  Allow ``Enter``-key to be used to go to a tag from the tree.
 
 -  Include latest git commit SHA in About dialog.
+
+-  Upgrade to libreadtags 0.1.0
+
+-  Upgrade to SQLite 3.35.4
+
+.. _0.9.1: https://github.com/ffes/npptags/releases/tag/v0.9.1
 
 
 Version `0.9.0`_, 2015-12-05
