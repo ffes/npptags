@@ -523,7 +523,7 @@ static void OnCommand(HWND hWnd, int ResID, int msg)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static BOOL CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message)
 	{
