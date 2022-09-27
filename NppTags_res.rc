@@ -132,12 +132,20 @@ IDCM_TAGS_TREE MENU PRELOAD DISCARDABLE
 /////////////////////////////////////////////////////////////////////////////
 // Bitmaps
 
-IDB_SHOW_TAGS	  	BITMAP	DISCARDABLE		"Res/MainToolbar_ShowTags.bmp"
-IDB_REFRESH_TAGS  	BITMAP	DISCARDABLE		"Res/MainToolbar_RefreshTags.bmp"
-IDB_JUMP_TO_TAG  	BITMAP	DISCARDABLE		"Res/MainToolbar_JumpToTag.bmp"
-IDB_JUMP_BACK	  	BITMAP	DISCARDABLE		"Res/MainToolbar_JumpBack.bmp"
+IDB_SHOW_TAGS			BITMAP	DISCARDABLE		"Res/MainToolbar_ShowTags.bmp"
+IDB_REFRESH_TAGS		BITMAP	DISCARDABLE		"Res/MainToolbar_RefreshTags.bmp"
+IDB_JUMP_TO_TAG			BITMAP	DISCARDABLE		"Res/MainToolbar_JumpToTag.bmp"
+IDB_JUMP_BACK			BITMAP	DISCARDABLE		"Res/MainToolbar_JumpBack.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 // Icons
 
-IDI_TAGS			ICON	DISCARDABLE		"Res/NppTags.ico"
+IDI_TAGS				ICON	DISCARDABLE		"Res/NppTags.ico"
+IDI_SHOW_TAGS			ICON	DISCARDABLE		"Res/MainToolbar_ShowTags.ico"
+IDI_SHOW_TAGS_DARK		ICON	DISCARDABLE		"Res/MainToolbar_ShowTags_dark.ico"
+IDI_REFRESH_TAGS		ICON	DISCARDABLE		"Res/MainToolbar_RefreshTags.ico"
+IDI_REFRESH_TAGS_DARK	ICON	DISCARDABLE		"Res/MainToolbar_RefreshTags_dark.ico"
+IDI_JUMP_TO_TAG			ICON	DISCARDABLE		"Res/MainToolbar_JumpToTag.ico"
+IDI_JUMP_TO_TAG_DARK	ICON	DISCARDABLE		"Res/MainToolbar_JumpToTag_dark.ico"
+IDI_JUMP_BACK			ICON	DISCARDABLE		"Res/MainToolbar_JumpBack.ico"
+IDI_JUMP_BACK_DARK		ICON	DISCARDABLE		"Res/MainToolbar_JumpBack_dark.ico"

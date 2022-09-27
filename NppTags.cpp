@@ -47,6 +47,9 @@ static const TCHAR PLUGIN_NAME[] = L"NppTags";
 static constexpr int nbFunc = 11;
 static int s_iRefreshTagsIndex, s_iJumpToTagIndex, s_iJumpBackIndex;
 static HBITMAP s_hbmpShowTags, s_hbmpRefreshTags, s_hbmpJumpToTag, s_hbmpJumpBack;
+static HICON s_iconShowTags = NULL, s_iconJumpToTag = NULL, s_iconRefreshTags = NULL, s_iconJumpBack = NULL;
+static HICON s_iconShowTagsDark = NULL, s_iconJumpToTagDark = NULL, s_iconRefreshTagsDark = NULL, s_iconJumpBackDark = NULL;
+
 static std::vector<Tag> s_JumpBackStack;
 
 HINSTANCE g_hInst;
@@ -92,12 +95,13 @@ HWND getCurrentHScintilla(int which)
 /////////////////////////////////////////////////////////////////////////////
 //
 
-static void AddToolbarButton(SCNotification* notifyCode, int index, HBITMAP hbmp)
+static void AddToolbarButton(SCNotification* notifyCode, int index, HBITMAP hbmp, HICON hIcon, HICON hIconDark) noexcept
 {
-	toolbarIcons tbiFolder;
-	tbiFolder.hToolbarIcon = NULL;
-	tbiFolder.hToolbarBmp = hbmp;
-	SendMessage((HWND) notifyCode->nmhdr.hwndFrom, NPPM_ADDTOOLBARICON, (WPARAM) g_funcItem[index]._cmdID, (LPARAM) &tbiFolder);
+	toolbarIconsWithDarkMode tbi{};
+	tbi.hToolbarBmp = hbmp;
+	tbi.hToolbarIcon = hIcon;
+	tbi.hToolbarIconDarkMode = hIconDark;
+	SendMessage((HWND) notifyCode->nmhdr.hwndFrom, NPPM_ADDTOOLBARICON_FORDARKMODE, (WPARAM) g_funcItem[index]._cmdID, (LPARAM) &tbi);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -136,10 +140,10 @@ extern "C" __declspec(dllexport) void beNotified(SCNotification* notifyCode)
 		case NPPN_TBMODIFICATION:
 		{
 			// Add the button to the toolbar
-			AddToolbarButton(notifyCode, g_iShowTagsIndex, s_hbmpShowTags);
-			AddToolbarButton(notifyCode, s_iJumpToTagIndex, s_hbmpJumpToTag);
-			AddToolbarButton(notifyCode, s_iJumpBackIndex, s_hbmpJumpBack);
-			AddToolbarButton(notifyCode, s_iRefreshTagsIndex, s_hbmpRefreshTags);
+			AddToolbarButton(notifyCode, g_iShowTagsIndex, s_hbmpShowTags, s_iconShowTags, s_iconShowTagsDark);
+			AddToolbarButton(notifyCode, s_iJumpToTagIndex, s_hbmpJumpToTag, s_iconJumpToTag, s_iconJumpToTagDark);
+			AddToolbarButton(notifyCode, s_iJumpBackIndex, s_hbmpJumpBack, s_iconJumpBack, s_iconJumpBackDark);
+			AddToolbarButton(notifyCode, s_iRefreshTagsIndex, s_hbmpRefreshTags, s_iconRefreshTags, s_iconRefreshTagsDark);
 			break;
 		}
 
@@ -522,6 +526,16 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 			s_hbmpJumpToTag = CreateMappedBitmap(g_hInst, IDB_JUMP_TO_TAG, 0, 0, 0);
 			s_hbmpJumpBack = CreateMappedBitmap(g_hInst, IDB_JUMP_BACK, 0, 0, 0);
 
+			// Load icons for the toolbar
+			s_iconShowTags = (HICON)LoadImage(g_hInst, MAKEINTRESOURCE(IDI_SHOW_TAGS), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_COLOR | LR_LOADTRANSPARENT);
+			s_iconShowTagsDark = (HICON)LoadImage(g_hInst, MAKEINTRESOURCE(IDI_SHOW_TAGS_DARK), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_COLOR | LR_LOADTRANSPARENT);
+			s_iconJumpToTag = (HICON)LoadImage(g_hInst, MAKEINTRESOURCE(IDI_JUMP_TO_TAG), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_COLOR | LR_LOADTRANSPARENT);
+			s_iconJumpToTagDark = (HICON)LoadImage(g_hInst, MAKEINTRESOURCE(IDI_JUMP_TO_TAG_DARK), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_COLOR | LR_LOADTRANSPARENT);
+			s_iconRefreshTags = (HICON)LoadImage(g_hInst, MAKEINTRESOURCE(IDI_REFRESH_TAGS), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_COLOR | LR_LOADTRANSPARENT);
+			s_iconRefreshTagsDark = (HICON)LoadImage(g_hInst, MAKEINTRESOURCE(IDI_REFRESH_TAGS_DARK), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_COLOR | LR_LOADTRANSPARENT);
+			s_iconJumpBack = (HICON)LoadImage(g_hInst, MAKEINTRESOURCE(IDI_JUMP_BACK), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_COLOR | LR_LOADTRANSPARENT);
+			s_iconJumpBackDark = (HICON)LoadImage(g_hInst, MAKEINTRESOURCE(IDI_JUMP_BACK_DARK), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_COLOR | LR_LOADTRANSPARENT);
+
 			// Allocate the database class
 			g_DB = new TagsDatabase();
 
@@ -546,6 +560,16 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID lpReserved)
 			DeleteObject(s_hbmpRefreshTags);
 			DeleteObject(s_hbmpJumpToTag);
 			DeleteObject(s_hbmpJumpBack);
+
+			// Destroy the toolbar icons
+			DestroyIcon(s_iconShowTags);
+			DestroyIcon(s_iconShowTagsDark);
+			DestroyIcon(s_iconJumpToTag);
+			DestroyIcon(s_iconJumpToTagDark);
+			DestroyIcon(s_iconRefreshTags);
+			DestroyIcon(s_iconRefreshTagsDark);
+			DestroyIcon(s_iconJumpBack);
+			DestroyIcon(s_iconJumpBackDark);
 
 			// Clean up the options
 			delete g_Options;

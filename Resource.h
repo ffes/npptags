@@ -15,8 +15,16 @@
 #define IDB_JUMP_TO_TAG				262
 #define IDB_JUMP_BACK				263
 
-// Icon for docking window
+// Icon for docking window and toolbar
 #define IDI_TAGS					270
+#define IDI_SHOW_TAGS				271
+#define IDI_SHOW_TAGS_DARK			272
+#define IDI_REFRESH_TAGS			273
+#define IDI_REFRESH_TAGS_DARK		274
+#define IDI_JUMP_TO_TAG				275
+#define IDI_JUMP_TO_TAG_DARK		276
+#define IDI_JUMP_BACK				277
+#define IDI_JUMP_BACK_DARK			278
 
 // Tree dialog
 #define	IDD_TAGS_TREE				3000
