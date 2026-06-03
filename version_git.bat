@@ -19,6 +19,14 @@ if exist C:\Cygwin\bin\bash.exe (
 	bash version_git.sh
 	exit /b 0
 )
+if exist C:\Cygwin64\bin\bash.exe (
+
+	echo Using bash from Cygwin
+	setlocal
+	PATH=C:\Cygwin64\bin
+	bash version_git.sh
+	exit /b 0
+)
 
 REM No Cygwin or Git for Windows installed
 REM If there is a file assume if is properly generated

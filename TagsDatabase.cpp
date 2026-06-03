@@ -384,6 +384,8 @@ bool TagsDatabase::ImportTags()
 		BeginTransaction();
 		while (tagsNext(file, &entry) == TagSuccess)
 		{
+			if (entry.name[0] == '!' || entry.kind == 0)
+				continue;
 			// Put it in the array
 			tag = entry;
 

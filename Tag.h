@@ -43,27 +43,28 @@ public:
 	int getIdx()					{ return _idx; };
 	std::string getTag()			{ return _tag; };
 	std::string getFullTag()		{ return _tag + _signature; };
-	std::string getFile()			{ return _file; };
+	std::wstring getFile()			{ return _file; };
+	std::string getFileUTF8();
 	int getLine()					{ return _line; };
 	std::string getPattern()		{ return _pattern; }
 	std::string getType()			{ return _type; };
 	std::string getLanguage()		{ return _language; };
 	std::string getMemberOf()		{ return _memberOf; };
-	std::string getBaseFile();
-	std::string getFullBaseFile();
+	std::wstring getBaseFile();
+	std::wstring getFullBaseFile();
 	std::string getDetails();
 	bool isMemberOf(LPCSTR);
 	bool isType(LPCSTR);
 	bool thisFileOnly()				{ return _thisFileOnly; };
 
 	void setTag(std::string t)		{ _tag = t; };
-	void setFile(std::string f)		{ _file = f; };
+	void setFile(std::wstring f)		{ _file = f; };
 	void setLine(int i)				{ _line = i; };
 
 protected:
 	int _idx;							// Index field in database
 	std::string _tag;					// Name of the tag
-	std::string _file;					// What file is the tag in?
+	std::wstring _file;					// What file is the tag in?
 	int _line;							// On which line it is?
 	std::string _pattern;				// Search pattern to find the tag with
 	std::string _type;					// What is its type?

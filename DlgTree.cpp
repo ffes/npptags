@@ -319,7 +319,7 @@ static void ShowTagsProperties()
 			std::string str = "Tag Name: " + tag->getFullTag();
 			str += "\r\nLanguage: " + tag->getLanguage();
 			str += "\r\nType: " + tag->getType();
-			str += "\r\nFile: " + tag->getFile();
+			str += "\r\nFile: " + tag->getFileUTF8();
 			if (tag->getMemberOf().length() != 0)
 				str += "\r\nMember of: " + tag->getMemberOf();
 			if (tag->getDetails().length() != 0)

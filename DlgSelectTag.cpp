@@ -68,11 +68,8 @@ static void CreateColumns(HWND hList)
 static void FillList(HWND hList)
 {
 	// Get the filename of the current document
-	WCHAR tmp[MAX_PATH];
-	SendMessage(g_nppData._nppHandle, NPPM_GETFULLCURRENTPATH, MAX_PATH, (LPARAM) &tmp);
-
-	char curPath[MAX_PATH];
-	Unicode2Ansi(curPath, tmp, MAX_PATH);
+	WCHAR curPath[MAX_PATH];
+	SendMessage(g_nppData._nppHandle, NPPM_GETFULLCURRENTPATH, MAX_PATH, (LPARAM) &curPath);
 
 	// To through the found items
 	LV_ITEM item;
@@ -98,15 +95,16 @@ static void FillList(HWND hList)
 		{
 			item.iItem = insertedItem;
 			item.iSubItem = col;
+			wstr.clear();
 
 			// Add the subitems in the proper column
 			switch (col)
 			{
 				case COL_FILE:      // Filename
-					str = s_foundTags.at(i).getFile();
+					wstr = s_foundTags.at(i).getFile();
 
 					// Is it the current file, preselect the tag
-					if (_stricmp(curPath, str.c_str()) == 0 && selItem < 0)
+					if (_wcsicmp(curPath, wstr.c_str()) == 0 && selItem < 0)
 						selItem = i;
 					break;
 
@@ -128,8 +126,9 @@ static void FillList(HWND hList)
 					return;
 			}
 
-			wstring wstr2(str.begin(), str.end());
-			item.pszText = (LPWSTR) wstr2.c_str();
+			if (wstr.empty())
+				wstr.assign(str.begin(), str.end());
+			item.pszText = const_cast<LPWSTR>(wstr.c_str());
 			ListView_SetItem(hList, &item);
 		}
 	}

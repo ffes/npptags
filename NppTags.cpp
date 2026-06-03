@@ -302,13 +302,11 @@ static void StoreCurrentPosition()
 	SendMessage(g_nppData._nppHandle, NPPM_GETFULLCURRENTPATH, MAX_PATH, (LPARAM) &wcurFile);
 	if (wcslen(wcurFile) == 0)
 		return;
-	CHAR curFile[MAX_PATH];
-	Unicode2Ansi(curFile, wcurFile, MAX_PATH);
 
 	// Store the information
 	Tag tag;
 	tag.setLine(line + 1);		// Line number from Scintilla is 0-based
-	tag.setFile(curFile);
+	tag.setFile(wcurFile);
 	s_JumpBackStack.push_back(tag);
 
 	// Don't let the stack get too big
@@ -326,8 +324,7 @@ void JumpToTag(Tag* pTag, bool storeCurPos)
 		StoreCurrentPosition();
 
 	// Open the file
-	string str = pTag->getFile();
-	wstring wstr(str.begin(), str.end());
+	wstring wstr = pTag->getFile();
 	SendMessage(g_nppData._nppHandle, NPPM_DOOPEN, 0, (LPARAM) wstr.c_str());
 
 	// Go to the right location
